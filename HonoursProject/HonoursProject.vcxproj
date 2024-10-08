@@ -147,10 +147,16 @@
     <ClCompile Include="WeightedGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGraph.h" />
+    <ClInclude Include="Copier.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="FilteredGraph.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="WeightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BaseGraph.inl" />
+    <None Include="FilteredGraph.inl" />
     <None Include="Graph.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
