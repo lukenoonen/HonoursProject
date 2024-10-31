@@ -53,6 +53,9 @@
     <ClInclude Include="FilteredGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dijkstra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graph.inl">
@@ -62,6 +65,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="FilteredGraph.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Dijkstra.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

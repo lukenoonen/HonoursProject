@@ -1,5 +1,6 @@
 #include <utility>
 #include <boost/graph/copy.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 template <class GraphType>
 template <class VertexCopier, class EdgeCopier>

@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="Copier.h" />
+    <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="FilteredGraph.h" />
     <ClInclude Include="Graph.h" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl" />
+    <None Include="Dijkstra.inl" />
     <None Include="FilteredGraph.inl" />
     <None Include="Graph.inl" />
   </ItemGroup>

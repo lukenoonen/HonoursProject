@@ -7,15 +7,15 @@ class BaseGraph
 public:
 	using graph_type = GraphType;
 
-	using vertex_property_type = graph_type::vertex_property_type;
-	using edge_property_type = graph_type::edge_property_type;
+	using vertex_property_type = typename graph_type::vertex_property_type;
+	using edge_property_type = typename graph_type::edge_property_type;
 
-	using vertex_descriptor = graph_type::vertex_descriptor;
-	using edge_descriptor = graph_type::edge_descriptor;
+	using vertex_descriptor = typename graph_type::vertex_descriptor;
+	using edge_descriptor = typename graph_type::edge_descriptor;
 
-	using vertices_size_type = graph_type::vertices_size_type;
-	using edges_size_type = graph_type::edges_size_type;
-	using degree_size_type = graph_type::degree_size_type;
+	using vertices_size_type = typename graph_type::vertices_size_type;
+	using edges_size_type = typename graph_type::edges_size_type;
+	using degree_size_type = typename graph_type::degree_size_type;
 
 public:
 	BaseGraph() = default;

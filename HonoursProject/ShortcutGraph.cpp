@@ -2,6 +2,7 @@
 #include "FilteredGraph.h"
 #include "Copier.h"
 #include "Filter.h"
+#include "Dijkstra.h"
 
 ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 {
@@ -32,8 +33,8 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<vert
 				// v1 and v2. They propose some hueristics which can speed up searches. For instance, since all edges are shortest
 				// paths, if v1 and v2 are connected by an edge, the shortest path does not go through v
 
-				const bool through = false;
-				if (through)
+				const bool hasWitnessPath = dijkstraWitnessSearch( filtered, v1, v2, v, throughWeight );
+				if (hasWitnessPath)
 				{
 					filtered.addEdge( v1, v2, ShortcutEdge{ filtered[v1], filtered[v2] } );
 				}
