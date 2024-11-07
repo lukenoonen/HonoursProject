@@ -14,17 +14,17 @@ namespace Filter
 	{
 		Exclude() = default;
 		Exclude( const std::unordered_set<T>& exclude_ )
-			: exclude( exclude_ )
+			: exclude( &exclude_ )
 		{
 
 		}
 
 		bool operator()( const T& t ) const
 		{
-			return !exclude.contains( t );
+			return !exclude->contains( t );
 		}
 
-		const std::unordered_set<T>& exclude;
+		const std::unordered_set<T>* exclude;
 	};
 }
 

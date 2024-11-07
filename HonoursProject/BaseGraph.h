@@ -1,14 +1,26 @@
 #ifndef BASEGRAPH_H
 #define BASEGRAPH_H
 
-template <class GraphType>
+template <class GraphType, class VertexType, class EdgeType>
+class MutableGraph;
+
+template <class GraphClass, class VertexPredicate, class EdgePredicate>
+class FilteredGraph;
+
+template <class GraphType, class VertexType, class EdgeType>
 class BaseGraph
 {
+private:
+	friend MutableGraph<GraphType, VertexType, EdgeType>;
+
+	template <class GraphClass, class VertexPredicate, class EdgePredicate>
+	friend class FilteredGraph;
+
 public:
 	using graph_type = GraphType;
 
-	using vertex_property_type = typename graph_type::vertex_property_type;
-	using edge_property_type = typename graph_type::edge_property_type;
+	using vertex_property_type = typename VertexType;
+	using edge_property_type = typename EdgeType;
 
 	using vertex_descriptor = typename graph_type::vertex_descriptor;
 	using edge_descriptor = typename graph_type::edge_descriptor;
@@ -19,16 +31,11 @@ public:
 
 public:
 	BaseGraph() = default;
-	template <class VertexCopier, class EdgeCopier>
-	BaseGraph( const BaseGraph<GraphType>& other, VertexCopier vc, EdgeCopier ec );
 	template <class... Args>
-	BaseGraph( Args&&... args );
+	BaseGraph( int test, Args&&... args );
 
-	template <class VertexCopier, class EdgeCopier>
-	void copy( const BaseGraph<GraphType>& other, VertexCopier vc, EdgeCopier ec );
-
-	vertex_descriptor addVertex( vertex_property_type data );
-	edge_descriptor addEdge( vertex_descriptor source, vertex_descriptor target, edge_property_type data );
+	template<class GraphType_, class VertexType_, class EdgeType_>
+	void copy( const BaseGraph<GraphType_, VertexType_, EdgeType_>& other );
 
 	vertex_descriptor source( edge_descriptor edge ) const;
 	vertex_descriptor target( edge_descriptor edge ) const;
@@ -56,13 +63,7 @@ public:
 	template <class P>
 	void edgeMap( vertex_descriptor v, P predicate ) const;
 
-private:
-	template <class T>
-	T extract( T arg ) const;
-	
-	graph_type& extract( BaseGraph<GraphType>& g );
-
-private:
+public:
 	graph_type _graph;
 };
 

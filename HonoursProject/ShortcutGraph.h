@@ -10,9 +10,8 @@ class ShortcutGraph : public Graph<ShortcutVertex, ShortcutEdge>
 {
 public:
 	ShortcutGraph( const WeightedGraph& source );
+	ShortcutGraph( const ShortcutGraph& source );
 	ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<vertex_descriptor>& discard );
-	template <class VertexCopier, class EdgeCopier>
-	ShortcutGraph( const ShortcutGraph& other, VertexCopier vc, EdgeCopier ec );
 
 	ShortcutGraph::vertex_descriptor fromSource( WeightedGraph::vertex_descriptor v ) const;
 	WeightedGraph::vertex_descriptor toSource( ShortcutGraph::vertex_descriptor v ) const;
@@ -21,6 +20,7 @@ public:
 class ShortcutVertex
 {
 public:
+	ShortcutVertex() = default;
 	ShortcutVertex( WeightedGraph::vertex_descriptor mapped );
 
 	WeightedGraph::vertex_descriptor mapped() const;
@@ -35,6 +35,7 @@ public:
 	using path_type = std::vector<const ShortcutEdge*>;
 
 public:
+	ShortcutEdge() = default;
 	ShortcutEdge( double weight );
 	ShortcutEdge( const ShortcutEdge* prev );
 	ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& second );
