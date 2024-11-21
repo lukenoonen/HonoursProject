@@ -1,5 +1,4 @@
 #include "ShortcutGraph.h"
-#include "FilteredGraph.h"
 #include "Filter.h"
 #include "Dijkstra.h"
 
@@ -9,9 +8,9 @@ ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 }
 
 ShortcutGraph::ShortcutGraph( const ShortcutGraph& source )
-	: Graph<ShortcutVertex, ShortcutEdge>( source )
+	: BaseGraph<ShortcutVertex, ShortcutEdge>( source )
 {
-	edgeMap( [&source, this]( const edge_descriptor e ) {
+	edgeMap( [&source, this]( const EdgeDescriptor e ) {
 		ShortcutEdge& edge = (*this)[e];
 		const ShortcutEdge otherEdge = source[e];
 		edge = ShortcutEdge{ &otherEdge };
@@ -19,56 +18,50 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& source )
 		} );
 }
 
-ShortcutGraph::ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<vertex_descriptor>& discard )
+ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const std::vector<VertexDescriptor>& discard )
+	: ShortcutGraph( prev )
 {
-	if (discard.size() == gPrev.numVertices()) { return; }
-
-	std::unordered_set<vertex_descriptor> discardSet;
-
-	ShortcutGraph temp( gPrev );
-	FilteredGraph filtered( temp, Filter::Exclude{ discardSet }, Filter::KeepAll{} );
-
-	for (const vertex_descriptor v : discard)
+	for (const VertexDescriptor v : discard)
 	{
-		filtered.edgeMap( v, [v, &filtered, &temp]( const edge_descriptor e1 ) {
-			filtered.edgeMap( v, [v, e1, &filtered, &temp]( const edge_descriptor e2 ) {
+		edgeMap( v, [v, this]( const EdgeDescriptor e1 ) {
+			edgeMap( v, [v, e1, this]( const EdgeDescriptor e2 ) {
 				if (e1 == e2) { return false; }
-				const double throughWeight = filtered[e1].weight() + filtered[e2].weight();
-				const vertex_descriptor v1 = filtered.other( e1, v );
-				const vertex_descriptor v2 = filtered.other( e2, v );
+				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
+				const VertexDescriptor v1 = other( e1, v );
+				const VertexDescriptor v2 = other( e2, v );
 
-				const bool hasWitnessPath = dijkstraWitnessSearch( filtered, v1, v2, v, throughWeight );
+				const bool hasWitnessPath = dijkstraWitnessSearch( *this, v1, v2, v, throughWeight );
 				if (hasWitnessPath)
 				{
-					temp.addEdge( v1, v2, ShortcutEdge{ filtered[e1], filtered[e2] } );
+					addEdge( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
 				}
 				return false;
 				} );
+			// TODO: delete e1
 			return false;
 			} );
-		discardSet.insert( v );
 	}
 
-	copy( filtered );
+	removeVertices( discard );
 }
 
-ShortcutGraph::vertex_descriptor ShortcutGraph::fromSource( WeightedGraph::vertex_descriptor v ) const
+ShortcutGraph::VertexDescriptor ShortcutGraph::fromSource( WeightedGraph::VertexDescriptor v ) const
 {
 	return (*this)[v].mapped();
 }
 
-ShortcutGraph::vertex_descriptor ShortcutGraph::toSource( WeightedGraph::vertex_descriptor v ) const
+ShortcutGraph::VertexDescriptor ShortcutGraph::toSource( WeightedGraph::VertexDescriptor v ) const
 {
 	return (*this)[v].mapped();
 }
 
-ShortcutVertex::ShortcutVertex( ShortcutGraph::vertex_descriptor mapped )
+ShortcutVertex::ShortcutVertex( ShortcutGraph::VertexDescriptor mapped )
 	: _mapped( mapped )
 {
 
 }
 
-ShortcutGraph::vertex_descriptor ShortcutVertex::mapped() const
+ShortcutGraph::VertexDescriptor ShortcutVertex::mapped() const
 {
 	return _mapped;
 }

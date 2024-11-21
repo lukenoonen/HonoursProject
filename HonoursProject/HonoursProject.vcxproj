@@ -149,17 +149,11 @@
   <ItemGroup>
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="Dijkstra.h" />
-    <ClInclude Include="Filter.h" />
-    <ClInclude Include="FilteredGraph.h" />
-    <ClInclude Include="Graph.h" />
-    <ClInclude Include="MutableGraph.h" />
     <ClInclude Include="WeightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl" />
     <None Include="Dijkstra.inl" />
-    <None Include="FilteredGraph.inl" />
-    <None Include="MutableGraph.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

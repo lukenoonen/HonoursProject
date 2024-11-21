@@ -1,12 +1,12 @@
 #ifndef WEIGHTEDGRAPH_H
 #define WEIGHTEDGRAPH_H
 
-#include "Graph.h"
+#include "BaseGraph.h"
 
 class WeightedVertex;
 class WeightedEdge;
 
-class WeightedGraph : public Graph<WeightedVertex, WeightedEdge>
+class WeightedGraph : public BaseGraph<WeightedVertex, WeightedEdge>
 {
 
 };

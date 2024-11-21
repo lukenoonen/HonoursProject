@@ -3,20 +3,20 @@
 
 #include <unordered_set>
 
-using EdgeVector   = std::vector<WeightedGraph::edge_descriptor>;
+using EdgeVector   = std::vector<WeightedGraph::EdgeDescriptor>;
 
-using VertexSet    = std::unordered_set<ShortcutGraph::vertex_descriptor>;
-using VertexVector = std::vector<ShortcutGraph::vertex_descriptor>;
+using VertexSet    = std::unordered_set<ShortcutGraph::VertexDescriptor>;
+using VertexVector = std::vector<ShortcutGraph::VertexDescriptor>;
 
 EdgeVector sortEdgesByWeight( const WeightedGraph& g )
 {
 	EdgeVector edges;
 	edges.reserve( g.numEdges() );
-	g.edgeMap( [&edges]( const WeightedGraph::edge_descriptor e ) {
+	g.edgeMap( [&edges]( const WeightedGraph::EdgeDescriptor e ) {
 		edges.push_back( e );
 		return false;
 		} );
-	std::sort( edges.begin(), edges.end(), [&g]( const WeightedGraph::edge_descriptor e1, const WeightedGraph::edge_descriptor e2 ) {
+	std::sort( edges.begin(), edges.end(), [&g]( const WeightedGraph::EdgeDescriptor e1, const WeightedGraph::EdgeDescriptor e2 ) {
 		return g[e1].weight() < g[e2].weight();
 		} );
 	return edges;
@@ -38,16 +38,16 @@ VertexSet selectVertices( double maxWeight, double prevMaxWeight, const Shortcut
 	VertexSet vertices;
 
 	const double minWeight = 0.75 * maxWeight;
-	current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( ShortcutGraph::vertex_descriptor origin ) {
+	current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( ShortcutGraph::VertexDescriptor origin ) {
 		ShortestPaths<ShortcutGraph> paths = dijkstraShortestPaths<ShortcutGraph>( current, origin, maxWeight, prevMaxWeight );
-		paths.vertexMap( [minWeight, &paths, &vertices]( ShortcutGraph::vertex_descriptor vertex, double distance ) {
+		paths.vertexMap( [minWeight, &paths, &vertices]( ShortcutGraph::VertexDescriptor vertex, double distance ) {
 			if (distance < minWeight) { return false; }
 
 			const double midpointTarget = distance * 0.5;
 			double bestMidpointDistance = abs( midpointTarget - distance );
-			ShortcutGraph::vertex_descriptor bestMidpoint = vertex;
+			ShortcutGraph::VertexDescriptor bestMidpoint = vertex;
 			bool addMidpoint = true;
-			paths.pathMap( vertex, [&vertices, midpointTarget, &bestMidpointDistance, &bestMidpoint, &addMidpoint]( ShortcutGraph::vertex_descriptor vertex_, double distance_ ) {
+			paths.pathMap( vertex, [&vertices, midpointTarget, &bestMidpointDistance, &bestMidpoint, &addMidpoint]( ShortcutGraph::VertexDescriptor vertex_, double distance_ ) {
 				if (vertices.contains( vertex_ ))
 				{
 					addMidpoint = false;
@@ -81,10 +81,10 @@ VertexSet selectVertices( double maxWeight, double prevMaxWeight, const Shortcut
 VertexVector calculateDiscard( const VertexSet& keepSet, const ShortcutGraph& current )
 {
 	const std::size_t discardSize = current.numVertices() - keepSet.size();
-	std::vector<ShortcutGraph::vertex_descriptor> discard;
+	std::vector<ShortcutGraph::VertexDescriptor> discard;
 	discard.reserve( discardSize );
 
-	current.vertexMap( [&keepSet, discardSize, &discard]( const ShortcutGraph::vertex_descriptor v ) {
+	current.vertexMap( [&keepSet, discardSize, &discard]( const ShortcutGraph::VertexDescriptor v ) {
 		if (keepSet.contains( v )) { discard.push_back( v ); }
 		return discard.size() == discardSize;
 		} );
@@ -97,7 +97,7 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 {
 	// First, get the edges sorted from lowest to heighest weight
 
-	std::vector<WeightedGraph::edge_descriptor> edges = sortEdgesByWeight( g );
+	std::vector<WeightedGraph::EdgeDescriptor> edges = sortEdgesByWeight( g );
 
 	double maxWeight = 1.0;
 	double prevMaxWeight = 0.0;
@@ -107,12 +107,16 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 		while (g[edges[minEdgeIndex]].weight() <= prevMaxWeight) { minEdgeIndex++; }
 
 		const ShortcutGraph& back = _hierarchy.back();
-		VertexSet keepSet = gatherEdgeVertices( minEdgeIndex, edges, g, back );
+		VertexSet keepSet = gatherEdgeVertices(minEdgeIndex, edges, g, back);
 		VertexSet selectedSet = selectVertices( maxWeight, prevMaxWeight, back );
+		for (const ShortcutGraph::VertexDescriptor v : selectedSet)
+		{
+			keepSet.insert( v );
+		}
 
 		VertexVector discard = calculateDiscard( keepSet, back );
 
-		for (const ShortcutGraph::vertex_descriptor v : discard)
+		for (const ShortcutGraph::VertexDescriptor v : discard)
 		{
 			_ladder[back[v].mapped()] = _hierarchy.size() - 1;
 		}

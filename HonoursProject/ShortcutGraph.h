@@ -1,32 +1,33 @@
 #ifndef SHORTCUTGRAPH_H
+#define SHORTCUTGRAPH_H
 
-#include "Graph.h"
+#include "BaseGraph.h"
 #include "WeightedGraph.h"
 
 class ShortcutVertex;
 class ShortcutEdge;
 
-class ShortcutGraph : public Graph<ShortcutVertex, ShortcutEdge>
+class ShortcutGraph : public BaseGraph<ShortcutVertex, ShortcutEdge>
 {
 public:
 	ShortcutGraph( const WeightedGraph& source );
 	ShortcutGraph( const ShortcutGraph& source );
-	ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<vertex_descriptor>& discard );
+	ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<VertexDescriptor>& discard );
 
-	ShortcutGraph::vertex_descriptor fromSource( WeightedGraph::vertex_descriptor v ) const;
-	WeightedGraph::vertex_descriptor toSource( ShortcutGraph::vertex_descriptor v ) const;
+	ShortcutGraph::VertexDescriptor fromSource( WeightedGraph::VertexDescriptor v ) const;
+	WeightedGraph::VertexDescriptor toSource( ShortcutGraph::VertexDescriptor v ) const;
 };
 
 class ShortcutVertex
 {
 public:
 	ShortcutVertex() = default;
-	ShortcutVertex( WeightedGraph::vertex_descriptor mapped );
+	ShortcutVertex( WeightedGraph::VertexDescriptor mapped );
 
-	WeightedGraph::vertex_descriptor mapped() const;
+	WeightedGraph::VertexDescriptor mapped() const;
 
 private:
-	WeightedGraph::vertex_descriptor _mapped;
+	WeightedGraph::VertexDescriptor _mapped;
 };
 
 class ShortcutEdge
@@ -46,6 +47,7 @@ public:
 
 private:
 	path_type _path;
+
 	double _weight;
 	double _maxEdge;
 };

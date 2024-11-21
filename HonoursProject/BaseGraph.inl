@@ -1,129 +1,171 @@
 #include <utility>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/filtered_graph.hpp>
-#include <boost/graph/copy.hpp>
 
-template <class GraphType, class VertexType, class EdgeType>
-template <class... Args>
-BaseGraph<GraphType, VertexType, EdgeType>::BaseGraph( int test, Args&&... args )
-	: _graph( std::forward<Args>( args )... )
+template <class VertexType, class EdgeType>
+BaseGraph<VertexType, EdgeType>::VertexDescriptor BaseGraph<VertexType, EdgeType>::addVertex( VertexType data )
 {
-
+	_graph.emplace_back( data, {} );
+	return _graph.size() - 1;
 }
 
-template <class GraphType, class VertexType, class EdgeType>
-template<class GraphType_, class VertexType_, class EdgeType_>
-void BaseGraph<GraphType, VertexType, EdgeType>::copy( const BaseGraph<GraphType_, VertexType_, EdgeType_>& other )
+template <class VertexType, class EdgeType>
+BaseGraph<VertexType, EdgeType>::EdgeDescriptor BaseGraph<VertexType, EdgeType>::addEdge( VertexDescriptor source, VertexDescriptor target, EdgeType data )
 {
-	boost::copy_graph( other._graph, _graph );
+	_graph[source].second.emplace_back( data, target );
+	_graph[target].second.emplace_back( data, source );
 }
 
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::vertex_descriptor BaseGraph<GraphType, VertexType, EdgeType>::source( edge_descriptor edge ) const
+template <class VertexType, class EdgeType>
+void BaseGraph<VertexType, EdgeType>::removeVertices( const std::vector<VertexDescriptor>& remove )
 {
-	return boost::source( edge, _graph );
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::vertex_descriptor BaseGraph<GraphType, VertexType, EdgeType>::target( edge_descriptor edge ) const
-{
-	return boost::target( edge, _graph );
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::vertex_descriptor BaseGraph<GraphType, VertexType, EdgeType>::other( edge_descriptor edge, vertex_descriptor v ) const
-{
-	vertex_descriptor s = source( edge );
-	return s != v ? s : target( edge );
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::vertex_property_type& BaseGraph<GraphType, VertexType, EdgeType>::operator[]( vertex_descriptor v )
-{
-	return _graph[v];
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-const BaseGraph<GraphType, VertexType, EdgeType>::vertex_property_type& BaseGraph<GraphType, VertexType, EdgeType>::operator[]( vertex_descriptor v ) const
-{
-	return _graph[v];
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::edge_property_type& BaseGraph<GraphType, VertexType, EdgeType>::operator[]( edge_descriptor e )
-{
-	return _graph[e];
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-const BaseGraph<GraphType, VertexType, EdgeType>::edge_property_type& BaseGraph<GraphType, VertexType, EdgeType>::operator[]( edge_descriptor e ) const
-{
-	return _graph[e];
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::vertices_size_type BaseGraph<GraphType, VertexType, EdgeType>::numVertices() const
-{
-	return boost::num_vertices( _graph );
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::edges_size_type BaseGraph<GraphType, VertexType, EdgeType>::numEdges() const
-{
-	return boost::num_edges( _graph );
-}
-
-template <class GraphType, class VertexType, class EdgeType>
-BaseGraph<GraphType, VertexType, EdgeType>::degree_size_type BaseGraph<GraphType, VertexType, EdgeType>::degree( vertex_descriptor v ) const
-{
-	return boost::out_degree( v, _graph );
-}
-
-
-template <class GraphType, class VertexType, class EdgeType>
-template <class P>
-void BaseGraph<GraphType, VertexType, EdgeType>::vertexMap( P predicate ) const
-{
-	auto [it, end] = boost::vertices( _graph );
-	while (it != end)
+	std::unordered_map<VertexDescriptor, VertexDescriptor> removeMap;
+	for (const VertexDescriptor v : remove)
 	{
-		if (predicate( *it )) { break; }
-		it++;
+		_graph[v] = _graph.back();
+		_graph.pop_back();
+		removeMap[_graph.size()] = v;
+	}
+
+	for (VertexDescriptor v = 0; v < _graph.size(); v++)
+	{
+		EdgeList& edgeList = _graph[v].second;
+		for (EdgeEntry& edgeEntry : edgeList)
+		{
+			if (const auto search = removeMap.find( edgeEntry.second ); search != removeMap.end())
+			{
+				edgeEntry.second = search->second;
+			}
+		}
 	}
 }
 
-template <class GraphType, class VertexType, class EdgeType>
-template <class P>
-void BaseGraph<GraphType, VertexType, EdgeType>::vertexMap( vertex_descriptor v, P predicate ) const
+template <class VertexType, class EdgeType>
+BaseGraph<VertexType, EdgeType>::VertexDescriptor BaseGraph<VertexType, EdgeType>::source( EdgeDescriptor e ) const
 {
-	auto [it, end] = boost::adjacent_vertices( v, _graph );
-	while (it != end)
+	return e.first;
+}
+
+template <class VertexType, class EdgeType>
+BaseGraph<VertexType, EdgeType>::VertexDescriptor BaseGraph<VertexType, EdgeType>::target( EdgeDescriptor e ) const
+{
+	return _graph[e.first].second[e.second].second;
+}
+
+template <class VertexType, class EdgeType>
+BaseGraph<VertexType, EdgeType>::VertexDescriptor BaseGraph<VertexType, EdgeType>::other( EdgeDescriptor e, VertexDescriptor v ) const
+{
+	const VertexDescriptor s = source( e );
+	return s != v ? s : target( e );
+}
+
+template <class VertexType, class EdgeType>
+VertexType& BaseGraph<VertexType, EdgeType>::get( VertexDescriptor v )
+{
+	return _graph[v].first;
+}
+
+template <class VertexType, class EdgeType>
+const VertexType& BaseGraph<VertexType, EdgeType>::get( VertexDescriptor v ) const
+{
+	return _graph[v].first;
+}
+
+template <class VertexType, class EdgeType>
+VertexType& BaseGraph<VertexType, EdgeType>::operator[]( VertexDescriptor v )
+{
+	return get( v );
+}
+
+template <class VertexType, class EdgeType>
+const VertexType& BaseGraph<VertexType, EdgeType>::operator[]( VertexDescriptor v ) const
+{
+	return get( v );
+}
+
+template <class VertexType, class EdgeType>
+EdgeType& BaseGraph<VertexType, EdgeType>::get( EdgeDescriptor e )
+{
+	return _graph[e.first].second[e.second].first;
+}
+
+template <class VertexType, class EdgeType>
+const EdgeType& BaseGraph<VertexType, EdgeType>::get( EdgeDescriptor e ) const
+{
+	return _graph[e.first].second[e.second].first;
+}
+
+template <class VertexType, class EdgeType>
+EdgeType& BaseGraph<VertexType, EdgeType>::operator[]( EdgeDescriptor e )
+{
+	return get( e );
+}
+
+template <class VertexType, class EdgeType>
+const EdgeType& BaseGraph<VertexType, EdgeType>::operator[]( EdgeDescriptor e ) const
+{
+	return get( e );
+}
+
+template <class VertexType, class EdgeType>
+size_t BaseGraph<VertexType, EdgeType>::numVertices() const
+{
+	return _graph.size();
+}
+
+template <class VertexType, class EdgeType>
+size_t BaseGraph<VertexType, EdgeType>::numEdges() const
+{
+	return _numEdges;
+}
+
+template <class VertexType, class EdgeType>
+size_t BaseGraph<VertexType, EdgeType>::degree( VertexDescriptor v ) const
+{
+	return _graph[v].size();
+}
+
+
+template <class VertexType, class EdgeType>
+template <class P>
+void BaseGraph<VertexType, EdgeType>::vertexMap( P predicate ) const
+{
+	for (VertexDescriptor v = 0; v < _graph.size(); v++)
 	{
-		if (predicate( *it )) { break; }
-		it++;
+		if (predicate( v )) { break; }
 	}
 }
 
-template <class GraphType, class VertexType, class EdgeType>
+template <class VertexType, class EdgeType>
 template <class P>
-void BaseGraph<GraphType, VertexType, EdgeType>::edgeMap( P predicate ) const
+void BaseGraph<VertexType, EdgeType>::vertexMap( VertexDescriptor v, P predicate ) const
 {
-	auto [it, end] = boost::edges( _graph );
-	while (it != end)
+	const EdgeList& edgeList = _graph[v].second;
+	for (const EdgeEntry& edgeEntry : edgeList)
 	{
-		if (predicate( *it )) { break; }
-		it++;
+		if (predicate( edgeEntry.second )) { break; }
 	}
 }
 
-template <class GraphType, class VertexType, class EdgeType>
+template <class VertexType, class EdgeType>
 template <class P>
-void BaseGraph<GraphType, VertexType, EdgeType>::edgeMap( vertex_descriptor v, P predicate ) const
+void BaseGraph<VertexType, EdgeType>::edgeMap( P predicate ) const
 {
-	auto [it, end] = boost::out_edges( v, _graph );
-	while (it != end)
+	for (VertexDescriptor v = 0; v < _graph.size(); v++)
 	{
-		if (predicate( *it )) { break; }
-		it++;
+		const EdgeList& edgeList = _graph[v].second;
+		for (size_t i = 0; i < edgeList.size(); i++)
+		{
+			if (predicate( { v, i } )) { break; }
+		}
+	}
+}
+
+template <class VertexType, class EdgeType>
+template <class P>
+void BaseGraph<VertexType, EdgeType>::edgeMap( VertexDescriptor v, P predicate ) const
+{
+	const EdgeList& edgeList = _graph[v].second;
+	for (size_t i = 0; i < edgeList.size(); i++)
+	{
+		if (predicate( { v, i } )) { break; }
 	}
 }

@@ -21,33 +21,33 @@ template <class Graph>
 class ShortestPaths
 {
 private:
-	using vertex_descriptor = typename Graph::vertex_descriptor;
+	using VertexDescriptor = typename Graph::VertexDescriptor;
 
-	using VertexSet = std::unordered_set<vertex_descriptor>;
+	using VertexSet = std::unordered_set<VertexDescriptor>;
 
 public:
-	ShortestPaths( vertex_descriptor to );
+	ShortestPaths( VertexDescriptor to );
 
-	void insert( vertex_descriptor v, const DijkstraResult<Graph>& result );
+	void insert( VertexDescriptor v, const DijkstraResult<Graph>& result );
 
-	double distance( vertex_descriptor from ) const;
+	double distance( VertexDescriptor from ) const;
 
 	template <class P>
 	void vertexMap( P predicate ) const;
 
 	template <class P>
-	void pathMap( vertex_descriptor from, P predicate ) const;
+	void pathMap( VertexDescriptor from, P predicate ) const;
 
 private:
-	vertex_descriptor _to;
-	std::unordered_map<vertex_descriptor, DijkstraResult<Graph>> _results;
+	VertexDescriptor _to;
+	std::unordered_map<VertexDescriptor, DijkstraResult<Graph>> _results;
 };
 
 template <class Graph>
-ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::vertex_descriptor source, double maxDist, double maxEdge );
+ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge );
 
 template <class Graph>
-bool dijkstraWitnessSearch( Graph graph, typename Graph::vertex_descriptor source, typename Graph::vertex_descriptor target, typename Graph::vertex_descriptor avoid, double minDist );
+bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist );
 
 #include "Dijkstra.inl"
 

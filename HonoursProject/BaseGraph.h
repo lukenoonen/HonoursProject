@@ -1,70 +1,60 @@
 #ifndef BASEGRAPH_H
 #define BASEGRAPH_H
 
-template <class GraphType, class VertexType, class EdgeType>
-class MutableGraph;
+#include <utility>
+#include <vector>
 
-template <class GraphClass, class VertexPredicate, class EdgePredicate>
-class FilteredGraph;
-
-template <class GraphType, class VertexType, class EdgeType>
+template <class VertexType, class EdgeType>
 class BaseGraph
 {
-private:
-	friend MutableGraph<GraphType, VertexType, EdgeType>;
-
-	template <class GraphClass, class VertexPredicate, class EdgePredicate>
-	friend class FilteredGraph;
-
 public:
-	using graph_type = GraphType;
+	using VertexDescriptor = size_t;
+	using EdgeDescriptor   = std::pair<VertexDescriptor, size_t>;
 
-	using vertex_property_type = typename VertexType;
-	using edge_property_type = typename EdgeType;
-
-	using vertex_descriptor = typename graph_type::vertex_descriptor;
-	using edge_descriptor = typename graph_type::edge_descriptor;
-
-	using vertices_size_type = typename graph_type::vertices_size_type;
-	using edges_size_type = typename graph_type::edges_size_type;
-	using degree_size_type = typename graph_type::degree_size_type;
+private:
+	using EdgeEntry   = std::pair<EdgeType, VertexDescriptor>;
+	using EdgeList    = std::vector<EdgeEntry>;
+	using VertexEntry = std::pair<VertexType, EdgeList>;
+	using GraphType   = std::vector<VertexEntry>;
 
 public:
 	BaseGraph() = default;
-	template <class... Args>
-	BaseGraph( int test, Args&&... args );
 
-	template<class GraphType_, class VertexType_, class EdgeType_>
-	void copy( const BaseGraph<GraphType_, VertexType_, EdgeType_>& other );
+	VertexDescriptor addVertex( VertexType data );
+	EdgeDescriptor addEdge( VertexDescriptor source, VertexDescriptor target, EdgeType data );
 
-	vertex_descriptor source( edge_descriptor edge ) const;
-	vertex_descriptor target( edge_descriptor edge ) const;
-	vertex_descriptor other( edge_descriptor edge, vertex_descriptor v ) const;
+	void removeVertices( const std::vector<VertexDescriptor>& remove );
 
-	vertex_property_type& operator[]( vertex_descriptor v );
-	const vertex_property_type& operator[]( vertex_descriptor v ) const;
+	VertexDescriptor source( EdgeDescriptor e ) const;
+	VertexDescriptor target( EdgeDescriptor e ) const;
+	VertexDescriptor other( EdgeDescriptor e, VertexDescriptor v ) const;
 
-	edge_property_type& operator[]( edge_descriptor e );
-	const edge_property_type& operator[]( edge_descriptor e ) const;
+	VertexType& get( VertexDescriptor v );
+	const VertexType& get( VertexDescriptor v ) const;
+	VertexType& operator[]( VertexDescriptor v );
+	const VertexType& operator[]( VertexDescriptor v ) const;
 
-	vertices_size_type numVertices() const;
-	edges_size_type numEdges() const;
-	degree_size_type degree( vertex_descriptor v ) const;
+	EdgeType& get( EdgeDescriptor e );
+	const EdgeType& get( EdgeDescriptor e ) const;
+	EdgeType& operator[]( EdgeDescriptor e );
+	const EdgeType& operator[]( EdgeDescriptor e ) const;
+
+	size_t numVertices() const;
+	size_t numEdges() const;
+	size_t degree( VertexDescriptor v ) const;
 
 	template <class P>
 	void vertexMap( P predicate ) const;
-
 	template <class P>
-	void vertexMap( vertex_descriptor v, P predicate ) const;
-
+	void vertexMap( VertexDescriptor v, P predicate ) const;
 	template <class P>
 	void edgeMap( P predicate ) const;
-
 	template <class P>
-	void edgeMap( vertex_descriptor v, P predicate ) const;
+	void edgeMap( VertexDescriptor v, P predicate ) const;
 
 public:
-	graph_type _graph;
+	GraphType _graph;
+	size_t    _numEdges;
 };
 
 #include "BaseGraph.inl"

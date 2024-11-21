@@ -35,25 +35,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WeightedGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FilteredGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dijkstra.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MutableGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -61,13 +49,7 @@
     <None Include="BaseGraph.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="FilteredGraph.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="Dijkstra.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="MutableGraph.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

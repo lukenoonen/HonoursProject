@@ -8,18 +8,18 @@ private:
 	struct VertexInfo;
 
 private:
-	using vertex_descriptor = typename Graph::vertex_descriptor;
+	using VertexDescriptor = typename Graph::VertexDescriptor;
 	using Heap = boost::heap::fibonacci_heap<DijkstraResult<Graph>>;
-	using Map = std::unordered_map<vertex_descriptor, VertexInfo>;
+	using Map = std::unordered_map<VertexDescriptor, VertexInfo>;
 
 public:
-	DijkstraData( vertex_descriptor to );
+	DijkstraData( VertexDescriptor to );
 
-	void emplace( vertex_descriptor v, vertex_descriptor p, double distance );
-	vertex_descriptor extract();
-	void decrease( vertex_descriptor v, vertex_descriptor p, double distance );
+	void emplace( VertexDescriptor v, VertexDescriptor p, double distance );
+	VertexDescriptor extract();
+	void decrease( VertexDescriptor v, VertexDescriptor p, double distance );
 
-	double distance( vertex_descriptor v ) const;
+	double distance( VertexDescriptor v ) const;
 	bool empty() const;
 
 	ShortestPaths<Graph> results();
@@ -31,7 +31,7 @@ private:
 };
 
 template <class Graph>
-DijkstraData<Graph>::DijkstraData( vertex_descriptor to )
+DijkstraData<Graph>::DijkstraData( VertexDescriptor to )
 	: _results( to )
 {
 
@@ -45,23 +45,23 @@ struct DijkstraData<Graph>::VertexInfo
 };
 
 template <class Graph>
-void DijkstraData<Graph>::emplace( vertex_descriptor v, vertex_descriptor p,  double distance )
+void DijkstraData<Graph>::emplace( VertexDescriptor v, VertexDescriptor p,  double distance )
 {
 	_info[v] = { _queue.emplace( v, p, distance ), distance };
 }
 
 template <class Graph>
-DijkstraData<Graph>::vertex_descriptor DijkstraData<Graph>::extract()
+DijkstraData<Graph>::VertexDescriptor DijkstraData<Graph>::extract()
 {
 	const DijkstraResult<Graph>& top = _queue.top();
-	vertex_descriptor v = top.vertex;
+	VertexDescriptor v = top.vertex;
 	_results.insert( v, top );
 	_queue.pop();
 	return v;
 }
 
 template <class Graph>
-void DijkstraData<Graph>::decrease( vertex_descriptor v, vertex_descriptor p, double distance )
+void DijkstraData<Graph>::decrease( VertexDescriptor v, VertexDescriptor p, double distance )
 {
 	if (const auto search = _info.find( v ); search != _info.end())
 	{
@@ -74,13 +74,13 @@ void DijkstraData<Graph>::decrease( vertex_descriptor v, vertex_descriptor p, do
 }
 
 template <class Graph>
-void ShortestPaths<Graph>::insert( vertex_descriptor v, const DijkstraResult<Graph>& result )
+void ShortestPaths<Graph>::insert( VertexDescriptor v, const DijkstraResult<Graph>& result )
 {
 	_results[v] = result;
 }
 
 template <class Graph>
-double DijkstraData<Graph>::distance( vertex_descriptor v ) const
+double DijkstraData<Graph>::distance( VertexDescriptor v ) const
 {
 	if (const auto search = _info.find( v ); search != _info.end())
 	{
@@ -102,14 +102,14 @@ ShortestPaths<Graph> DijkstraData<Graph>::results()
 }
 
 template <class Graph>
-ShortestPaths<Graph>::ShortestPaths( vertex_descriptor to )
+ShortestPaths<Graph>::ShortestPaths( VertexDescriptor to )
 	: _to( to )
 {
 
 }
 
 template <class Graph>
-double ShortestPaths<Graph>::distance( vertex_descriptor from ) const
+double ShortestPaths<Graph>::distance( VertexDescriptor from ) const
 {
 	if (const auto search = _results.find( from ); search != _results.end())
 	{
@@ -131,11 +131,11 @@ void ShortestPaths<Graph>::vertexMap( P predicate ) const
 
 template <class Graph>
 template <class P>
-void ShortestPaths<Graph>::pathMap( vertex_descriptor from, P predicate ) const
+void ShortestPaths<Graph>::pathMap( VertexDescriptor from, P predicate ) const
 {
 	if (!_results.contains( from )) { return; }
 
-	vertex_descriptor vertex = from;
+	VertexDescriptor vertex = from;
 	while (true)
 	{
 		const auto search = _results.find( vertex );
@@ -147,7 +147,7 @@ void ShortestPaths<Graph>::pathMap( vertex_descriptor from, P predicate ) const
 }
 
 template <class Graph>
-ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::vertex_descriptor source, double maxDist, double maxEdge )
+ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge )
 {
 	DijkstraData<Graph> data( source );
 
@@ -155,10 +155,10 @@ ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::vertex_
 
 	while (!data.empty())
 	{
-		const typename Graph::vertex_descriptor u = data.extract();
+		const typename Graph::VertexDescriptor u = data.extract();
 		const double uDist = data.distance( u );
 		graph.edgeMap( u, [u, uDist, maxDist, maxEdge, &graph, &data]( const typename Graph::edge_descriptor e ) {
-			const Graph::vertex_descriptor v = graph.other( e, u );
+			const Graph::VertexDescriptor v = graph.other( e, u );
 			if (graph[e].maxEdge() > maxEdge) { return false; }
 			const double newDist = uDist + graph[e].weight();
 			if (newDist > maxDist) { return false; }
@@ -171,7 +171,7 @@ ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::vertex_
 }
 
 template <class Graph>
-bool dijkstraWitnessSearch( Graph graph, typename Graph::vertex_descriptor source, typename Graph::vertex_descriptor target, typename Graph::vertex_descriptor avoid, double minDist )
+bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist )
 {
 	DijkstraData<Graph> data( source );
 
@@ -179,11 +179,11 @@ bool dijkstraWitnessSearch( Graph graph, typename Graph::vertex_descriptor sourc
 
 	while (!data.empty())
 	{
-		const typename Graph::vertex_descriptor u = data.extract();
+		const typename Graph::VertexDescriptor u = data.extract();
 		const double uDist = data.distance( u );
 		bool witnessFound = false;
 		graph.edgeMap( u, [target, avoid, u, uDist, minDist, &graph, &data, &witnessFound]( const typename Graph::edge_descriptor e ) {
-			const typename Graph::vertex_descriptor v = graph.other( e, u );
+			const typename Graph::VertexDescriptor v = graph.other( e, u );
 			if (v == avoid) { return false; }
 			const double newDist = uDist + graph[e].weight();
 			if (v == target && newDist < minDist)
