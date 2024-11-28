@@ -25,8 +25,9 @@ public:
 	ShortestPaths<Graph> results();
 
 private:
-	Map _info;
+	Map  _info;
 	Heap _queue;
+
 	ShortestPaths<Graph> _results;
 };
 
@@ -147,7 +148,7 @@ void ShortestPaths<Graph>::pathMap( VertexDescriptor from, P predicate ) const
 }
 
 template <class Graph>
-ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge )
+ShortestPaths<Graph> dijkstraShortestPaths( const Graph& graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge )
 {
 	DijkstraData<Graph> data( source );
 
@@ -157,21 +158,21 @@ ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::VertexD
 	{
 		const typename Graph::VertexDescriptor u = data.extract();
 		const double uDist = data.distance( u );
-		graph.edgeMap( u, [u, uDist, maxDist, maxEdge, &graph, &data]( const typename Graph::edge_descriptor e ) {
+		graph.edgeMap( u, [u, uDist, maxDist, maxEdge, &graph, &data]( const typename Graph::EdgeDescriptor e ) {
 			const Graph::VertexDescriptor v = graph.other( e, u );
 			if (graph[e].maxEdge() > maxEdge) { return false; }
 			const double newDist = uDist + graph[e].weight();
 			if (newDist > maxDist) { return false; }
 			data.decrease( v, u, newDist );
 			return false;
-			} );
+		} );
 	}
 
 	return data.results();
 }
 
 template <class Graph>
-bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist )
+bool dijkstraWitnessSearch( const Graph& graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist )
 {
 	DijkstraData<Graph> data( source );
 
@@ -182,7 +183,7 @@ bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source
 		const typename Graph::VertexDescriptor u = data.extract();
 		const double uDist = data.distance( u );
 		bool witnessFound = false;
-		graph.edgeMap( u, [target, avoid, u, uDist, minDist, &graph, &data, &witnessFound]( const typename Graph::edge_descriptor e ) {
+		graph.edgeMap( u, [target, avoid, u, uDist, minDist, &graph, &data, &witnessFound]( const typename Graph::EdgeDescriptor e ) {
 			const typename Graph::VertexDescriptor v = graph.other( e, u );
 			if (v == avoid) { return false; }
 			const double newDist = uDist + graph[e].weight();
@@ -193,7 +194,7 @@ bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source
 			}
 			data.decrease( v, u, newDist );
 			return false;
-			} );
+		} );
 		if (witnessFound) { return true; }
 	}
 

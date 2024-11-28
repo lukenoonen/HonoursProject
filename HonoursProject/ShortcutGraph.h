@@ -11,11 +11,16 @@ class ShortcutGraph : public BaseGraph<ShortcutVertex, ShortcutEdge>
 {
 public:
 	ShortcutGraph( const WeightedGraph& source );
-	ShortcutGraph( const ShortcutGraph& source );
-	ShortcutGraph( const ShortcutGraph& gPrev, const std::vector<VertexDescriptor>& discard );
+	ShortcutGraph( const ShortcutGraph& prev, const std::vector<VertexDescriptor>& discard );
 
 	ShortcutGraph::VertexDescriptor fromSource( WeightedGraph::VertexDescriptor v ) const;
 	WeightedGraph::VertexDescriptor toSource( ShortcutGraph::VertexDescriptor v ) const;
+
+private:
+	void calculateMap();
+
+private:
+	std::unordered_map<WeightedGraph::VertexDescriptor, ShortcutGraph::VertexDescriptor> _map;
 };
 
 class ShortcutVertex
@@ -33,7 +38,7 @@ private:
 class ShortcutEdge
 {
 public:
-	using path_type = std::vector<const ShortcutEdge*>;
+	using PathType = std::vector<const ShortcutEdge*>;
 
 public:
 	ShortcutEdge() = default;
@@ -41,12 +46,12 @@ public:
 	ShortcutEdge( const ShortcutEdge* prev );
 	ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& second );
 
-	const path_type& path() const;
+	const PathType& path() const;
 	double weight() const;
 	double maxEdge() const;
 
 private:
-	path_type _path;
+	PathType _path;
 
 	double _weight;
 	double _maxEdge;

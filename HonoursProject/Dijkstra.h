@@ -7,8 +7,8 @@
 template <class Graph>
 struct DijkstraResult
 {
-	Graph::vertex_descriptor vertex;
-	Graph::vertex_descriptor prev;
+	Graph::VertexDescriptor vertex;
+	Graph::VertexDescriptor prev;
 	double distance;
 
 	bool operator<( const DijkstraResult& other ) const
@@ -44,10 +44,10 @@ private:
 };
 
 template <class Graph>
-ShortestPaths<Graph> dijkstraShortestPaths( Graph graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge );
+ShortestPaths<Graph> dijkstraShortestPaths( const Graph& graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge );
 
 template <class Graph>
-bool dijkstraWitnessSearch( Graph graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist );
+bool dijkstraWitnessSearch( const Graph& graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist );
 
 #include "Dijkstra.inl"
 

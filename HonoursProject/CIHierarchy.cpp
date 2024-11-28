@@ -15,10 +15,10 @@ EdgeVector sortEdgesByWeight( const WeightedGraph& g )
 	g.edgeMap( [&edges]( const WeightedGraph::EdgeDescriptor e ) {
 		edges.push_back( e );
 		return false;
-		} );
+	} );
 	std::sort( edges.begin(), edges.end(), [&g]( const WeightedGraph::EdgeDescriptor e1, const WeightedGraph::EdgeDescriptor e2 ) {
 		return g[e1].weight() < g[e2].weight();
-		} );
+	} );
 	return edges;
 }
 
@@ -33,11 +33,14 @@ VertexSet gatherEdgeVertices( std::size_t fromIndex, const EdgeVector& edges, co
 	return vertices;
 }
 
+#include <iostream>
+
 VertexSet selectVertices( double maxWeight, double prevMaxWeight, const ShortcutGraph& current )
 {
 	VertexSet vertices;
 
 	const double minWeight = 0.75 * maxWeight;
+	std::cout << "test1\n";
 	current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( ShortcutGraph::VertexDescriptor origin ) {
 		ShortestPaths<ShortcutGraph> paths = dijkstraShortestPaths<ShortcutGraph>( current, origin, maxWeight, prevMaxWeight );
 		paths.vertexMap( [minWeight, &paths, &vertices]( ShortcutGraph::VertexDescriptor vertex, double distance ) {
@@ -62,7 +65,7 @@ VertexSet selectVertices( double maxWeight, double prevMaxWeight, const Shortcut
 				}
 
 				return false;
-				} );
+			} );
 
 			if (addMidpoint)
 			{
@@ -70,10 +73,12 @@ VertexSet selectVertices( double maxWeight, double prevMaxWeight, const Shortcut
 			}
 
 			return false;
-			} );
+		} );
 
 		return false;
-		} );
+	} );
+
+	std::cout << "test2\n";
 
 	return vertices;
 }
@@ -87,7 +92,7 @@ VertexVector calculateDiscard( const VertexSet& keepSet, const ShortcutGraph& cu
 	current.vertexMap( [&keepSet, discardSize, &discard]( const ShortcutGraph::VertexDescriptor v ) {
 		if (keepSet.contains( v )) { discard.push_back( v ); }
 		return discard.size() == discardSize;
-		} );
+	} );
 
 	return discard;
 }
@@ -99,15 +104,18 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 
 	std::vector<WeightedGraph::EdgeDescriptor> edges = sortEdgesByWeight( g );
 
+	_hierarchy.push_back( g );
+
 	double maxWeight = 1.0;
 	double prevMaxWeight = 0.0;
 	std::size_t minEdgeIndex = 0;
-	while (false) // TODO: condition?
+	while (true) // TODO: condition?
 	{
 		while (g[edges[minEdgeIndex]].weight() <= prevMaxWeight) { minEdgeIndex++; }
 
 		const ShortcutGraph& back = _hierarchy.back();
-		VertexSet keepSet = gatherEdgeVertices(minEdgeIndex, edges, g, back);
+
+		VertexSet keepSet     = gatherEdgeVertices( minEdgeIndex, edges, g, back );
 		VertexSet selectedSet = selectVertices( maxWeight, prevMaxWeight, back );
 		for (const ShortcutGraph::VertexDescriptor v : selectedSet)
 		{

@@ -1,30 +1,41 @@
 #include "ShortcutGraph.h"
-#include "Filter.h"
 #include "Dijkstra.h"
 
 ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 {
+	size_t index = 0;
+	while (numVertices() < source.numVertices())
+	{
+		addVertex( { index++ } );
+	}
 
-}
-
-ShortcutGraph::ShortcutGraph( const ShortcutGraph& source )
-	: BaseGraph<ShortcutVertex, ShortcutEdge>( source )
-{
-	edgeMap( [&source, this]( const EdgeDescriptor e ) {
-		ShortcutEdge& edge = (*this)[e];
-		const ShortcutEdge otherEdge = source[e];
-		edge = ShortcutEdge{ &otherEdge };
+	source.edgeMap( [&source, this]( const WeightedGraph::EdgeDescriptor e ) {
+		addEdge( source.source( e ), source.target( e ), { source[e].weight() } );
 		return false;
-		} );
+	} );
+
+	calculateMap();
 }
 
 ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const std::vector<VertexDescriptor>& discard )
-	: ShortcutGraph( prev )
+	: BaseGraph<ShortcutVertex, ShortcutEdge>( prev )
 {
+	edgeMap( [&prev, this]( const EdgeDescriptor e ) {
+		ShortcutEdge& edge = (*this)[e];
+		const ShortcutEdge otherEdge = prev[e];
+		edge = ShortcutEdge{ &otherEdge };
+		return false;
+	} );
+
+	std::unordered_set<VertexDescriptor> discarded;
 	for (const VertexDescriptor v : discard)
 	{
-		edgeMap( v, [v, this]( const EdgeDescriptor e1 ) {
-			edgeMap( v, [v, e1, this]( const EdgeDescriptor e2 ) {
+		edgeMap( v, [v, &discarded, this]( const EdgeDescriptor e1 ) {
+			if (discarded.contains( target( e1 ) )) { return false; }
+
+			edgeMap( v, [v, &discarded, e1, this]( const EdgeDescriptor e2 ) {
+				if (discarded.contains( target( e2 ) )) { return false; }
+
 				if (e1 == e2) { return false; }
 				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
 				const VertexDescriptor v1 = other( e1, v );
@@ -36,23 +47,34 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const std::vector<Verte
 					addEdge( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
 				}
 				return false;
-				} );
-			// TODO: delete e1
-			return false;
 			} );
+			return false;
+		} );
+		discarded.insert( v );
 	}
 
 	removeVertices( discard );
+
+	calculateMap();
 }
 
 ShortcutGraph::VertexDescriptor ShortcutGraph::fromSource( WeightedGraph::VertexDescriptor v ) const
 {
-	return (*this)[v].mapped();
+	return _map.find( v )->second;
 }
 
-ShortcutGraph::VertexDescriptor ShortcutGraph::toSource( WeightedGraph::VertexDescriptor v ) const
+WeightedGraph::VertexDescriptor ShortcutGraph::toSource( ShortcutGraph::VertexDescriptor v ) const
 {
-	return (*this)[v].mapped();
+	return get( v ).mapped();
+}
+
+void ShortcutGraph::calculateMap()
+{
+	_map.clear();
+	vertexMap( [this]( const WeightedGraph::VertexDescriptor v ) {
+		_map[get( v ).mapped()] = v;
+		return false;
+	} );
 }
 
 ShortcutVertex::ShortcutVertex( ShortcutGraph::VertexDescriptor mapped )
@@ -80,8 +102,8 @@ ShortcutEdge::ShortcutEdge( const ShortcutEdge* prev )
 
 ShortcutEdge::ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& second )
 {
-	const path_type& firstPath = first.path();
-	const path_type& secondPath = second.path();
+	const PathType& firstPath = first.path();
+	const PathType& secondPath = second.path();
 
 	_path.reserve( firstPath.size() + secondPath.size() );
 
@@ -97,10 +119,10 @@ ShortcutEdge::ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& secon
 		{
 			_maxEdge = edge->maxEdge();
 		}
-	}
+	}	
 }
 
-const ShortcutEdge::path_type& ShortcutEdge::path() const
+const ShortcutEdge::PathType& ShortcutEdge::path() const
 {
 	return _path;
 }
