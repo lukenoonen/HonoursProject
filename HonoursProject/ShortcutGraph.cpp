@@ -3,14 +3,13 @@
 
 ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 {
-	size_t index = 0;
-	while (numVertices() < source.numVertices())
-	{
-		addVertex( { index++ } );
-	}
+	source.vertexMap( [&source, this]( const auto v ) {
+		addVertex( { v } );
+		return false;
+	} );
 
-	source.edgeMap( [&source, this]( const WeightedGraph::EdgeDescriptor e ) {
-		addEdge( source.source( e ), source.target( e ), { source[e].weight() } );
+	source.edgeMap( [&source, this]( const auto e ) {
+		addEdge( source.source( e ), source.target( e ), { e, source[e].weight() } );
 		return false;
 	} );
 
@@ -18,44 +17,53 @@ ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 }
 
 ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const std::vector<VertexDescriptor>& discard )
-	: BaseGraph<ShortcutVertex, ShortcutEdge>( prev )
+	: BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>( prev )
 {
-	edgeMap( [&prev, this]( const EdgeDescriptor e ) {
-		ShortcutEdge& edge = (*this)[e];
-		const ShortcutEdge otherEdge = prev[e];
-		edge = ShortcutEdge{ &otherEdge };
-		return false;
-	} );
-
-	std::unordered_set<VertexDescriptor> discarded;
 	for (const VertexDescriptor v : discard)
 	{
-		edgeMap( v, [v, &discarded, this]( const EdgeDescriptor e1 ) {
-			if (discarded.contains( target( e1 ) )) { return false; }
-
-			edgeMap( v, [v, &discarded, e1, this]( const EdgeDescriptor e2 ) {
-				if (discarded.contains( target( e2 ) )) { return false; }
-
-				if (e1 == e2) { return false; }
-				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
-				const VertexDescriptor v1 = other( e1, v );
+		VertexSet processed;
+		std::vector<std::tuple<VertexDescriptor, VertexDescriptor, ShortcutEdge>> shortcuts;
+		edgeMap( v, [v, this, &processed, &shortcuts]( const auto e1 ) {
+			const VertexDescriptor v1 = other( e1, v );
+			processed.insert( v1 );
+			edgeMap( v, [v, e1, v1, this, &processed, &shortcuts]( const auto e2 ) {
 				const VertexDescriptor v2 = other( e2, v );
+				if (processed.contains( v2 )) { return false; }
 
-				const bool hasWitnessPath = dijkstraWitnessSearch( *this, v1, v2, v, throughWeight );
-				if (hasWitnessPath)
+				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
+				const bool hasWitnessPath = witnessSearch( *this, v1, v2, v, throughWeight );
+				if (!hasWitnessPath)
 				{
-					addEdge( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
+					shortcuts.emplace_back( v1, v2, std::move( ShortcutEdge{ get( e1 ), get( e2 ) } ) );
 				}
 				return false;
 			} );
 			return false;
 		} );
-		discarded.insert( v );
+
+		_filter.filter.insert( v );
+
+		for (auto& [v1, v2, edge] : shortcuts)
+		{
+			addEdge( v1, v2, std::move( edge ) );
+		}
 	}
+
+	_filter.filter.clear();
 
 	removeVertices( discard );
 
 	calculateMap();
+}
+
+double ShortcutGraph::length() const
+{
+	double l = 0;
+	edgeMap( [&l, this]( const auto e ) {
+		l += get( e ).weight();
+		return false;
+	} );
+	return l;
 }
 
 ShortcutGraph::VertexDescriptor ShortcutGraph::fromSource( WeightedGraph::VertexDescriptor v ) const
@@ -71,31 +79,51 @@ WeightedGraph::VertexDescriptor ShortcutGraph::toSource( ShortcutGraph::VertexDe
 void ShortcutGraph::calculateMap()
 {
 	_map.clear();
-	vertexMap( [this]( const WeightedGraph::VertexDescriptor v ) {
+	vertexMap( [this]( const auto v ) {
 		_map[get( v ).mapped()] = v;
 		return false;
 	} );
 }
 
-ShortcutVertex::ShortcutVertex( ShortcutGraph::VertexDescriptor mapped )
+void serialize( std::ostream& os, const ShortcutGraph& data )
+{
+	using BaseType = BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>;
+	serialize( os, data._map );
+	serialize( os, (const BaseType&)(data) );
+}
+
+void deserialize( std::istream& is, ShortcutGraph& data )
+{
+	using BaseType = BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>;
+	deserialize( is, data._map );
+	deserialize( is, (BaseType&)(data) );
+}
+
+ShortcutVertex::ShortcutVertex( WeightedGraph::VertexDescriptor mapped )
 	: _mapped( mapped )
 {
 
 }
 
-ShortcutGraph::VertexDescriptor ShortcutVertex::mapped() const
+WeightedGraph::VertexDescriptor ShortcutVertex::mapped() const
 {
 	return _mapped;
 }
 
-ShortcutEdge::ShortcutEdge( double weight )
-	: _path( {} ), _weight( weight ), _maxEdge( weight )
+void serialize( std::ostream& os, const ShortcutVertex& data )
 {
-
+	serialize( os, data._mapped );
 }
 
-ShortcutEdge::ShortcutEdge( const ShortcutEdge* prev )
-	: _path( { prev } ), _weight( prev->weight() ), _maxEdge( prev->maxEdge() )
+void deserialize( std::istream& is, ShortcutVertex& data )
+{
+	deserialize( is, data._mapped );
+}
+
+ShortcutEdge::ShortcutEdge( WeightedGraph::EdgeDescriptor e, double weight )
+	: _path( { e } ),
+	_weight( weight ),
+	_maxEdge( weight )
 {
 
 }
@@ -112,14 +140,6 @@ ShortcutEdge::ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& secon
 
 	_weight = first.weight() + second.weight();
 	_maxEdge = std::max( first.maxEdge(), second.maxEdge() );
-	for (const ShortcutEdge* edge : _path)
-	{
-		_weight += edge->weight();
-		if (_maxEdge < edge->maxEdge())
-		{
-			_maxEdge = edge->maxEdge();
-		}
-	}	
 }
 
 const ShortcutEdge::PathType& ShortcutEdge::path() const
@@ -135,4 +155,18 @@ double ShortcutEdge::weight() const
 double ShortcutEdge::maxEdge() const
 {
 	return _maxEdge;
+}
+
+void serialize( std::ostream& os, const ShortcutEdge& data )
+{
+	serialize( os, data._path );
+	serialize( os, data._weight );
+	serialize( os, data._maxEdge );
+}
+
+void deserialize( std::istream& is, ShortcutEdge& data )
+{
+	deserialize( is, data._path );
+	deserialize( is, data._weight );
+	deserialize( is, data._maxEdge );
 }

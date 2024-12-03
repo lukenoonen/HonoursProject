@@ -1,17 +1,18 @@
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
 
-#include <unordered_map>
-#include <unordered_set>
+#include "ShortcutGraph.h"
 
 template <class Graph>
 struct DijkstraResult
 {
-	Graph::VertexDescriptor vertex;
-	Graph::VertexDescriptor prev;
-	double distance;
+	using VertexDescriptor = typename Graph::VertexDescriptor;
 
-	bool operator<( const DijkstraResult& other ) const
+	VertexDescriptor vertex;
+	VertexDescriptor prev;
+	double           distance;
+
+	inline bool operator<( const DijkstraResult& other ) const
 	{
 		return distance < other.distance;
 	}
@@ -20,10 +21,8 @@ struct DijkstraResult
 template <class Graph>
 class ShortestPaths
 {
-private:
+public:
 	using VertexDescriptor = typename Graph::VertexDescriptor;
-
-	using VertexSet = std::unordered_set<VertexDescriptor>;
 
 public:
 	ShortestPaths( VertexDescriptor to );
@@ -38,16 +37,29 @@ public:
 	template <class P>
 	void pathMap( VertexDescriptor from, P predicate ) const;
 
-private:
 	VertexDescriptor _to;
 	std::unordered_map<VertexDescriptor, DijkstraResult<Graph>> _results;
 };
 
-template <class Graph>
-ShortestPaths<Graph> dijkstraShortestPaths( const Graph& graph, typename Graph::VertexDescriptor source, double maxDist, double maxEdge );
+ShortestPaths<ShortcutGraph> shortestPaths(
+	const ShortcutGraph& graph,
+	ShortcutGraph::VertexDescriptor source,
+	double                          maxDist,
+	double                          maxEdge
+);
 
-template <class Graph>
-bool dijkstraWitnessSearch( const Graph& graph, typename Graph::VertexDescriptor source, typename Graph::VertexDescriptor target, typename Graph::VertexDescriptor avoid, double minDist );
+bool witnessSearch(
+	const ShortcutGraph& graph,
+	ShortcutGraph::VertexDescriptor source,
+	ShortcutGraph::VertexDescriptor target,
+	ShortcutGraph::VertexDescriptor avoid,
+	double                          minDist
+);
+
+bool usefulEdge(
+	const WeightedGraph& graph,
+	WeightedGraph::EdgeDescriptor e
+);
 
 #include "Dijkstra.inl"
 

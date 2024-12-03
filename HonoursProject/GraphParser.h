@@ -8,6 +8,10 @@
 
 class GraphParser
 {
+protected:
+	using VertexDescriptor = WeightedGraph::VertexDescriptor;
+	using EdgeDescriptor = WeightedGraph::EdgeDescriptor;
+
 public:
 	GraphParser( std::filesystem::path filepath );
 

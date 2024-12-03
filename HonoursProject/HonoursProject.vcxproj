@@ -18,10 +18,35 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CIHierarchy.cpp" />
+    <ClCompile Include="Dijkstra.cpp" />
+    <ClCompile Include="GraphParser.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RoadDParser.cpp" />
+    <ClCompile Include="ShortcutGraph.cpp" />
+    <ClCompile Include="WeightedGraph.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseGraph.h" />
+    <ClInclude Include="CIHierarchy.h" />
+    <ClInclude Include="Dijkstra.h" />
+    <ClInclude Include="Filters.h" />
+    <ClInclude Include="GraphParser.h" />
+    <ClInclude Include="RoadDParser.h" />
+    <ClInclude Include="Serialize.h" />
+    <ClInclude Include="ShortcutGraph.h" />
+    <ClInclude Include="WeightedGraph.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BaseGraph.inl" />
+    <None Include="Dijkstra.inl" />
+    <None Include="Serialize.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c7743aa2-40b9-450e-aa08-e672abfb9f3c}</ProjectGuid>
+    <ProjectGuid>{8e43bdbf-1a22-42f7-bbf4-8e2335ec8c2b}</ProjectGuid>
     <RootNamespace>HonoursProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -78,8 +103,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -94,8 +117,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +133,6 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,7 +149,6 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,27 +157,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="CIHierarchy.cpp" />
-    <ClCompile Include="CIHierarchy.h" />
-    <ClCompile Include="GraphParser.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RoadDParser.cpp" />
-    <ClCompile Include="ShortcutGraph.cpp" />
-    <ClCompile Include="ShortcutGraph.h" />
-    <ClCompile Include="WeightedGraph.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="BaseGraph.h" />
-    <ClInclude Include="Dijkstra.h" />
-    <ClInclude Include="GraphParser.h" />
-    <ClInclude Include="RoadDParser.h" />
-    <ClInclude Include="WeightedGraph.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BaseGraph.inl" />
-    <None Include="Dijkstra.inl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

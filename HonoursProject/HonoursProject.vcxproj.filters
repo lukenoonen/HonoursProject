@@ -13,56 +13,86 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Parser">
+      <UniqueIdentifier>{4d6b17a5-25a4-46ca-b051-255ddaab192d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graph">
+      <UniqueIdentifier>{e388d93b-fb2f-4aa7-b954-2fd69a1cc257}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{01e71645-9312-4669-aad8-94a9d660326e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graph">
+      <UniqueIdentifier>{7e39929f-54fd-4ec7-8a88-6b55ab688ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{12c0f507-08a7-44ad-9790-c8ffde04727f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Parser">
+      <UniqueIdentifier>{e5542bc6-fb72-4493-89c7-bc9659e2d86c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShortcutGraph.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShortcutGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WeightedGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CIHierarchy.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="CIHierarchy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GraphParser.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GraphParser.cpp">
+      <Filter>Source Files\Parser</Filter>
+    </ClCompile>
     <ClCompile Include="RoadDParser.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShortcutGraph.cpp">
+      <Filter>Source Files\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="WeightedGraph.cpp">
+      <Filter>Source Files\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Dijkstra.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="WeightedGraph.h">
+    <ClInclude Include="CIHierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseGraph.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graph</Filter>
     </ClInclude>
-    <ClInclude Include="Dijkstra.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ShortcutGraph.h">
+      <Filter>Header Files\Graph</Filter>
     </ClInclude>
-    <ClInclude Include="GraphParser.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="WeightedGraph.h">
+      <Filter>Header Files\Graph</Filter>
     </ClInclude>
     <ClInclude Include="RoadDParser.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphParser.h">
+      <Filter>Header Files\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Filters.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Dijkstra.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BaseGraph.inl">
+    <None Include="Serialize.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="BaseGraph.inl">
+      <Filter>Header Files\Graph</Filter>
+    </None>
     <None Include="Dijkstra.inl">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
 </Project>
