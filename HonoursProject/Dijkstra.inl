@@ -48,3 +48,9 @@ inline void ShortestPaths<Graph>::pathMap( VertexDescriptor from, P predicate ) 
 		vertex = current.prev;
 	}
 }
+
+template <class Graph>
+inline size_t ShortestPaths<Graph>::numVertices() const
+{
+	return _results.size();
+}

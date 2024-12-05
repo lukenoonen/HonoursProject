@@ -48,10 +48,12 @@ namespace
 	{
 		ShortcutVertexSet vertices;
 
+		size_t totalFound = 0;
 		const double minWeight = 0.75 * maxWeight;
-		current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( const auto origin ) {
+		current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices, &totalFound]( const auto origin ) {
 			if (vertices.contains( origin )) { return false; }
 			ShortestPaths<ShortcutGraph> paths = shortestPaths( current, origin, maxWeight, prevMaxWeight );
+			totalFound += paths.numVertices();
 			paths.vertexMap( [minWeight, &paths, &vertices]( auto vertex, double distance ) {
 				if (distance < minWeight) { return false; }
 				if (vertices.contains( vertex )) { return false; }
@@ -87,6 +89,7 @@ namespace
 			return false;
 		} );
 
+		std::cout << totalFound / (double)current.numVertices() << " avg \n";
 		return vertices;
 	}
 
@@ -145,7 +148,7 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 			_ladder[back[v].mapped()] = _hierarchy.size() - 1;
 		}
 
-		/*
+		
 		std::cout << "Adding shortcut graph\n";
 		const double backLength = back.length();
 		_hierarchy.emplace_back( _hierarchy.back(), discard );
@@ -153,7 +156,7 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 		const double currentLength = current.length();
 		std::cout << currentLength << " total " << (currentLength < backLength ? "(less)" : "(more)") << "\n";
 		std::cout << current.numVertices() << " vertices, " << current.numEdges() << " edges\n";
-		std::cout << current.meanDegree() << " mean degree\n\n";*/
+		std::cout << current.meanDegree() << " mean degree\n\n";
 	}
 }
 

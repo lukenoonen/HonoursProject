@@ -37,6 +37,9 @@ public:
 	template <class P>
 	void pathMap( VertexDescriptor from, P predicate ) const;
 
+	size_t numVertices() const;
+
+private:
 	VertexDescriptor _to;
 	std::unordered_map<VertexDescriptor, DijkstraResult<Graph>> _results;
 };

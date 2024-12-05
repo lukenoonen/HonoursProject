@@ -34,7 +34,7 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const std::vector<Verte
 				const bool hasWitnessPath = witnessSearch( *this, v1, v2, v, throughWeight );
 				if (!hasWitnessPath)
 				{
-					shortcuts.emplace_back( v1, v2, std::move( ShortcutEdge{ get( e1 ), get( e2 ) } ) );
+					shortcuts.emplace_back( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
 				}
 				return false;
 			} );
