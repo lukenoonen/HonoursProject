@@ -12,6 +12,7 @@ namespace
 	{
 	private:
 		using VertexDescriptor = typename Graph::VertexDescriptor;
+		using EdgeDescriptor   = typename Graph::EdgeDescriptor;
 
 		using Heap        = boost::heap::fibonacci_heap<DijkstraResult<Graph>>;
 		using HeapHandle  = DijkstraData<Graph>::Heap::handle_type;
@@ -24,9 +25,10 @@ namespace
 	public:
 		DijkstraData( VertexDescriptor to );
 
-		void emplace( VertexDescriptor v, VertexDescriptor p, double distance );
+		void emplace( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance );
+		void decrease( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance );
+
 		ExtractType extract();
-		void decrease( VertexDescriptor v, VertexDescriptor p, double distance );
 
 		double distance( VertexDescriptor v ) const;
 		bool empty() const;
@@ -46,42 +48,43 @@ namespace
 	DijkstraData<Graph>::DijkstraData( VertexDescriptor to )
 		: _results( to )
 	{
-
+		_handles[to]   = _queue.emplace( to );
+		_distances[to] = 0.0;
 	}
 
 	template <class Graph>
-	void DijkstraData<Graph>::emplace( VertexDescriptor v, VertexDescriptor p, double distance )
+	void DijkstraData<Graph>::emplace( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance )
 	{
-		_handles[v] = _queue.emplace( v, p, distance );
+		_handles[v]   = _queue.emplace( v, p, e, distance );
 		_distances[v] = distance;
+	}
+
+	template <class Graph>
+	void DijkstraData<Graph>::decrease( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance )
+	{
+		if (auto search = _handles.find( v ); search != _handles.end())
+		{
+			DijkstraResult<Graph>& entry = *(search->second);
+			entry.update( p, e, distance );
+			_queue.decrease( search->second );
+			_distances[v] = distance;
+		}
+		else
+		{
+			emplace( v, p, e, distance );
+		}
 	}
 
 	template <class Graph>
 	DijkstraData<Graph>::ExtractType DijkstraData<Graph>::extract()
 	{
 		const DijkstraResult<Graph>& top = _queue.top();
-		const VertexDescriptor v = top.vertex;
-		const double dist = top.distance;
+		const VertexDescriptor v = top.vertex();
+		const double dist = top.distance();
 		_results.insert( v, top );
 		_queue.pop();
 		_handles.erase( v );
 		return { v, dist };
-	}
-
-	template <class Graph>
-	void DijkstraData<Graph>::decrease( VertexDescriptor v, VertexDescriptor p, double distance )
-	{
-		if (auto search = _handles.find( v ); search != _handles.end())
-		{
-			DijkstraResult<Graph>& entry = *(search->second);
-			entry.distance = distance;
-			_queue.decrease( search->second );
-			_distances[v] = distance;
-		}
-		else
-		{
-			emplace( v, p, distance );
-		}
 	}
 
 	template <class Graph>
@@ -122,8 +125,6 @@ namespace
 	{
 		DijkstraData<Graph> data( source );
 
-		data.emplace( source, source, 0.0 );
-
 		while (!data.empty())
 		{
 			const auto [u, uDist] = data.extract();
@@ -135,7 +136,7 @@ namespace
 				const PredicateResponse pr = predicate( v, e, newDist );
 				if (pr == PredicateResponse::FALSE) { return false; }
 				if (pr == PredicateResponse::BREAK) { return true; }
-				data.decrease( v, u, newDist );
+				data.decrease( v, u, e, newDist );
 				return false;
 			} );
 			if (result) { break; }
@@ -149,14 +150,39 @@ ShortestPaths<ShortcutGraph> shortestPaths(
 	const ShortcutGraph&            graph,
 	ShortcutGraph::VertexDescriptor source,
 	double                          maxDist,
+	double                          minDist,
 	double                          maxEdge
 )
 {
-	return dijkstra( graph, source, [&graph, maxDist, maxEdge]( const auto v, const auto e, const double dist ) {
+	ShortestPaths<ShortcutGraph> paths = dijkstra( graph, source, [&graph, maxDist]( const auto v, const auto e, const double dist ) {
 		if (dist > maxDist) { return PredicateResponse::FALSE; }
-		if (graph[e].maxEdge() > maxEdge) { return PredicateResponse::FALSE; }
 		return PredicateResponse::TRUE;
 	} );
+
+	paths.vertexMap( [&graph, minDist, maxEdge, &paths]( const auto& result ) {
+		if (result.distance() < minDist)
+		{
+			paths.filter( result.vertex() );
+			return false;
+		}
+
+		std::vector<ShortcutGraph::VertexDescriptor> path;
+		const bool filter = paths.pathMap( result.vertex(), [&graph, maxEdge, &paths, &path]( const auto& result_ ) {
+			if (result_.isOrigin()) { return false; }
+			path.push_back( result_.vertex() );
+			return graph[result_.edge()].maxEdge() > maxEdge;
+		} );
+		if (filter)
+		{
+			for (const auto v : path)
+			{
+				paths.filter( v );
+			}
+		}
+		return false;
+	} );
+
+	return paths;
 }
 
 bool witnessSearch(

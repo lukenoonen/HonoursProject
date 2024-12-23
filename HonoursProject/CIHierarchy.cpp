@@ -33,7 +33,7 @@ namespace
 		return edges;
 	}
 
-	ShortcutVertexSet gatherEdgeVertices( std::size_t fromIndex, const WeightedEdgeVector& edges, const WeightedGraph& g, const ShortcutGraph& current )
+	ShortcutVertexSet gatherEdgeVertices( std::size_t fromIndex, const WeightedEdgeVector& edges, const WeightedGraph& g, const ShortcutGraph& current, double test )
 	{
 		ShortcutVertexSet vertices;
 		for (std::size_t i = fromIndex; i < edges.size(); i++)
@@ -48,31 +48,25 @@ namespace
 	{
 		ShortcutVertexSet vertices;
 
-		size_t totalFound = 0;
 		const double minWeight = 0.75 * maxWeight;
-		current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices, &totalFound]( const auto origin ) {
+		current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( const auto origin ) {
 			if (vertices.contains( origin )) { return false; }
-			ShortestPaths<ShortcutGraph> paths = shortestPaths( current, origin, maxWeight, prevMaxWeight );
-			totalFound += paths.numVertices();
-			paths.vertexMap( [minWeight, &paths, &vertices]( auto vertex, double distance ) {
-				if (distance < minWeight) { return false; }
-				if (vertices.contains( vertex )) { return false; }
-				const double midpointTarget = distance * 0.5;
-				double bestMidpointDistance = std::abs( midpointTarget - distance );
-				auto bestMidpoint = vertex;
-				bool addMidpoint = true;
-				paths.pathMap( vertex, [&vertices, midpointTarget, &bestMidpointDistance, &bestMidpoint, &addMidpoint]( auto vertex_, double distance_ ) {
-					if (vertices.contains( vertex_ ))
-					{
-						addMidpoint = false;
-						return true;
-					}
+			ShortestPaths<ShortcutGraph> paths = shortestPaths( current, origin, maxWeight, minWeight, prevMaxWeight );
+			paths.vertexMap( [minWeight, &paths, &vertices]( const auto& result ) {
+				if (vertices.contains( result.vertex() )) { return false; }
 
-					const double midpointDistance = std::abs( midpointTarget - distance_ );
+				const double midpointTarget = result.distance() * 0.5;
+				double bestMidpointDistance = std::abs( midpointTarget - result.distance() );
+				auto bestMidpoint = result.vertex();
+
+				const bool addMidpoint = !paths.pathMap( result.vertex(), [&vertices, midpointTarget, &bestMidpointDistance, &bestMidpoint]( const auto result_ ) {
+					if (vertices.contains( result_.vertex() )) { return true; }
+					
+					const double midpointDistance = std::abs( midpointTarget - result_.distance() );
 					if (midpointDistance < bestMidpointDistance)
 					{
 						bestMidpointDistance = midpointDistance;
-						bestMidpoint = vertex_;
+						bestMidpoint = result_.vertex();
 					}
 
 					return false;
@@ -89,9 +83,24 @@ namespace
 			return false;
 		} );
 
-		std::cout << totalFound / (double)current.numVertices() << " avg \n";
 		return vertices;
 	}
+
+	/*std::optional<size_t> vertexCover(const ShortcutVertexSet& cover, double r, const ShortcutGraph& current)
+	{
+		const bool first = current.vertexMap( [&cover, &current, r]( const auto origin ) {
+			ShortestPaths<ShortcutGraph> paths = shortestPaths( current, origin, r, r );
+			return paths.vertexMap( [&cover, &paths]( const auto vertex, double distance ) {
+				return paths.pathMap( vertex, [&cover]( auto vertex_, double distance_ ) {
+					return cover.contains( vertex_ );
+				} );
+			} );
+		} );
+		if (!first) { return {}; }
+
+		size_t second;
+
+	}*/
 
 	ShortcutVertexVector calculateDiscard( const ShortcutVertexSet& keepSet, const ShortcutGraph& current )
 	{
@@ -117,7 +126,7 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 
 	double maxWeight = 8.0;
 	double prevMaxWeight = 1.0;
-	std::size_t minEdgeIndex = 0;
+	size_t minEdgeIndex = 0;
 	while (true)
 	{
 		while (minEdgeIndex < edges.size() && g[edges[minEdgeIndex]].weight() <= prevMaxWeight)
@@ -127,7 +136,7 @@ CIHierarchy::CIHierarchy( const WeightedGraph& g )
 
 		const ShortcutGraph& back = _hierarchy.back();
 
-		ShortcutVertexSet keepSet = gatherEdgeVertices( minEdgeIndex, edges, g, back );
+		ShortcutVertexSet keepSet = gatherEdgeVertices( minEdgeIndex, edges, g, back, maxWeight );
 		ShortcutVertexSet selectedSet = selectVertices( maxWeight, prevMaxWeight, back );
 		for (const auto v : selectedSet)
 		{

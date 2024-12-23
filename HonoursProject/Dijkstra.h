@@ -4,18 +4,38 @@
 #include "ShortcutGraph.h"
 
 template <class Graph>
-struct DijkstraResult
+class DijkstraResult
 {
+public:
 	using VertexDescriptor = typename Graph::VertexDescriptor;
+	using EdgeDescriptor   = typename Graph::EdgeDescriptor;
 
-	VertexDescriptor vertex;
-	VertexDescriptor prev;
-	double           distance;
+public:
+	DijkstraResult() = default;
+	DijkstraResult( VertexDescriptor source );
+	DijkstraResult(
+		VertexDescriptor vertex,
+		VertexDescriptor prev,
+		EdgeDescriptor   edge,
+		double           distance
+	);
 
-	inline bool operator<( const DijkstraResult& other ) const
-	{
-		return distance < other.distance;
-	}
+	void update( VertexDescriptor prev, EdgeDescriptor edge, double distance );
+
+	bool operator<( const DijkstraResult& other ) const;
+
+	VertexDescriptor vertex() const;
+	VertexDescriptor prev() const;
+	EdgeDescriptor   edge() const;
+	double           distance() const;
+
+	bool isOrigin() const;
+
+private:
+	VertexDescriptor _vertex;
+	VertexDescriptor _prev;
+	EdgeDescriptor   _edge;
+	double           _distance;
 };
 
 template <class Graph>
@@ -31,32 +51,34 @@ public:
 
 	double distance( VertexDescriptor from ) const;
 
-	template <class P>
-	void vertexMap( P predicate ) const;
+	void filter( VertexDescriptor vertex );
 
 	template <class P>
-	void pathMap( VertexDescriptor from, P predicate ) const;
+	bool vertexMap( P predicate ) const;
 
-	size_t numVertices() const;
+	template <class P>
+	bool pathMap( VertexDescriptor from, P predicate ) const;
 
 private:
 	VertexDescriptor _to;
 	std::unordered_map<VertexDescriptor, DijkstraResult<Graph>> _results;
+	std::unordered_set<VertexDescriptor> _filter;
 };
 
 ShortestPaths<ShortcutGraph> shortestPaths(
-	const ShortcutGraph& graph,
+	const ShortcutGraph&            graph,
 	ShortcutGraph::VertexDescriptor source,
 	double                          maxDist,
+	double                          minDist,
 	double                          maxEdge
 );
 
 bool witnessSearch(
-	const ShortcutGraph& graph,
+	const ShortcutGraph&            graph,
 	ShortcutGraph::VertexDescriptor source,
 	ShortcutGraph::VertexDescriptor target,
 	ShortcutGraph::VertexDescriptor avoid,
-	double                          minDist
+	double                          maxDist
 );
 
 bool usefulEdge(
