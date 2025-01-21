@@ -4,23 +4,23 @@
 #include <string>
 #include <unordered_map>
 
-RoadDParser::RoadDParser( std::filesystem::path filepath )
+RoadDParser::RoadDParser( FilePath filepath )
 	: GraphParser( std::move( filepath ) )
 {
 
 }
 
-std::optional<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
+Ptr<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
 {
-	std::unordered_map<VertexDescriptor, VertexDescriptor> map;
-	WeightedGraph result;
+	Map<Vertex, Vertex> map;
+	Ptr<WeightedGraph> result = std::make_unique<WeightedGraph>();
 
-	std::string line;
+	Str line;
 	while (std::getline( file, line ))
 	{
 		if (line[0] == '#') { continue; }
 		std::stringstream stream( line );
-		VertexDescriptor source, target;
+		Vertex source, target;
 		double weight;
 		stream >> source >> target >> weight;
 
@@ -37,13 +37,13 @@ std::optional<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) c
 		{
 			return {};
 		}
-		while (result.numVertices() <= source)
+		while (result->numVertices() <= source)
 		{
-			result.addVertex( {} );
+			result->addVertex( {} );
 		}
-		while (result.numVertices() <= target)
+		while (result->numVertices() <= target)
 		{
-			result.addVertex( {} );
+			result->addVertex( {} );
 		}
 
 		if (weight == 0.0)
@@ -53,27 +53,35 @@ std::optional<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) c
 				map[target] = source;
 			}
 		}
-		else if (!result.edge( source, target ))
+		else if (!result->edge( source, target ))
 		{
-			result.addEdge( source, target, { weight } );
+			result->addEdge( source, target, { weight } );
 		}
 	}
 
-	result.removeIsolatedVertices();
-	result.normalize();
+	result->removeIsolatedVertices();
+	result->normalize();
 
-	WeightedGraph::EdgeVector uselessEdges;
-	result.edgeMap( [&result, &uselessEdges]( const auto e ) {
-		if (!usefulEdge( result, e )) { uselessEdges.push_back( e ); }
+	Vec<WeightedGraph::Edge> uselessEdges;
+	result->edgeMap( [&result, &uselessEdges]( const auto e ) {
+		if (!usefulEdge( *result, e )) { uselessEdges.push_back( e ); }
 		return false;
 	} );
 
-	result.removeEdges( uselessEdges );
+	result->removeEdges( uselessEdges );
 
-	return std::move( result );
+	return result;
 }
 
 std::ios_base::openmode RoadDParser::getOpenMode() const
 {
 	return std::ios::in;
 }
+
+FACTORY_BEGIN_JSON( "road-d", RoadDParser, GraphParser )
+
+	JSON_ARG( Str, filepath )
+
+	FACTORY_FABRICATE( std::move( filepath ) )
+
+FACTORY_END()

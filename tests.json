@@ -1,0 +1,90 @@
+{
+	"logger":
+	{
+		"log":
+		{
+			"type": "file",
+			"filepath": "results.log"
+		},
+		"debug":
+		{
+			"type": "stream"
+		}
+	},
+	"suite":
+	{
+		"tests":
+		[
+			{
+				"name": "Sample_Hongkong",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Hongkong.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hongkong.ci"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "list",
+						"endpoints":
+						[
+							{ "u": 0, "v": 1 }
+						],
+						"name": "Hongkong_single_0_1"
+					},
+					{
+						"type": "random",
+						"trials": 10,
+						"name": "Hongkong_random_10"
+					}
+				]
+			},
+			{
+				"name": "Sample_Beijing",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Beijing.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "beijing.ci"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "list",
+						"endpoints":
+						[
+							{ "u": 0, "v": 1 }
+						],
+						"name": "Beijing_single_0_1"
+					},
+					{
+						"type": "random",
+						"trials": 10,
+						"name": "Beijing_random_10"
+					}
+				]
+			}
+		]
+	}
+}

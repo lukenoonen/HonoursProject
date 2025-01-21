@@ -1,9 +1,6 @@
 #include "Dijkstra.h"
 
-#include <unordered_map>
 #include <boost/heap/fibonacci_heap.hpp>
-
-#include <iostream>
 
 namespace
 {
@@ -11,26 +8,25 @@ namespace
 	class DijkstraData
 	{
 	private:
-		using VertexDescriptor = typename Graph::VertexDescriptor;
-		using EdgeDescriptor   = typename Graph::EdgeDescriptor;
+		using Vertex = typename Graph::Vertex;
+		using Edge   = typename Graph::Edge;
 
 		using Heap        = boost::heap::fibonacci_heap<DijkstraResult<Graph>>;
 		using HeapHandle  = DijkstraData<Graph>::Heap::handle_type;
-		using HandleMap   = std::unordered_map<VertexDescriptor, HeapHandle>;
-		using DistanceMap = std::unordered_map<VertexDescriptor, double>;
+		using HandleMap   = Map<Vertex, HeapHandle>;
+		using DistanceMap = Map<Vertex, double>;
 
 	public:
-		using ExtractType = std::tuple<VertexDescriptor, double>;
+		using ExtractType = std::tuple<Vertex, double>;
 
 	public:
-		DijkstraData( VertexDescriptor to );
+		DijkstraData( Vertex to );
 
-		void emplace( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance );
-		void decrease( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance );
+		void decrease( Vertex v, Vertex p, Edge e, double distance );
 
 		ExtractType extract();
 
-		double distance( VertexDescriptor v ) const;
+		double distance( Vertex v ) const;
 		bool empty() const;
 
 		ShortestPaths<Graph> results();
@@ -45,7 +41,7 @@ namespace
 	};
 
 	template <class Graph>
-	DijkstraData<Graph>::DijkstraData( VertexDescriptor to )
+	DijkstraData<Graph>::DijkstraData( Vertex to )
 		: _results( to )
 	{
 		_handles[to]   = _queue.emplace( to );
@@ -53,14 +49,7 @@ namespace
 	}
 
 	template <class Graph>
-	void DijkstraData<Graph>::emplace( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance )
-	{
-		_handles[v]   = _queue.emplace( v, p, e, distance );
-		_distances[v] = distance;
-	}
-
-	template <class Graph>
-	void DijkstraData<Graph>::decrease( VertexDescriptor v, VertexDescriptor p, EdgeDescriptor e, double distance )
+	void DijkstraData<Graph>::decrease( Vertex v, Vertex p, Edge e, double distance )
 	{
 		if (auto search = _handles.find( v ); search != _handles.end())
 		{
@@ -71,7 +60,8 @@ namespace
 		}
 		else
 		{
-			emplace( v, p, e, distance );
+			_handles[v]   = _queue.emplace( v, p, e, distance );
+			_distances[v] = distance;
 		}
 	}
 
@@ -79,16 +69,16 @@ namespace
 	DijkstraData<Graph>::ExtractType DijkstraData<Graph>::extract()
 	{
 		const DijkstraResult<Graph>& top = _queue.top();
-		const VertexDescriptor v = top.vertex();
+		const Vertex v    = top.vertex();
 		const double dist = top.distance();
 		_results.insert( v, top );
 		_queue.pop();
-		_handles.erase( v );
+		// _handles.erase( v );
 		return { v, dist };
 	}
 
 	template <class Graph>
-	double DijkstraData<Graph>::distance( VertexDescriptor v ) const
+	double DijkstraData<Graph>::distance( Vertex v ) const
 	{
 		if (const auto search = _distances.find( v ); search != _distances.end())
 		{
@@ -118,9 +108,9 @@ namespace
 
 	template <class Graph, class P>
 	ShortestPaths<Graph> dijkstra(
-		const Graph&                     graph,
-		typename Graph::VertexDescriptor source,
-		P                                predicate
+		const Graph&           graph,
+		typename Graph::Vertex source,
+		P                      predicate
 	)
 	{
 		DijkstraData<Graph> data( source );
@@ -146,19 +136,29 @@ namespace
 	}
 }
 
+CREATE_GLOBAL_PROFILER( total, shortestPaths );
+CREATE_LOCAL_PROFILER( dijkstra, shortestPaths );
+CREATE_LOCAL_PROFILER( processing, shortestPaths );
+
 ShortestPaths<ShortcutGraph> shortestPaths(
-	const ShortcutGraph&            graph,
-	ShortcutGraph::VertexDescriptor source,
-	double                          maxDist,
-	double                          minDist,
-	double                          maxEdge
+	const ShortcutGraph&  graph,
+	ShortcutGraph::Vertex source,
+	double                maxDist,
+	double                minDist,
+	double                maxEdge
 )
 {
+	START_PROFILER( total, shortestPaths );
+
+	START_PROFILER( dijkstra, shortestPaths );
 	ShortestPaths<ShortcutGraph> paths = dijkstra( graph, source, [&graph, maxDist]( const auto v, const auto e, const double dist ) {
 		if (dist > maxDist) { return PredicateResponse::FALSE; }
 		return PredicateResponse::TRUE;
 	} );
+	STOP_PROFILER( dijkstra, shortestPaths );
 
+
+	START_PROFILER( processing, shortestPaths );
 	paths.vertexMap( [&graph, minDist, maxEdge, &paths]( const auto& result ) {
 		if (result.distance() < minDist)
 		{
@@ -166,12 +166,13 @@ ShortestPaths<ShortcutGraph> shortestPaths(
 			return false;
 		}
 
-		std::vector<ShortcutGraph::VertexDescriptor> path;
+		Vec<ShortcutGraph::Vertex> path;
 		const bool filter = paths.pathMap( result.vertex(), [&graph, maxEdge, &paths, &path]( const auto& result_ ) {
 			if (result_.isOrigin()) { return false; }
 			path.push_back( result_.vertex() );
 			return graph[result_.edge()].maxEdge() > maxEdge;
 		} );
+
 		if (filter)
 		{
 			for (const auto v : path)
@@ -181,16 +182,18 @@ ShortestPaths<ShortcutGraph> shortestPaths(
 		}
 		return false;
 	} );
+	STOP_PROFILER( processing, shortestPaths );
 
+	STOP_PROFILER( total, shortestPaths );
 	return paths;
 }
 
 bool witnessSearch(
-	const ShortcutGraph&            graph,
-	ShortcutGraph::VertexDescriptor source,
-	ShortcutGraph::VertexDescriptor target,
-	ShortcutGraph::VertexDescriptor avoid,
-	double                          maxDist
+	const ShortcutGraph&  graph,
+	ShortcutGraph::Vertex source,
+	ShortcutGraph::Vertex target,
+	ShortcutGraph::Vertex avoid,
+	double                maxDist
 )
 {
 	bool witnessFound = false;
@@ -209,8 +212,8 @@ bool witnessSearch(
 }
 
 bool usefulEdge(
-	const WeightedGraph&          graph,
-	WeightedGraph::EdgeDescriptor e
+	const WeightedGraph& graph,
+	WeightedGraph::Edge  e
 )
 {
 	const auto source = graph.source( e );
@@ -228,4 +231,25 @@ bool usefulEdge(
 		return PredicateResponse::TRUE;
 	} );
 	return useful;
+}
+
+ShortestPaths<WeightedGraph> dijkstraSearch( const WeightedGraph& graph, WeightedGraph::Vertex source, WeightedGraph::Vertex target )
+{
+	DijkstraData<WeightedGraph> data( source );
+
+	while (!data.empty())
+	{
+		const auto [u, uDist] = data.extract();
+		if (u == target) { break; }
+		graph.edgeMap( u, [u, uDist, &graph, &data]( const auto e ) {
+			const auto v = graph.other( e, u );
+			const double vDist = data.distance( v );
+			const double newDist = uDist + graph[e].weight();
+			if (newDist >= vDist) { return false; }
+			data.decrease( v, u, e, newDist );
+			return false;
+		} );
+	}
+
+	return data.results();
 }

@@ -1,89 +1,101 @@
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
 
+#include "Util.h"
+
 #include "ShortcutGraph.h"
 
 template <class Graph>
 class DijkstraResult
 {
 public:
-	using VertexDescriptor = typename Graph::VertexDescriptor;
-	using EdgeDescriptor   = typename Graph::EdgeDescriptor;
+	using Vertex = typename Graph::Vertex;
+	using Edge   = typename Graph::Edge;
 
 public:
 	DijkstraResult() = default;
-	DijkstraResult( VertexDescriptor source );
+	DijkstraResult( Vertex source );
 	DijkstraResult(
-		VertexDescriptor vertex,
-		VertexDescriptor prev,
-		EdgeDescriptor   edge,
-		double           distance
+		Vertex vertex,
+		Vertex prev,
+		Edge   edge,
+		double distance
 	);
 
-	void update( VertexDescriptor prev, EdgeDescriptor edge, double distance );
+	void update( Vertex prev, Edge edge, double distance );
 
 	bool operator<( const DijkstraResult& other ) const;
 
-	VertexDescriptor vertex() const;
-	VertexDescriptor prev() const;
-	EdgeDescriptor   edge() const;
-	double           distance() const;
+	Vertex vertex() const;
+	Vertex prev() const;
+	Edge   edge() const;
+	double distance() const;
 
 	bool isOrigin() const;
 
 private:
-	VertexDescriptor _vertex;
-	VertexDescriptor _prev;
-	EdgeDescriptor   _edge;
-	double           _distance;
+	Vertex _vertex;
+	Vertex _prev;
+	Edge   _edge;
+	double _distance;
 };
 
 template <class Graph>
 class ShortestPaths
 {
 public:
-	using VertexDescriptor = typename Graph::VertexDescriptor;
+	using Vertex = typename Graph::Vertex;
 
 public:
-	ShortestPaths( VertexDescriptor to );
+	ShortestPaths( Vertex to );
 
-	void insert( VertexDescriptor v, const DijkstraResult<Graph>& result );
+	void insert( Vertex v, const DijkstraResult<Graph>& result );
 
-	double distance( VertexDescriptor from ) const;
+	double distance( Vertex from ) const;
 
-	void filter( VertexDescriptor vertex );
+	void filter( Vertex vertex );
 
 	template <class P>
 	bool vertexMap( P predicate ) const;
 
 	template <class P>
-	bool pathMap( VertexDescriptor from, P predicate ) const;
+	bool pathMap( Vertex from, P predicate ) const;
 
 private:
-	VertexDescriptor _to;
-	std::unordered_map<VertexDescriptor, DijkstraResult<Graph>> _results;
-	std::unordered_set<VertexDescriptor> _filter;
+	Vertex _to;
+	Map<Vertex, DijkstraResult<Graph>> _results;
+	Set<Vertex> _filter;
 };
 
+#include "Profiler.h"
+
+CREATE_PROFILER_SET( shortestPaths );
+
 ShortestPaths<ShortcutGraph> shortestPaths(
-	const ShortcutGraph&            graph,
-	ShortcutGraph::VertexDescriptor source,
-	double                          maxDist,
-	double                          minDist,
-	double                          maxEdge
+	const ShortcutGraph&  graph,
+	ShortcutGraph::Vertex source,
+	double                maxDist,
+	double                minDist,
+	double                maxEdge
 );
 
 bool witnessSearch(
-	const ShortcutGraph&            graph,
-	ShortcutGraph::VertexDescriptor source,
-	ShortcutGraph::VertexDescriptor target,
-	ShortcutGraph::VertexDescriptor avoid,
-	double                          maxDist
+	const ShortcutGraph&  graph,
+	ShortcutGraph::Vertex source,
+	ShortcutGraph::Vertex target,
+	ShortcutGraph::Vertex avoid,
+	double                maxDist
 );
 
 bool usefulEdge(
 	const WeightedGraph& graph,
-	WeightedGraph::EdgeDescriptor e
+	WeightedGraph::Edge  e
+);
+
+ShortestPaths<WeightedGraph> dijkstraSearch(
+	const WeightedGraph& graph,
+	WeightedGraph::Vertex source,
+	WeightedGraph::Vertex target
 );
 
 #include "Dijkstra.inl"

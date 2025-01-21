@@ -1,6 +1,10 @@
 #ifndef WEIGHTEDGRAPH_H
 #define WEIGHTEDGRAPH_H
 
+#include "Util.h"
+
+#include "JSON.h"
+
 #include "BaseGraph.h"
 #include "Filters.h"
 
@@ -20,9 +24,6 @@ public:
 	friend void deserialize( std::istream& is, WeightedVertex& data );
 };
 
-void serialize( std::ostream& os, const WeightedVertex& data );
-void deserialize( std::istream& is, WeightedVertex& data );
-
 class WeightedEdge
 {
 public:
@@ -40,7 +41,6 @@ private:
 	double _weight;
 };
 
-void serialize( std::ostream& os, const WeightedEdge& data );
-void deserialize( std::istream& is, WeightedEdge& data );
+JSON_CREATE( Ptr<WeightedGraph> )
 
 #endif // WEIGHTEDGRAPH_H

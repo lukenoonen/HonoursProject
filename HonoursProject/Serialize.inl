@@ -1,5 +1,4 @@
-#include <ostream>
-#include <istream>
+#include <fstream>
 
 #include <vector>
 #include <unordered_map>
@@ -17,7 +16,7 @@ inline void deserialize( std::istream& is, T& data )
 }
 
 template <class T>
-inline void serialize( std::ostream& os, const std::vector<T>& data )
+inline void serialize( std::ostream& os, const Vec<T>& data )
 {
 	serialize( os, data.size() );
 
@@ -28,7 +27,7 @@ inline void serialize( std::ostream& os, const std::vector<T>& data )
 }
 
 template <class T>
-inline void deserialize( std::istream& is, std::vector<T>& data )
+inline void deserialize( std::istream& is, Vec<T>& data )
 {
 	size_t size;
 	deserialize( is, size );
@@ -41,7 +40,7 @@ inline void deserialize( std::istream& is, std::vector<T>& data )
 }
 
 template <class T, class U>
-inline void serialize( std::ostream& os, const std::unordered_map<T, U>& data )
+inline void serialize( std::ostream& os, const Map<T, U>& data )
 {
 	serialize( os, data.size() );
 
@@ -53,7 +52,7 @@ inline void serialize( std::ostream& os, const std::unordered_map<T, U>& data )
 }
 
 template <class T, class U>
-inline void deserialize( std::istream& is, std::unordered_map<T, U>& data )
+inline void deserialize( std::istream& is, Map<T, U>& data )
 {
 	size_t size;
 	deserialize( is, size );
@@ -71,15 +70,49 @@ inline void deserialize( std::istream& is, std::unordered_map<T, U>& data )
 }
 
 template<class T, class U>
-inline void serialize( std::ostream& os, const std::pair<T, U>& data )
+inline void serialize( std::ostream& os, const Pair<T, U>& data )
 {
 	serialize( os, data.first );
 	serialize( os, data.second );
 }
 
 template<class T, class U>
-inline void deserialize( std::istream& is, std::pair<T, U>& data )
+inline void deserialize( std::istream& is, Pair<T, U>& data )
 {
 	deserialize( is, data.first );
 	deserialize( is, data.second );
+}
+
+template<class T>
+inline bool serialize( FilePath filepath, const T& data )
+{
+	std::ofstream file( filepath, std::ios::out | std::ios::binary );
+	if (!file.is_open()) { return false; }
+	try
+	{
+		serialize( file, data );
+	}
+	catch (...)
+	{
+		return false;
+	}
+	file.close();
+	return true;
+}
+
+template<class T>
+inline bool deserialize( FilePath filepath, T& data )
+{
+	std::ifstream file( filepath, std::ios::in | std::ios::binary );
+	if (!file.is_open()) { return false; }
+	try
+	{
+		deserialize( file, data );
+	}
+	catch (...)
+	{
+		return false;
+	}
+	file.close();
+	return true;
 }

@@ -1,6 +1,8 @@
 #ifndef BASEGRAPH_H
 #define BASEGRAPH_H
 
+#include "Util.h"
+
 #include <boost/graph/adjacency_list.hpp>
 
 #include <utility>
@@ -13,58 +15,48 @@ template <class V, class E, template<class, class> class F>
 class BaseGraph
 {
 public:
-
 	using GraphType = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, V, E>;
 
-	using VertexDescriptor = typename GraphType::vertex_descriptor;
-	using EdgeDescriptor   = typename GraphType::edge_descriptor;
+	using Vertex = typename GraphType::vertex_descriptor;
+	using Edge   = typename GraphType::edge_descriptor;
 
 	struct EdgeHash
 	{
-		size_t operator() ( const EdgeDescriptor& edge ) const;
+		size_t operator() ( const Edge& edge ) const;
 	};
-
-	using OptVertexDescriptor = std::optional<typename VertexDescriptor>;
-	using OptEdgeDescriptor   = std::optional<typename EdgeDescriptor>;
-
-	using VertexSet    = std::unordered_set<VertexDescriptor>;
-	using VertexVector = std::vector<VertexDescriptor>;
-
-	using EdgeSet    = std::unordered_set<EdgeDescriptor, EdgeHash>;
-	using EdgeVector = std::vector<EdgeDescriptor>;
 
 	using FilterType = typename F<V, E>;
 
 public:
 	BaseGraph();
 
-	VertexDescriptor addVertex( V data );
-	OptEdgeDescriptor addEdge( VertexDescriptor source, VertexDescriptor target, E data );
+	Vertex addVertex( V data );
+	Opt<Edge> addEdge( Vertex s, Vertex t, E data );
 
-	void removeVertices( const VertexVector& remove );
+	void removeVertices( const Vec<Vertex>& remove );
 	void removeIsolatedVertices();
 
-	void removeEdges( const EdgeVector& remove );
+	void removeEdges( const Vec<Edge>& remove );
 
-	VertexDescriptor source( EdgeDescriptor e ) const;
-	VertexDescriptor target( EdgeDescriptor e ) const;
-	VertexDescriptor other( EdgeDescriptor e, VertexDescriptor v ) const;
+	Vertex source( Edge e ) const;
+	Vertex target( Edge e ) const;
+	Vertex other( Edge e, Vertex v ) const;
 
-	OptEdgeDescriptor edge( VertexDescriptor source, VertexDescriptor target ) const;
+	Opt<Edge> edge( Vertex s, Vertex t ) const;
 
-	V& get( VertexDescriptor v );
-	const V& get( VertexDescriptor v ) const;
-	V& operator[]( VertexDescriptor v );
-	const V& operator[]( VertexDescriptor v ) const;
+	V& get( Vertex v );
+	const V& get( Vertex v ) const;
+	V& operator[]( Vertex v );
+	const V& operator[]( Vertex v ) const;
 
-	E& get( EdgeDescriptor e );
-	const E& get( EdgeDescriptor e ) const;
-	E& operator[]( EdgeDescriptor e );
-	const E& operator[]( EdgeDescriptor e ) const;
+	E& get( Edge e );
+	const E& get( Edge e ) const;
+	E& operator[]( Edge e );
+	const E& operator[]( Edge e ) const;
 
 	size_t numVertices() const;
 	size_t numEdges() const;
-	size_t degree( VertexDescriptor v ) const;
+	size_t degree( Vertex v ) const;
 
 	double meanDegree() const;
 	bool connected() const;
@@ -72,15 +64,15 @@ public:
 	template <class P>
 	bool vertexMap( P predicate ) const;
 	template <class P>
-	bool vertexMap( VertexDescriptor v, P predicate ) const;
+	bool vertexMap( Vertex v, P predicate ) const;
 
 	template <class P>
 	bool edgeMap( P predicate ) const;
 	template <class P>
-	bool edgeMap( VertexDescriptor v, P predicate ) const;
+	bool edgeMap( Vertex v, P predicate ) const;
 
 	template <class P>
-	bool dfs( VertexDescriptor v, P predicate ) const;
+	bool dfs( Vertex v, P predicate ) const;
 
 public:
 	template <class V_, class E_, template<class, class> class F_>
@@ -95,14 +87,6 @@ protected:
 	GraphType  _graph;
 	FilterType _filter;
 };
-
-template <class V, class E, template<class, class> class F>
-std::ostream& operator<<( std::ostream& os, const BaseGraph<V, E, F>& graph );
-
-template <class V, class E, template<class, class> class F>
-void serialize( std::ostream& os, const BaseGraph<V, E, F>& data );
-template <class V, class E, template<class, class> class F>
-void deserialize( std::istream& is, BaseGraph<V, E, F>& data );
 
 #include "BaseGraph.inl"
 

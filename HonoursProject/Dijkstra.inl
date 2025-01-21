@@ -1,6 +1,5 @@
-#include "Dijkstra.h"
 template<class Graph>
-inline DijkstraResult<Graph>::DijkstraResult( VertexDescriptor vertex )
+inline DijkstraResult<Graph>::DijkstraResult( Vertex vertex )
 	: _vertex( vertex ),
 	  _prev( vertex ),
 	  _distance( 0.0 )
@@ -10,10 +9,10 @@ inline DijkstraResult<Graph>::DijkstraResult( VertexDescriptor vertex )
 
 template<class Graph>
 inline DijkstraResult<Graph>::DijkstraResult(
-	VertexDescriptor vertex,
-	VertexDescriptor prev,
-	EdgeDescriptor   edge,
-	double           distance
+	Vertex vertex,
+	Vertex prev,
+	Edge   edge,
+	double distance
 )
 	: _vertex( vertex ),
 	  _prev( prev ),
@@ -24,7 +23,7 @@ inline DijkstraResult<Graph>::DijkstraResult(
 }
 
 template<class Graph>
-inline void DijkstraResult<Graph>::update( VertexDescriptor prev, EdgeDescriptor edge, double distance )
+inline void DijkstraResult<Graph>::update( Vertex prev, Edge edge, double distance )
 {
 	_prev     = prev;
 	_edge     = edge;
@@ -34,23 +33,23 @@ inline void DijkstraResult<Graph>::update( VertexDescriptor prev, EdgeDescriptor
 template<class Graph>
 inline bool DijkstraResult<Graph>::operator<( const DijkstraResult<Graph>& other ) const
 {
-	return _distance < other._distance;
+	return _distance > other._distance;
 }
 
 template<class Graph>
-inline DijkstraResult<Graph>::VertexDescriptor DijkstraResult<Graph>::vertex() const
+inline DijkstraResult<Graph>::Vertex DijkstraResult<Graph>::vertex() const
 {
 	return _vertex;
 }
 
 template<class Graph>
-inline DijkstraResult<Graph>::VertexDescriptor DijkstraResult<Graph>::prev() const
+inline DijkstraResult<Graph>::Vertex DijkstraResult<Graph>::prev() const
 {
 	return _prev;
 }
 
 template<class Graph>
-inline DijkstraResult<Graph>::EdgeDescriptor DijkstraResult<Graph>::edge() const
+inline DijkstraResult<Graph>::Edge DijkstraResult<Graph>::edge() const
 {
 	return _edge;
 }
@@ -68,20 +67,20 @@ inline bool DijkstraResult<Graph>::isOrigin() const
 }
 
 template <class Graph>
-inline ShortestPaths<Graph>::ShortestPaths( VertexDescriptor to )
+inline ShortestPaths<Graph>::ShortestPaths( Vertex to )
 	: _to( to )
 {
 
 }
 
 template <class Graph>
-inline void ShortestPaths<Graph>::insert( VertexDescriptor v, const DijkstraResult<Graph>& result )
+inline void ShortestPaths<Graph>::insert( Vertex v, const DijkstraResult<Graph>& result )
 {
 	_results[v] = result;
 }
 
 template <class Graph>
-inline double ShortestPaths<Graph>::distance( VertexDescriptor from ) const
+inline double ShortestPaths<Graph>::distance( Vertex from ) const
 {
 	if (const auto search = _results.find( from ); search != _results.end())
 	{
@@ -92,7 +91,7 @@ inline double ShortestPaths<Graph>::distance( VertexDescriptor from ) const
 }
 
 template<class Graph>
-inline void ShortestPaths<Graph>::filter( VertexDescriptor vertex )
+inline void ShortestPaths<Graph>::filter( Vertex vertex )
 {
 	_filter.insert( vertex );
 }
@@ -111,12 +110,12 @@ inline bool ShortestPaths<Graph>::vertexMap( P predicate ) const
 
 template <class Graph>
 template <class P>
-inline bool ShortestPaths<Graph>::pathMap( VertexDescriptor from, P predicate ) const
+inline bool ShortestPaths<Graph>::pathMap( Vertex from, P predicate ) const
 {
 	if (!_results.contains( from )) { return false; }
 	if (_filter.contains( from )) { return false; }
 
-	VertexDescriptor vertex = from;
+	Vertex vertex = from;
 	while (true)
 	{
 		const auto search = _results.find( vertex );

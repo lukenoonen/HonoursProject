@@ -1,28 +1,34 @@
 #ifndef GRAPHPARSER_H
 #define GRAPHPARSER_H
 
-#include "WeightedGraph.h"
+#include "Util.h"
 
-#include <filesystem>
-#include <fstream>
+#include "JSON.h"
+
+#include "WeightedGraph.h"
+#include "Factory.h"
 
 class GraphParser
 {
 protected:
-	using VertexDescriptor = WeightedGraph::VertexDescriptor;
-	using EdgeDescriptor = WeightedGraph::EdgeDescriptor;
+	using Vertex = WeightedGraph::Vertex;
+	using Edge   = WeightedGraph::Edge;
 
 public:
-	GraphParser( std::filesystem::path filepath );
+	GraphParser( FilePath filepath );
 
-	std::optional<WeightedGraph> create() const;
+	Ptr<WeightedGraph> create() const;
 
 protected:
-	virtual std::optional<WeightedGraph> createInternal( std::ifstream file ) const = 0;
+	virtual Ptr<WeightedGraph> createInternal( std::ifstream file ) const = 0;
 	virtual	std::ios_base::openmode getOpenMode() const = 0;
 
 private:
-	std::filesystem::path _filepath;
+	FilePath _filepath;
 };
+
+FACTORY_CREATE_BASE_JSON( GraphParser )
+
+JSON_CREATE_FACTORY( GraphParser )
 
 #endif // GRAPHPARSER_H

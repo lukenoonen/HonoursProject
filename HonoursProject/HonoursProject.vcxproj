@@ -19,29 +19,63 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CIHierarchy.cpp" />
-    <ClCompile Include="Dijkstra.cpp" />
-    <ClCompile Include="GraphParser.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RoadDParser.cpp" />
-    <ClCompile Include="ShortcutGraph.cpp" />
-    <ClCompile Include="WeightedGraph.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="BaseGraph.h" />
-    <ClInclude Include="CIHierarchy.h" />
+    <ClInclude Include="CIHierarchyBuilder.h" />
     <ClInclude Include="Dijkstra.h" />
+    <ClInclude Include="DijkstraSolver.h" />
+    <ClInclude Include="DijkstraSolverBuilder.h" />
+    <ClInclude Include="Factory.h" />
+    <ClInclude Include="FileOutput.h" />
     <ClInclude Include="Filters.h" />
     <ClInclude Include="GraphParser.h" />
+    <ClInclude Include="JSON.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="Output.h" />
+    <ClInclude Include="PathSolver.h" />
+    <ClInclude Include="PathSolverBuilder.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="RoadDParser.h" />
     <ClInclude Include="Serialize.h" />
     <ClInclude Include="ShortcutGraph.h" />
+    <ClInclude Include="ShortcutHierarchy.h" />
+    <ClInclude Include="ShortcutHierarchyBuilder.h" />
+    <ClInclude Include="StreamOutput.h" />
+    <ClInclude Include="TestCase.h" />
+    <ClInclude Include="TestInst.h" />
+    <ClInclude Include="TestSuite.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="WeightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl" />
     <None Include="Dijkstra.inl" />
+    <None Include="Factory.inl" />
+    <None Include="JSON.inl" />
+    <None Include="Logger.inl" />
     <None Include="Serialize.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CIHierarchyBuilder.cpp" />
+    <ClCompile Include="Dijkstra.cpp" />
+    <ClCompile Include="DijkstraSolver.cpp" />
+    <ClCompile Include="DijkstraSolverBuilder.cpp" />
+    <ClCompile Include="FileOutput.cpp" />
+    <ClCompile Include="GraphParser.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Output.cpp" />
+    <ClCompile Include="PathSolver.cpp" />
+    <ClCompile Include="PathSolverBuilder.cpp" />
+    <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="RoadDParser.cpp" />
+    <ClCompile Include="ShortcutGraph.cpp" />
+    <ClCompile Include="ShortcutHierarchy.cpp" />
+    <ClCompile Include="ShortcutHierarchyBuilder.cpp" />
+    <ClCompile Include="StreamOutput.cpp" />
+    <ClCompile Include="TestCase.cpp" />
+    <ClCompile Include="TestInst.cpp" />
+    <ClCompile Include="TestSuite.cpp" />
+    <ClCompile Include="WeightedGraph.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -135,7 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -151,8 +185,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

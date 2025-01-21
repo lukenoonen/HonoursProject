@@ -2,6 +2,8 @@
 #ifndef SHORTCUTGRAPH_H
 #define SHORTCUTGRAPH_H
 
+#include "Util.h"
+
 #include "BaseGraph.h"
 #include "WeightedGraph.h"
 
@@ -13,12 +15,10 @@ class ShortcutGraph : public BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilte
 public:
 	ShortcutGraph() = default;
 	ShortcutGraph( const WeightedGraph& source );
-	ShortcutGraph( const ShortcutGraph& prev, const std::vector<VertexDescriptor>& discard );
+	ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& discard );
 
-	double length() const;
-
-	ShortcutGraph::VertexDescriptor fromSource( WeightedGraph::VertexDescriptor v ) const;
-	WeightedGraph::VertexDescriptor toSource( ShortcutGraph::VertexDescriptor v ) const;
+	ShortcutGraph::Vertex fromSource( WeightedGraph::Vertex v ) const;
+	WeightedGraph::Vertex toSource( ShortcutGraph::Vertex v ) const;
 
 private:
 	void calculateMap();
@@ -28,38 +28,32 @@ public:
 	friend void deserialize( std::istream& is, ShortcutGraph& data );
 
 private:
-	std::unordered_map<VertexDescriptor, VertexDescriptor> _map;
+	Map<Vertex, Vertex> _map;
 };
-
-void serialize( std::ostream& os, const ShortcutGraph& data );
-void deserialize( std::istream& is, ShortcutGraph& data );
 
 class ShortcutVertex
 {
 public:
 	ShortcutVertex() = default;
-	ShortcutVertex( WeightedGraph::VertexDescriptor mapped );
+	ShortcutVertex( WeightedGraph::Vertex mapped );
 
-	WeightedGraph::VertexDescriptor mapped() const;
+	WeightedGraph::Vertex mapped() const;
 
 	friend void serialize( std::ostream& os, const ShortcutVertex& data );
 	friend void deserialize( std::istream& is, ShortcutVertex& data );
 
 private:
-	WeightedGraph::VertexDescriptor _mapped;
+	WeightedGraph::Vertex _mapped;
 };
-
-void serialize( std::ostream& os, const ShortcutVertex& data );
-void deserialize( std::istream& is, ShortcutVertex& data );
 
 class ShortcutEdge
 {
 public:
-	using PathType = WeightedGraph::EdgeVector;
+	using PathType = Vec<WeightedGraph::Edge>;
 
 public:
 	ShortcutEdge() = default;
-	ShortcutEdge( WeightedGraph::EdgeDescriptor e, double weight );
+	ShortcutEdge( WeightedGraph::Edge e, double weight );
 	ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& second );
 
 	const PathType& path() const;
@@ -75,8 +69,5 @@ private:
 	double _weight;
 	double _maxEdge;
 };
-
-void serialize( std::ostream& os, const ShortcutEdge& data );
-void deserialize( std::istream& is, ShortcutEdge& data );
 
 #endif // SHORTCUTGRAPH_H

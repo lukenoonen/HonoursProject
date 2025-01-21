@@ -366,4 +366,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Project specific files
-# data/
+include/
+data/
+*.ci

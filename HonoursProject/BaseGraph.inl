@@ -6,7 +6,7 @@
 #include <stack>
 
 template <class V, class E, template<class, class> class F>
-inline size_t BaseGraph<V, E, F>::EdgeHash::operator()( const EdgeDescriptor& edge ) const
+inline size_t BaseGraph<V, E, F>::EdgeHash::operator()( const Edge& edge ) const
 {
 	const auto u = std::max( edge.m_source, edge.m_target );
 	const auto v = std::min( edge.m_source, edge.m_target );
@@ -23,27 +23,27 @@ inline BaseGraph<V, E, F>::BaseGraph()
 }
 
 template <class V, class E, template<class, class> class F>
-inline BaseGraph<V, E, F>::VertexDescriptor BaseGraph<V, E, F>::addVertex( V data )
+inline BaseGraph<V, E, F>::Vertex BaseGraph<V, E, F>::addVertex( V data )
 {
 	return boost::add_vertex( std::move( data ), _graph );
 }
 
 template <class V, class E, template<class, class> class F>
-inline BaseGraph<V, E, F>::OptEdgeDescriptor BaseGraph<V, E, F>::addEdge( VertexDescriptor source, VertexDescriptor target, E data )
+inline Opt<typename BaseGraph<V, E, F>::Edge> BaseGraph<V, E, F>::addEdge( Vertex s, Vertex t, E data )
 {
-	if (_filter( source ) || _filter( target )) { return {}; }
-	auto result = boost::add_edge( source, target, std::move( data ), _graph );
+	if (_filter( s ) || _filter( t )) { return {}; }
+	auto result = boost::add_edge( s, t, std::move( data ), _graph );
 	if (!result.second) { return {}; }
 	return result.first;
 }
 
 template <class V, class E, template<class, class> class F>
-inline void BaseGraph<V, E, F>::removeVertices( const VertexVector& remove )
+inline void BaseGraph<V, E, F>::removeVertices( const Vec<Vertex>& remove )
 {
 	if (remove.empty()) { return; }
 
-	const VertexSet removeSet( remove.begin(), remove.end() );
-	std::unordered_map<VertexDescriptor, VertexDescriptor> toUpdated;
+	const Set<Vertex> removeSet( remove.begin(), remove.end() );
+	Map<Vertex, Vertex> toUpdated;
 	GraphType updated;
 
 	vertexMap( [this, &removeSet, &toUpdated, &updated]( const auto v ) {
@@ -67,7 +67,7 @@ inline void BaseGraph<V, E, F>::removeVertices( const VertexVector& remove )
 template <class V, class E, template<class, class> class F>
 inline void BaseGraph<V, E, F>::removeIsolatedVertices()
 {
-	VertexVector remove;
+	Vec<Vertex> remove;
 	vertexMap( [this, &remove]( const auto v ) {
 		if (degree( v ) == 0)
 		{
@@ -79,11 +79,11 @@ inline void BaseGraph<V, E, F>::removeIsolatedVertices()
 }
 
 template <class V, class E, template<class, class> class F>
-void BaseGraph<V, E, F>::removeEdges( const EdgeVector& remove )
+void BaseGraph<V, E, F>::removeEdges( const Vec<Edge>& remove )
 {
 	if (remove.empty()) { return; }
 
-	const EdgeSet removeSet( remove.begin(), remove.end() );
+	const Set<Edge, EdgeHash> removeSet( remove.begin(), remove.end() );
 	GraphType updated;
 
 	vertexMap( [this, &updated]( const auto v ) {
@@ -101,76 +101,76 @@ void BaseGraph<V, E, F>::removeEdges( const EdgeVector& remove )
 }
 
 template <class V, class E, template<class, class> class F>
-inline BaseGraph<V, E, F>::VertexDescriptor BaseGraph<V, E, F>::source( EdgeDescriptor e ) const
+inline BaseGraph<V, E, F>::Vertex BaseGraph<V, E, F>::source( Edge e ) const
 {
 	return boost::source( e, _graph );
 }
 
 template <class V, class E, template<class, class> class F>
-inline BaseGraph<V, E, F>::VertexDescriptor BaseGraph<V, E, F>::target( EdgeDescriptor e ) const
+inline BaseGraph<V, E, F>::Vertex BaseGraph<V, E, F>::target( Edge e ) const
 {
 	return boost::target( e, _graph );
 }
 
 template <class V, class E, template<class, class> class F>
-BaseGraph<V, E, F>::VertexDescriptor BaseGraph<V, E, F>::other( EdgeDescriptor e, VertexDescriptor v ) const
+BaseGraph<V, E, F>::Vertex BaseGraph<V, E, F>::other( Edge e, Vertex v ) const
 {
-	const VertexDescriptor s = source( e );
-	return s != v ? s : target( e );
+	const Vertex u = source( e );
+	return u != v ? u : target( e );
 }
 
 template <class V, class E, template<class, class> class F>
-inline BaseGraph<V, E, F>::OptEdgeDescriptor BaseGraph<V, E, F>::edge( VertexDescriptor source, VertexDescriptor target ) const
+inline Opt<typename BaseGraph<V, E, F>::Edge> BaseGraph<V, E, F>::edge( Vertex s, Vertex t ) const
 {
-	auto result = boost::edge( source, target, _graph );
+	auto result = boost::edge( s, t, _graph );
 	if (!result.second) { return {}; }
 	return result.first;
 }
 
 template <class V, class E, template<class, class> class F>
-inline V& BaseGraph<V, E, F>::get( VertexDescriptor v )
+inline V& BaseGraph<V, E, F>::get( Vertex v )
 {
 	return _graph[v];
 }
 
 template <class V, class E, template<class, class> class F>
-inline const V& BaseGraph<V, E, F>::get( VertexDescriptor v ) const
+inline const V& BaseGraph<V, E, F>::get( Vertex v ) const
 {
 	return _graph[v];
 }
 
 template <class V, class E, template<class, class> class F>
-inline V& BaseGraph<V, E, F>::operator[]( VertexDescriptor v )
+inline V& BaseGraph<V, E, F>::operator[]( Vertex v )
 {
 	return get( v );
 }
 
 template <class V, class E, template<class, class> class F>
-inline const V& BaseGraph<V, E, F>::operator[]( VertexDescriptor v ) const
+inline const V& BaseGraph<V, E, F>::operator[]( Vertex v ) const
 {
 	return get( v );
 }
 
 template <class V, class E, template<class, class> class F>
-inline E& BaseGraph<V, E, F>::get( EdgeDescriptor e )
+inline E& BaseGraph<V, E, F>::get( Edge e )
 {
 	return _graph[e];
 }
 
 template <class V, class E, template<class, class> class F>
-inline const E& BaseGraph<V, E, F>::get( EdgeDescriptor e ) const
+inline const E& BaseGraph<V, E, F>::get( Edge e ) const
 {
 	return _graph[e];
 }
 
 template <class V, class E, template<class, class> class F>
-inline E& BaseGraph<V, E, F>::operator[]( EdgeDescriptor e )
+inline E& BaseGraph<V, E, F>::operator[]( Edge e )
 {
 	return get( e );
 }
 
 template <class V, class E, template<class, class> class F>
-inline const E& BaseGraph<V, E, F>::operator[]( EdgeDescriptor e ) const
+inline const E& BaseGraph<V, E, F>::operator[]( Edge e ) const
 {
 	return get( e );
 }
@@ -188,7 +188,7 @@ inline size_t BaseGraph<V, E, F>::numEdges() const
 }
 
 template <class V, class E, template<class, class> class F>
-inline size_t BaseGraph<V, E, F>::degree( VertexDescriptor v ) const
+inline size_t BaseGraph<V, E, F>::degree( Vertex v ) const
 {
 	return boost::degree( v, _graph );
 }
@@ -228,7 +228,7 @@ inline bool BaseGraph<V, E, F>::vertexMap( P predicate ) const
 
 template <class V, class E, template<class, class> class F>
 template <class P>
-inline bool BaseGraph<V, E, F>::vertexMap( VertexDescriptor v, P predicate ) const
+inline bool BaseGraph<V, E, F>::vertexMap( Vertex v, P predicate ) const
 {
 	if (_filter( v )) { return false; }
 	auto [it, end] = boost::adjacent_vertices( v, _graph );
@@ -260,7 +260,7 @@ inline bool BaseGraph<V, E, F>::edgeMap( P predicate ) const
 
 template <class V, class E, template<class, class> class F>
 template <class P>
-inline bool BaseGraph<V, E, F>::edgeMap( VertexDescriptor v, P predicate ) const
+inline bool BaseGraph<V, E, F>::edgeMap( Vertex v, P predicate ) const
 {
 	if (_filter( v )) { return false; }
 	auto [it, end] = boost::out_edges( v, _graph );
@@ -268,7 +268,7 @@ inline bool BaseGraph<V, E, F>::edgeMap( VertexDescriptor v, P predicate ) const
 	{
 		const auto e = *it;
 		const auto u = other( e, v );
-		const bool filter = _filter( e );
+		const bool filter  = _filter( e );
 		const bool filter2 = _filter( u );
 		if (!filter && !filter2 && predicate( e )) { return true; }
 		it++;
@@ -278,22 +278,22 @@ inline bool BaseGraph<V, E, F>::edgeMap( VertexDescriptor v, P predicate ) const
 
 template <class V, class E, template<class, class> class F>
 template<class P>
-inline bool BaseGraph<V, E, F>::dfs( VertexDescriptor source, P predicate ) const
+inline bool BaseGraph<V, E, F>::dfs( Vertex v, P predicate ) const
 {
-	if (_filter( source )) { return false; }
-	std::vector<bool> visited( numVertices(), false );
-	std::stack<VertexDescriptor> stack;
-	visited[source] = true;
-	stack.push( source );
+	if (_filter( v )) { return false; }
+	Vec<bool> visited( numVertices(), false );
+	std::stack<Vertex> stack;
+	visited[v] = true;
+	stack.push( v );
 	while (!stack.empty())
 	{
-		const auto v = stack.top();
+		const auto u = stack.top();
 		stack.pop();
-		if (predicate( v )) { return true; }
-		vertexMap( v, [this, &visited, &stack]( const auto u ) {
-			if (visited[u]) { return false; }
-			visited[u] = true;
-			stack.push( u );
+		if (predicate( u )) { return true; }
+		vertexMap( u, [this, &visited, &stack]( const auto w ) {
+			if (visited[w]) { return false; }
+			visited[w] = true;
+			stack.push( w );
 			return false;
 		} );
 	}
@@ -343,7 +343,7 @@ inline void serialize( std::ostream& os, const BaseGraph<V, E, F>& data )
 template <class V, class E, template<class, class> class F>
 inline void deserialize( std::istream& is, BaseGraph<V, E, F>& data )
 {
-	using VertexDescriptor = BaseGraph<V, E, F>::VertexDescriptor;
+	using Vertex = BaseGraph<V, E, F>::Vertex;
 
 	size_t numVertices;
 	deserialize( is, numVertices );
@@ -358,7 +358,7 @@ inline void deserialize( std::istream& is, BaseGraph<V, E, F>& data )
 	deserialize( is, numEdges );
 	for (size_t i = 0; i < numEdges; i++)
 	{
-		VertexDescriptor s, t;
+		Vertex s, t;
 		deserialize( is, s );
 		deserialize( is, t );
 		E edge;

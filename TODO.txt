@@ -1,0 +1,13 @@
+Code:
+1. Verify that CIShortcutHierarchy construction follows properties given by CI paper
+	a. Debug if necessary
+2. Add bidirectional dijkstra search to BaseShortcutHierarchy
+	a. Check for correctness
+3. Refactor for easier understanding, add comments
+4. Add test interface
+	a. Finish adding from_json functions, factories
+	b. Write up some basic tests (checking that dijkstra works, for example)
+	c. Clean up everything
+
+Report:
+1. Continue editing background research chapter
