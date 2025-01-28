@@ -1,8 +1,20 @@
 #include "ShortcutGraph.h"
 #include "Dijkstra.h"
 
+CREATE_GLOBAL_PROFILER( total, shortcut_graph );
+CREATE_GLOBAL_PROFILER( initialization, shortcut_graph );
+CREATE_GLOBAL_PROFILER( construction, shortcut_graph );
+CREATE_GLOBAL_PROFILER( filter, shortcut_graph );
+CREATE_GLOBAL_PROFILER( witness_search, shortcut_graph );
+CREATE_GLOBAL_PROFILER( remove_vertices, shortcut_graph );
+CREATE_GLOBAL_PROFILER( map, shortcut_graph );
+
 ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 {
+	START_PROFILER( total, shortcut_graph );
+
+	START_PROFILER( initialization, shortcut_graph );
+
 	source.vertexMap( [&source, this]( const auto v ) {
 		addVertex( { v } );
 		return false;
@@ -13,17 +25,25 @@ ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
 		return false;
 	} );
 
+	START_PROFILER( map, shortcut_graph );
+
 	calculateMap();
+
+	STOP_PROFILER( map, shortcut_graph );
+
+	STOP_PROFILER( initialization, shortcut_graph );
+
+	STOP_PROFILER( total, shortcut_graph );
 }
 
 ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& discard )
 	: BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>( prev )
 {
-	Set<WeightedGraph::Vertex> mappedDiscard;
-	for (const Vertex v : discard)
-	{
-		mappedDiscard.insert( get( v ).mapped() );
-	}
+	START_PROFILER( total, shortcut_graph );
+
+	START_PROFILER( construction, shortcut_graph );
+
+	START_PROFILER( filter, shortcut_graph );
 
 	for (const Vertex v : discard)
 	{
@@ -37,7 +57,13 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& disc
 				if (processed.contains( v2 )) { return false; }
 
 				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
+
+				START_PROFILER( witness_search, shortcut_graph );
+
 				const bool hasWitnessPath = witnessSearch( *this, v1, v2, v, throughWeight );
+
+				STOP_PROFILER( witness_search, shortcut_graph );
+
 				if (!hasWitnessPath)
 				{
 					shortcuts.emplace_back( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
@@ -55,11 +81,25 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& disc
 		}
 	}
 
+	STOP_PROFILER( filter, shortcut_graph );
+
 	_filter.filter.clear();
+
+	START_PROFILER( remove_vertices, shortcut_graph );
 
 	removeVertices( discard );
 
+	STOP_PROFILER( remove_vertices, shortcut_graph );
+
+	START_PROFILER( map, shortcut_graph );
+
 	calculateMap();
+
+	STOP_PROFILER( map, shortcut_graph );
+
+	STOP_PROFILER( construction, shortcut_graph );
+
+	STOP_PROFILER( total, shortcut_graph );
 }
 
 ShortcutGraph::Vertex ShortcutGraph::fromSource( WeightedGraph::Vertex v ) const

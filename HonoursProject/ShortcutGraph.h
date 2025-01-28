@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SHORTCUTGRAPH_H
 #define SHORTCUTGRAPH_H
 
@@ -6,6 +5,10 @@
 
 #include "BaseGraph.h"
 #include "WeightedGraph.h"
+
+#include "Profiler.h"
+
+CREATE_PROFILER_SET( shortcut_graph );
 
 class ShortcutVertex;
 class ShortcutEdge;

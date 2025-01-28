@@ -5,6 +5,10 @@
 
 #include "ShortcutGraph.h"
 
+#include "Profiler.h"
+
+#include <boost/heap/fibonacci_heap.hpp>
+
 template <class Graph>
 class DijkstraResult
 {
@@ -40,7 +44,7 @@ private:
 	double _distance;
 };
 
-template <class Graph>
+template <class Graph, template <class> class Result>
 class ShortestPaths
 {
 public:
@@ -49,7 +53,7 @@ public:
 public:
 	ShortestPaths( Vertex to );
 
-	void insert( Vertex v, const DijkstraResult<Graph>& result );
+	const Result<Graph>& insert( Vertex v, const Result<Graph>& result );
 
 	double distance( Vertex from ) const;
 
@@ -63,15 +67,47 @@ public:
 
 private:
 	Vertex _to;
-	Map<Vertex, DijkstraResult<Graph>> _results;
+	Map<Vertex, Result<Graph>> _results;
 	Set<Vertex> _filter;
 };
 
-#include "Profiler.h"
+template <class Graph, template <class> class Result>
+class DijkstraData
+{
+private:
+	using Vertex = typename Graph::Vertex;
+	using Edge = typename Graph::Edge;
 
-CREATE_PROFILER_SET( shortestPaths );
+	using Heap = boost::heap::fibonacci_heap<Result<Graph>>;
+	using HeapHandle = DijkstraData<Graph, Result>::Heap::handle_type;
+	using HandleMap = Map<Vertex, HeapHandle>;
+	using DistanceMap = Map<Vertex, double>;
 
-ShortestPaths<ShortcutGraph> shortestPaths(
+public:
+	template <class... Ts>
+	DijkstraData( Vertex to, Ts... args );
+
+	void decrease( Vertex v, Vertex p, Edge e, double distance );
+
+	const Result<Graph>& extract();
+
+	double distance( Vertex v ) const;
+	bool empty() const;
+
+	ShortestPaths<Graph, Result> results();
+
+private:
+	HandleMap   _handles;
+	DistanceMap _distances;
+
+	Heap _queue;
+
+	ShortestPaths<Graph, Result> _results;
+};
+
+CREATE_PROFILER_SET( shortest_paths );
+
+ShortestPaths<ShortcutGraph, DijkstraResult> shortestPaths(
 	const ShortcutGraph&  graph,
 	ShortcutGraph::Vertex source,
 	double                maxDist,
@@ -92,7 +128,7 @@ bool usefulEdge(
 	WeightedGraph::Edge  e
 );
 
-ShortestPaths<WeightedGraph> dijkstraSearch(
+ShortestPaths<WeightedGraph, DijkstraResult> dijkstraSearch(
 	const WeightedGraph& graph,
 	WeightedGraph::Vertex source,
 	WeightedGraph::Vertex target

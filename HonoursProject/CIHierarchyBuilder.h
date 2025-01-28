@@ -3,6 +3,10 @@
 
 #include "ShortcutHierarchyBuilder.h"
 
+#include "Profiler.h"
+
+CREATE_PROFILER_SET( ci_builder );
+
 class CIHierarchyBuilder : public ShortcutHierarchyBuilder
 {
 public:
