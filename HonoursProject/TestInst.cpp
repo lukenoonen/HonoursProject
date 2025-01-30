@@ -62,7 +62,7 @@ bool TestInst::run() const
 
 	instTimer.stop();
 
-	g_logger.log( "{} {}\n", instTimer.duration(), failures );
+	g_logger.log( "{:.4f}\t{}\n", instTimer.duration(), failures );
 	g_logger.debug( "Finished TestInst {}\n", _name );
 
 	return true;

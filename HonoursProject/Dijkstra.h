@@ -55,6 +55,7 @@ public:
 
 	const Result<Graph>& insert( Vertex v, const Result<Graph>& result );
 
+	bool contains( Vertex v ) const;
 	double distance( Vertex from ) const;
 
 	void filter( Vertex vertex );
@@ -87,10 +88,12 @@ public:
 	template <class... Ts>
 	DijkstraData( Vertex to, Ts... args );
 
-	void decrease( Vertex v, Vertex p, Edge e, double distance );
+	template <class... Ts>
+	void decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args );
 
 	const Result<Graph>& extract();
 
+	bool closed( Vertex v ) const;
 	double distance( Vertex v ) const;
 	bool empty() const;
 

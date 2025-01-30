@@ -128,7 +128,7 @@ bool usefulEdge(
 	const double maxDist = graph[e].weight();
 
 	bool useful = true;
-	dijkstra<ShortcutGraph, DijkstraResult>( graph, source, [&graph, target, maxDist, &useful]( const auto v, const auto e, const double dist ) {
+	dijkstra<WeightedGraph, DijkstraResult>( graph, source, [&graph, target, maxDist, &useful]( const auto v, const auto e, const double dist ) {
 		if (dist >= maxDist) { return PredicateResponse::FALSE; }
 		if (v == target)
 		{

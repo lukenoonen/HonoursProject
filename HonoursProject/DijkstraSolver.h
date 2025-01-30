@@ -12,7 +12,6 @@ public:
 	
 private:
 	const WeightedGraph& _g;
-
 };
 
 #endif // DIJKSTRASOLVER_H

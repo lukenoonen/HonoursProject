@@ -30,10 +30,15 @@ public:
 	const Str& name() const;
 
 private:
-	double run(
+	double runAuthority(
 		const Endpoints&  endpoints,
+		const PathSolver* authority
+	) const;
+
+	bool run(
+		const Endpoints& endpoints,
 		const PathSolver* pathSolver,
-		double            authorityDistance = -1.0
+		double            authorityDistance
 	) const;
 
 protected:

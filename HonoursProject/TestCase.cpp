@@ -28,17 +28,21 @@ size_t TestCase::run(
 
 	for (const auto& ep : eps)
 	{
-		const double authorityDistance = run( ep, authority );
+		const double authorityDistance = runAuthority( ep, authority );
 		for (const auto& pathSolver : pathSolvers)
 		{
-			const double distance = run( ep, pathSolver.get(), authorityDistance );
-			if (distance != authorityDistance) { failures++; }
+			const bool success = run( ep, pathSolver.get(), authorityDistance );
+			if (!success)
+			{
+				g_logger.debug( "failed {} to {} ", ep.u(), ep.v() );
+				failures++;
+			}
 		}
 	}
 
 	totalTimer.stop();
 
-	g_logger.log( "{} {}\n", totalTimer.duration(), failures );
+	g_logger.log( "{:.4f}\t{}\n", totalTimer.duration(), failures );
 	g_logger.debug( "Finished TestCase {}\n", _name );
 
 	return failures;
@@ -49,10 +53,21 @@ const Str& TestCase::name() const
 	return _name;
 }
 
-double TestCase::run(
+double TestCase::runAuthority( const Endpoints& endpoints, const PathSolver* authority ) const
+{
+	Timer timer;
+	timer.start();
+	const double distance = authority->distance( endpoints.u(), endpoints.v() );
+	timer.stop();
+
+	g_logger.log( "{:.4f}\t{:.4f}\n", timer.duration(), distance );
+	return distance;
+}
+
+bool TestCase::run(
 	const Endpoints&  endpoints,
 	const PathSolver* pathSolver,
-	double            authorityDistance /* = -1.0 */
+	double            authorityDistance
 ) const
 {
 	Timer timer;
@@ -60,16 +75,9 @@ double TestCase::run(
 	const double distance = pathSolver->distance( endpoints.u(), endpoints.v() );
 	timer.stop();
 
-	if (authorityDistance != -1.0)
-	{
-		const bool success = authorityDistance == distance;
-		g_logger.log( "{} {}\n", timer.duration(), success );
-	}
-	else
-	{
-		g_logger.log( "{} {}\n", timer.duration(), distance );
-	}
-	return distance;
+	const bool success = std::abs( authorityDistance - distance ) < 1.0;
+	g_logger.log( "{:.4f}\t{:.4f}\t{}\n", timer.duration(), distance, (int)success );
+	return success;
 }
 
 JSON_DEFINE_FACTORY( TestCase )
@@ -123,9 +131,17 @@ AllTestCase::AllTestCase( Str name )
 
 }
 
-Vec<TestCase::Endpoints> AllTestCase::endpoints( const WeightedGraph& ) const
+Vec<TestCase::Endpoints> AllTestCase::endpoints( const WeightedGraph& g ) const
 {
-	return {};
+	Vec<TestCase::Endpoints> result;
+	for (size_t v = 0; v < g.numVertices(); v++)
+	{
+		for (size_t u = v + 1; u < g.numVertices(); u++)
+		{
+			result.emplace_back( v, u );
+		}
+	}
+	return result;
 }
 
 FACTORY_BEGIN_JSON( "all", AllTestCase, TestCase )

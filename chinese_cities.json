@@ -36,17 +36,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -71,17 +63,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -106,17 +90,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -141,17 +117,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -176,17 +144,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -211,17 +171,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -246,17 +198,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -281,17 +225,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -316,17 +252,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			},
@@ -351,17 +279,9 @@
 				"testCases":
 				[
 					{
-						"type": "list",
-						"endpoints":
-						[
-							{ "u": 0, "v": 1 }
-						],
-						"name": "single_0_1"
-					},
-					{
 						"type": "random",
-						"trials": 10,
-						"name": "random_10"
+						"trials": 100,
+						"name": "random_100"
 					}
 				]
 			}

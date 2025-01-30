@@ -1,6 +1,8 @@
 #include "ShortcutHierarchy.h"
 #include "Dijkstra.h"
 
+#include "DijkstraSolver.h"
+
 namespace
 {
 	template <class Graph>
@@ -55,6 +57,36 @@ namespace
 	{
 		return _level;
 	}
+
+	bool oalgo(
+		const Vec<ShortcutGraph>& hierarchy,
+		const Vec<size_t>& ladder,
+		DijkstraData<ShortcutGraph, HierarchyResult>& first,
+		DijkstraData<ShortcutGraph, HierarchyResult>& second,
+		double& bestDistance
+	)
+	{
+		const auto& ex = first.extract();
+		const auto& graph = hierarchy[ex.level()];
+		const auto u = graph.fromSource( ex.vertex() );
+
+		graph.edgeMap( u, [&ex, &graph, u, &first, &second, &bestDistance, &ladder]( const auto e ) {
+			const auto v = graph.other( e, u );
+			const auto vS = graph.toSource( v );
+			const double vDist = first.distance( vS );
+			const double newDist = ex.distance() + graph[e].weight();
+			if (newDist >= vDist) { return false; }
+			first.decrease( vS, ex.vertex(), e, newDist, ladder[vS] );
+			const double distance = newDist + second.distance( vS );
+			if (bestDistance > distance)
+			{
+				bestDistance = distance;
+			}
+			return false;
+		} );
+		
+		return !first.empty() && ex.distance() < bestDistance;
+	}
 }
 
 ShortcutHierarchy::ShortcutHierarchy( const WeightedGraph& g )
@@ -75,38 +107,34 @@ void ShortcutHierarchy::extend( const Vec<ShortcutGraph::Vertex>& discard )
 	_hierarchy.emplace_back( _hierarchy.back(), discard );
 }
 
-double ShortcutHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const
-{
-	DijkstraData<WeightedGraph, HierarchyResult> forward( s, _ladder[s] );
-	DijkstraData<WeightedGraph, HierarchyResult> backward( t, _ladder[t] );
-
-	double dist = std::numeric_limits<double>::infinity();
-
-	/*
-	while (!forward.empty() && !backward.empty())
-	{
-		const auto& exF    = forward.extract();
-		const auto& graphF = _hierarchy[exF.level()];
-
-		const auto& exB    = backward.extract();
-		const auto& graphB = _hierarchy[exB.level()];
-		graph.edgeMap( ex.vertex(), [&ex, &graph, &data]( const auto e ) {
-			const auto v = graph.other( e, ex.vertex() );
-			const double vDist = data.distance( v );
-			const double newDist = ex.distance() + graph[e].weight();
-			if (newDist >= vDist) { return false; }
-			data.decrease( v, ex.vertex(), e, newDist );
-			return false;
-		} );
-	}
-
-	return data.results();*/
-	return 0.0;
-}
-
 const ShortcutGraph& ShortcutHierarchy::top() const
 {
 	return _hierarchy.back();
+}
+
+double ShortcutHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const
+{
+	DijkstraData<ShortcutGraph, HierarchyResult> forward( s, 0 );
+	DijkstraData<ShortcutGraph, HierarchyResult> backward( t, 0 );
+
+	double bestDistance = std::numeric_limits<double>::infinity();
+
+	bool forwardSearch = true;
+	bool backwardSearch = true;
+	
+	while (forwardSearch || backwardSearch)
+	{
+		if (forwardSearch)
+		{
+			forwardSearch = oalgo( _hierarchy, _ladder, forward, backward, bestDistance );
+		}
+		if (backwardSearch)
+		{
+			backwardSearch = oalgo( _hierarchy, _ladder, backward, forward, bestDistance );
+		}
+	}
+
+	return bestDistance;
 }
 
 void serialize( std::ostream& os, const ShortcutHierarchy& data )
@@ -120,5 +148,3 @@ void deserialize( std::istream& is, ShortcutHierarchy& data )
 	deserialize( is, data._hierarchy );
 	deserialize( is, data._ladder );
 }
-
-// FACTORY_DEFINE_CACHE( "cached_shortcut_hierarchy", ShortcutHierarchy, PathSolver )

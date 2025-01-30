@@ -79,6 +79,12 @@ inline const Result<Graph>& ShortestPaths<Graph, Result>::insert( Vertex v, cons
 	return _results[v] = result;
 }
 
+template<class Graph, template <class> class Result>
+inline bool ShortestPaths<Graph, Result>::contains( Vertex v ) const
+{
+	return _results.contains( v );
+}
+
 template <class Graph, template <class> class Result>
 inline double ShortestPaths<Graph, Result>::distance( Vertex from ) const
 {
@@ -137,7 +143,8 @@ DijkstraData<Graph, Result>::DijkstraData( Vertex to, Ts... args )
 }
 
 template <class Graph, template<class> class Result>
-void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double distance )
+template <class... Ts>
+void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args )
 {
 	if (auto search = _handles.find( v ); search != _handles.end())
 	{
@@ -148,7 +155,7 @@ void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double d
 	}
 	else
 	{
-		_handles[v] = _queue.emplace( v, p, e, distance );
+		_handles[v] = _queue.emplace( v, p, e, distance, std::forward<Ts>( args )... );
 		_distances[v] = distance;
 	}
 }
@@ -156,12 +163,19 @@ void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double d
 template <class Graph, template<class> class Result>
 const Result<Graph>& DijkstraData<Graph, Result>::extract()
 {
-	const DijkstraResult<Graph>& top = _queue.top();
+	const Result<Graph>& top = _queue.top();
 	const Vertex v = top.vertex();
 	const double dist = top.distance();
-	const DijkstraResult<Graph>& extracted = _results.insert( v, top );
+	const Result<Graph>& extracted = _results.insert( v, top );
 	_queue.pop();
+	_handles.erase( v );
 	return extracted;
+}
+
+template <class Graph, template<class> class Result>
+inline bool DijkstraData<Graph, Result>::closed( Vertex v ) const
+{
+	return _results.contains( v );
 }
 
 template <class Graph, template<class> class Result>

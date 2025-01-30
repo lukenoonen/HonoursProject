@@ -1,5 +1,7 @@
 #include "ShortcutHierarchyBuilder.h"
 
+#include "Logger.h"
+
 ShortcutHierarchyBuilder::ShortcutHierarchyBuilder( FilePath filepath, const WeightedGraph& graph )
 	: PathSolverBuilder( graph ),
 	  _filepath( std::move( filepath ) )
@@ -9,6 +11,8 @@ ShortcutHierarchyBuilder::ShortcutHierarchyBuilder( FilePath filepath, const Wei
 
 Ptr<PathSolver> ShortcutHierarchyBuilder::createInternal() const
 {
+	g_logger.debug( "Creating shortcut hierarchy...\n" );
+
 	auto result = load();
 	if (result) { return result; }
 	return build();
@@ -17,7 +21,7 @@ Ptr<PathSolver> ShortcutHierarchyBuilder::createInternal() const
 Ptr<PathSolver> ShortcutHierarchyBuilder::load() const
 {
 	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>();
-	if (!_filepath.empty() && deserialize(_filepath, *result)) { return result; }
+	if (!_filepath.empty() && deserialize( _filepath, *result )) { return result; }
 	return nullptr;
 }
 
