@@ -11,7 +11,7 @@ namespace
 	)
 	{
 		const auto& ex = first.extract();
-		const auto u = ex.vertex();
+		const auto u   = ex.vertex();
 		graph.edgeMap( ex.vertex(), [&ex, &graph, u, &first, &second, &bestDistance]( const auto e ) {
 			const auto v = graph.other( e, u );
 			if (first.closed( v )) { return false; }

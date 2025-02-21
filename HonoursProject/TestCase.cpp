@@ -34,7 +34,7 @@ size_t TestCase::run(
 			const bool success = run( ep, pathSolver.get(), authorityDistance );
 			if (!success)
 			{
-				g_logger.debug( "failed {} to {} ", ep.u(), ep.v() );
+				g_logger.debug( "Failed {} to {} ", ep.u(), ep.v() );
 				failures++;
 			}
 		}

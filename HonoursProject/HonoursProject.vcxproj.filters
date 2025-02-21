@@ -108,9 +108,6 @@
     <ClInclude Include="ShortcutGraph.h">
       <Filter>Header Files\Graph</Filter>
     </ClInclude>
-    <ClInclude Include="ShortcutHierarchyBuilder.h">
-      <Filter>Header Files\Hierarchy\Builder</Filter>
-    </ClInclude>
     <ClInclude Include="StreamOutput.h">
       <Filter>Header Files\Util\Output</Filter>
     </ClInclude>
@@ -182,9 +179,6 @@
       <Filter>Source Files\Hierarchy\Builder</Filter>
     </ClCompile>
     <ClCompile Include="PathSolverBuilder.cpp">
-      <Filter>Source Files\Hierarchy\Builder</Filter>
-    </ClCompile>
-    <ClCompile Include="ShortcutHierarchyBuilder.cpp">
       <Filter>Source Files\Hierarchy\Builder</Filter>
     </ClCompile>
     <ClCompile Include="GraphParser.cpp">

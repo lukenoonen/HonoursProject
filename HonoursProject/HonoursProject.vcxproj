@@ -42,7 +42,6 @@
     <ClInclude Include="Serialize.h" />
     <ClInclude Include="ShortcutGraph.h" />
     <ClInclude Include="ShortcutHierarchy.h" />
-    <ClInclude Include="ShortcutHierarchyBuilder.h" />
     <ClInclude Include="StreamOutput.h" />
     <ClInclude Include="TestCase.h" />
     <ClInclude Include="TestInst.h" />
@@ -78,7 +77,6 @@
     <ClCompile Include="RoadDParser.cpp" />
     <ClCompile Include="ShortcutGraph.cpp" />
     <ClCompile Include="ShortcutHierarchy.cpp" />
-    <ClCompile Include="ShortcutHierarchyBuilder.cpp" />
     <ClCompile Include="StreamOutput.cpp" />
     <ClCompile Include="TestCase.cpp" />
     <ClCompile Include="TestInst.cpp" />
