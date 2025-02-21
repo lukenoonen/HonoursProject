@@ -3,6 +3,7 @@
 
 #include "Util.h"
 
+#include "Serialize.h"
 #include "BaseGraph.h"
 
 template<class V, class E>

@@ -7,26 +7,40 @@
 
 namespace
 {
-	Vec<WeightedGraph::Edge> sortEdgesByWeight( const WeightedGraph& g )
+	Vec<WeightedGraph::Edge> sortEdgesByWeight( const WeightedGraph& source )
 	{
 		Vec<WeightedGraph::Edge> edges;
-		edges.reserve( g.numEdges() );
-		g.edgeMap( [&edges]( const auto e ) {
+		edges.reserve( source.numEdges() );
+		source.edgeMap( [&edges]( const auto e ) {
 			edges.push_back( e );
 			return false;
-			} );
-		std::sort( edges.begin(), edges.end(), [&g]( const auto e1, const auto e2 ) {
-			return g[e1].weight() < g[e2].weight();
-			} );
+		} );
+		std::sort( edges.begin(), edges.end(), [&source]( const auto e1, const auto e2 ) {
+			return source[e1].weight() < source[e2].weight();
+		} );
 		return edges;
+	}
+
+	size_t incrementEdgeIndexToWeight(
+		double                          weight,
+		const WeightedGraph&            source,
+		const Vec<WeightedGraph::Edge>& edges,
+		size_t                          index
+	)
+	{
+		while (index < edges.size() && source[edges[index]].weight() <= weight)
+		{
+			index++;
+		}
+
+		return index;
 	}
 
 	Set<ShortcutGraph::Vertex> gatherEdgeVertices(
 		size_t                          fromIndex,
 		const Vec<WeightedGraph::Edge>& edges,
-		const WeightedGraph& g,
-		const ShortcutGraph& current,
-		double                          test
+		const WeightedGraph&            g,
+		const ShortcutGraph&            current
 	)
 	{
 		Set<ShortcutGraph::Vertex> vertices;
@@ -46,7 +60,6 @@ namespace
 
 	Set<ShortcutGraph::Vertex> selectVertices(
 		double               maxWeight,
-		double               prevMaxWeight,
 		const ShortcutGraph& current
 	)
 	{
@@ -54,11 +67,11 @@ namespace
 		Set<ShortcutGraph::Vertex> vertices;
 
 		const double minWeight = 0.75 * maxWeight;
-		current.vertexMap( [&current, minWeight, maxWeight, prevMaxWeight, &vertices]( const auto origin ) {
+		current.vertexMap( [&current, minWeight, maxWeight, &vertices]( const auto origin ) {
 			if (vertices.contains( origin )) { return false; }
 
 			START_PROFILER( shortest_paths, select_vertices );
-			const auto paths = shortestPaths( current, origin, maxWeight, minWeight, prevMaxWeight );
+			const auto paths = shortestPaths( current, origin, maxWeight, minWeight );
 			STOP_PROFILER( shortest_paths, select_vertices );
 
 			START_PROFILER( processing, select_vertices );
@@ -81,7 +94,7 @@ namespace
 					}
 
 					return false;
-					} );
+				} );
 
 				if (addMidpoint)
 				{
@@ -89,12 +102,12 @@ namespace
 				}
 
 				return false;
-				} );
+			} );
 
 			STOP_PROFILER( processing, select_vertices );
 
 			return false;
-			} );
+		} );
 
 		STOP_PROFILER( total, select_vertices );
 
@@ -119,17 +132,13 @@ namespace
 }
 
 CIHierarchyBuilder::CIHierarchyBuilder( FilePath filepath, const WeightedGraph& graph )
-	: ShortcutHierarchyBuilder( std::move( filepath ), graph )
+	: CachedPathSolverBuilder<ShortcutHierarchy>( std::move( filepath ), graph )
 {
 
 }
 
 CREATE_GLOBAL_PROFILER( total, ci_builder );
-CREATE_GLOBAL_PROFILER( edge_increment, ci_builder );
-CREATE_GLOBAL_PROFILER( edge_select, ci_builder );
 CREATE_GLOBAL_PROFILER( select_vertices, ci_builder );
-CREATE_GLOBAL_PROFILER( keep_calculate, ci_builder );
-CREATE_GLOBAL_PROFILER( calculate_discard, ci_builder );
 CREATE_GLOBAL_PROFILER( extend, ci_builder );
 
 Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal() const
@@ -137,72 +146,51 @@ Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal() const
 	g_logger.debug( "Constructing CI hierarchy...\n" );
 
 	START_PROFILER( total, ci_builder );
+	 
+	const WeightedGraph&     source = graph();
+	Vec<WeightedGraph::Edge> edges = sortEdgesByWeight( source );
 
-	const WeightedGraph& g = graph();
+	double maxEdge = 0.125;
+	double maxWeight = 1.0;
 
-	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>( g );
-	Vec<WeightedGraph::Edge> edges = sortEdgesByWeight( g );
+	size_t maxEdgeIndex   = 0;
+	size_t maxWeightIndex = incrementEdgeIndexToWeight( maxWeight, source, edges, maxEdgeIndex );
 
-	double maxWeight = 8.0;
-	double prevMaxWeight = 1.0;
-	size_t minEdgeIndex = 0;
+	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>( source, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
+
 	while (true)
 	{
-		using std::chrono::high_resolution_clock;
+		maxEdge = maxWeight;
+		maxWeight *= 8.0;
 
-		START_PROFILER( edge_increment, ci_builder );
+		maxEdgeIndex   = maxWeightIndex;
+		maxWeightIndex = incrementEdgeIndexToWeight( maxWeight, source, edges, maxEdgeIndex );
 
-		while (minEdgeIndex < edges.size() && g[edges[minEdgeIndex]].weight() <= prevMaxWeight)
-		{
-			minEdgeIndex++;
-		}
-
-		STOP_PROFILER( edge_increment, ci_builder );
-
-		const ShortcutGraph& back = result->top();
-
-		START_PROFILER( edge_select, ci_builder );
+		const ShortcutGraph& top = result->top();
 
 		Set<ShortcutGraph::Vertex> keepSet
-			= gatherEdgeVertices( minEdgeIndex, edges, g, back, maxWeight );
-
-		STOP_PROFILER( edge_select, ci_builder );
+			= gatherEdgeVertices( maxEdgeIndex, edges, source, top );
 
 		START_PROFILER( select_vertices, ci_builder );
-
 		Set<ShortcutGraph::Vertex> selectedSet
-			= selectVertices( maxWeight, prevMaxWeight, back );
-
+			= selectVertices( maxWeight, top );
 		STOP_PROFILER( select_vertices, ci_builder );
-
-		START_PROFILER( keep_calculate, ci_builder );
 
 		for (const auto v : selectedSet)
 		{
 			keepSet.insert( v );
 		}
 
-		STOP_PROFILER( keep_calculate, ci_builder );
-
 		if (keepSet.size() == 0) { break; }
 
-		prevMaxWeight = maxWeight;
-		maxWeight *= 8.0;
-
-		if (keepSet.size() == back.numVertices()) { continue; }
-
-		START_PROFILER( calculate_discard, ci_builder );
-
-		Vec<ShortcutGraph::Vertex> discard = calculateDiscard( keepSet, back );
-
-		STOP_PROFILER( calculate_discard, ci_builder );
+		Vec<ShortcutGraph::Vertex> discard = calculateDiscard( keepSet, top );
 
 		START_PROFILER( extend, ci_builder );
-
-		result->extend( discard );
-
+		result->extend( discard, maxWeight, source, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
 		STOP_PROFILER( extend, ci_builder );
 	}
+
+	result->finalize();
 
 	STOP_PROFILER( total, ci_builder );
 

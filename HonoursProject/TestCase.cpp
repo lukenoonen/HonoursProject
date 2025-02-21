@@ -183,7 +183,7 @@ RandomTestCase::RandomTestCase( size_t trials, Str name )
 Vec<TestCase::Endpoints> RandomTestCase::endpoints( const WeightedGraph& graph ) const
 { 
 	std::mt19937 rng( std::random_device{}() );
-	std::uniform_int_distribution<size_t> dist( 0, graph.numVertices() );
+	std::uniform_int_distribution<size_t> dist( 0, graph.numVertices() - 1 );
 
 	Vec<Endpoints> endpoints;
 	endpoints.reserve( _trials );

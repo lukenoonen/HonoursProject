@@ -108,8 +108,8 @@ inline bool ShortestPaths<Graph, Result>::vertexMap( P predicate ) const
 {
 	for (const auto& [vertex, result] : _results)
 	{
-		if (_filter.contains( vertex )) { continue; }
-		if (predicate( result )) { return true; }
+		const bool filter = _filter.contains( vertex );
+		if (!filter && predicate( result )) { return true; }
 	}
 	return false;
 }
@@ -149,8 +149,8 @@ void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double d
 	if (auto search = _handles.find( v ); search != _handles.end())
 	{
 		Result<Graph>& entry = *(search->second);
-		entry.update( p, e, distance );
-		_queue.decrease( search->second );
+		entry.update( p, e, distance, std::forward<Ts>( args )... );
+		_queue.increase( search->second );
 		_distances[v] = distance;
 	}
 	else
@@ -198,4 +198,58 @@ template <class Graph, template<class> class Result>
 ShortestPaths<Graph, Result> DijkstraData<Graph, Result>::results()
 {
 	return std::move( _results );
+}
+
+template <class Graph, template <class> class Result, class P>
+ShortestPaths<Graph, Result> dijkstra(
+	const Graph& graph,
+	typename Graph::Vertex source,
+	P                      predicate
+)
+{
+	DijkstraData<Graph, Result> data( source );
+
+	while (!data.empty())
+	{
+		const auto ex = data.extract();
+		const bool result = graph.edgeMap( ex.vertex(), [&ex, &graph, &predicate, &data]( const auto e ) {
+			const auto v = graph.other( e, ex.vertex() );
+			if (data.closed( v )) { return false; }
+			const double vDist = data.distance( v );
+			const double newDist = ex.distance() + graph[e].weight();
+			if (newDist >= vDist) { return false; }
+			const PredicateResponse pr = predicate( v, e, newDist );
+			if (pr == PredicateResponse::FALSE) { return false; }
+			if (pr == PredicateResponse::BREAK) { return true; }
+			data.decrease( v, ex.vertex(), e, newDist );
+			return false;
+			} );
+		if (result) { break; }
+	}
+
+	return data.results();
+}
+
+template<class Graph>
+inline bool witnessSearch(
+	const Graph&          graph,
+	ShortcutGraph::Vertex source,
+	ShortcutGraph::Vertex target,
+	ShortcutGraph::Vertex avoid,
+	double                maxDist
+)
+{
+	bool witnessFound = false;
+	dijkstra<Graph, DijkstraResult>( graph, source, [&graph, target, avoid, maxDist, &witnessFound]( const auto v, const auto e, const double dist ) {
+		if (dist > maxDist) { return PredicateResponse::FALSE; }
+		if (v == avoid) { return PredicateResponse::FALSE; }
+		if (v == target)
+		{
+			witnessFound = true;
+			return PredicateResponse::BREAK;
+		}
+		return PredicateResponse::TRUE;
+	} );
+
+	return witnessFound;
 }

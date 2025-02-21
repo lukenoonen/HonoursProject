@@ -20,7 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseGraph.h" />
+    <ClInclude Include="BottomUpCHBuilder.h" />
+    <ClInclude Include="CachedPathSolverBuilder.h" />
     <ClInclude Include="CIHierarchyBuilder.h" />
+    <ClInclude Include="ContractionGraph.h" />
+    <ClInclude Include="ContractionHierarchy.h" />
     <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="DijkstraSolver.h" />
     <ClInclude Include="DijkstraSolverBuilder.h" />
@@ -48,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl" />
+    <None Include="CachedPathSolverBuilder.inl" />
     <None Include="Dijkstra.inl" />
     <None Include="Factory.inl" />
     <None Include="JSON.inl" />
@@ -55,7 +60,10 @@
     <None Include="Serialize.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BottomUpCHBuilder.cpp" />
     <ClCompile Include="CIHierarchyBuilder.cpp" />
+    <ClCompile Include="ContractionGraph.cpp" />
+    <ClCompile Include="ContractionHierarchy.cpp" />
     <ClCompile Include="Dijkstra.cpp" />
     <ClCompile Include="DijkstraSolver.cpp" />
     <ClCompile Include="DijkstraSolverBuilder.cpp" />

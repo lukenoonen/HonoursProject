@@ -2,74 +2,57 @@
 #include "Dijkstra.h"
 
 CREATE_GLOBAL_PROFILER( total, shortcut_graph );
-CREATE_GLOBAL_PROFILER( initialization, shortcut_graph );
-CREATE_GLOBAL_PROFILER( construction, shortcut_graph );
-CREATE_GLOBAL_PROFILER( filter, shortcut_graph );
 CREATE_GLOBAL_PROFILER( witness_search, shortcut_graph );
-CREATE_GLOBAL_PROFILER( remove_vertices, shortcut_graph );
-CREATE_GLOBAL_PROFILER( map, shortcut_graph );
 
-ShortcutGraph::ShortcutGraph( const WeightedGraph& source )
+ShortcutGraph::ShortcutGraph(
+	const WeightedGraph&            source,
+	const Vec<WeightedGraph::Edge>& edges,
+	const Pair<size_t, size_t>&     edgeRange
+)
 {
 	START_PROFILER( total, shortcut_graph );
-
-	START_PROFILER( initialization, shortcut_graph );
 
 	source.vertexMap( [&source, this]( const auto v ) {
 		addVertex( { v } );
 		return false;
 	} );
 
-	source.edgeMap( [&source, this]( const auto e ) {
-		addEdge( source.source( e ), source.target( e ), { e, source[e].weight() } );
-		return false;
-	} );
-
-	START_PROFILER( map, shortcut_graph );
-
 	calculateMap();
 
-	STOP_PROFILER( map, shortcut_graph );
-
-	STOP_PROFILER( initialization, shortcut_graph );
+	addSourceEdges( source, edges, edgeRange );
 
 	STOP_PROFILER( total, shortcut_graph );
 }
 
-ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& discard )
-	: BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>( prev )
+ShortcutGraph::ShortcutGraph(
+	const ShortcutGraph&            prev,
+	const Vec<Vertex>&              discard,
+	double                          maxEdge,
+	const WeightedGraph&            source,
+	const Vec<WeightedGraph::Edge>& edges,
+	const Pair<size_t, size_t>&     edgeRange
+)
+	: ShortcutGraph( prev )
 {
 	START_PROFILER( total, shortcut_graph );
 
-	START_PROFILER( construction, shortcut_graph );
-
-	START_PROFILER( filter, shortcut_graph );
+	addSourceEdges( source, edges, edgeRange );
 
 	for (const Vertex v : discard)
 	{
-		Set<Vertex> processed;
 		Vec<std::tuple<Vertex, Vertex, ShortcutEdge>> shortcuts;
-		edgeMap( v, [v, this, &processed, &shortcuts]( const auto e1 ) {
+		neighbourEdgeMap( v, [v, this, maxEdge, &shortcuts]( const auto e1, const auto e2 ) {
 			const Vertex v1 = other( e1, v );
-			processed.insert( v1 );
-			edgeMap( v, [v, e1, v1, this, &processed, &shortcuts]( const auto e2 ) {
-				const Vertex v2 = other( e2, v );
-				if (processed.contains( v2 )) { return false; }
-
-				const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
-
-				START_PROFILER( witness_search, shortcut_graph );
-
-				const bool hasWitnessPath = witnessSearch( *this, v1, v2, v, throughWeight );
-
-				STOP_PROFILER( witness_search, shortcut_graph );
-
-				if (!hasWitnessPath)
-				{
-					shortcuts.emplace_back( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
-				}
-				return false;
-			} );
+			const Vertex v2 = other( e2, v );
+			const double throughWeight = get( e1 ).weight() + get( e2 ).weight();
+			if (throughWeight > maxEdge) { return false; }
+			START_PROFILER( witness_search, shortcut_graph );
+			const bool hasWitnessPath = witnessSearch( *this, v1, v2, v, throughWeight );
+			STOP_PROFILER( witness_search, shortcut_graph );
+			if (!hasWitnessPath)
+			{
+				shortcuts.emplace_back( v1, v2, ShortcutEdge{ get( e1 ), get( e2 ) } );
+			}
 			return false;
 		} );
 
@@ -81,23 +64,11 @@ ShortcutGraph::ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& disc
 		}
 	}
 
-	STOP_PROFILER( filter, shortcut_graph );
-
 	_filter.filter.clear();
-
-	START_PROFILER( remove_vertices, shortcut_graph );
 
 	removeVertices( discard );
 
-	STOP_PROFILER( remove_vertices, shortcut_graph );
-
-	START_PROFILER( map, shortcut_graph );
-
 	calculateMap();
-
-	STOP_PROFILER( map, shortcut_graph );
-
-	STOP_PROFILER( construction, shortcut_graph );
 
 	STOP_PROFILER( total, shortcut_graph );
 }
@@ -110,6 +81,21 @@ ShortcutGraph::Vertex ShortcutGraph::fromSource( WeightedGraph::Vertex v ) const
 WeightedGraph::Vertex ShortcutGraph::toSource( ShortcutGraph::Vertex v ) const
 {
 	return get( v ).mapped();
+}
+
+void ShortcutGraph::addSourceEdges(
+	const WeightedGraph&            source,
+	const Vec<WeightedGraph::Edge>& edges,
+	const Pair<size_t, size_t>&     edgeRange
+)
+{
+	for (size_t i = edgeRange.first; i < edgeRange.second; i++)
+	{
+		const auto& e = edges[i];
+		const auto u = fromSource( source.source( e ) );
+		const auto v = fromSource( source.target( e ) );
+		addEdge( u, v, { e, source[e].weight() } );
+	}
 }
 
 void ShortcutGraph::calculateMap()
@@ -158,8 +144,7 @@ void deserialize( std::istream& is, ShortcutVertex& data )
 
 ShortcutEdge::ShortcutEdge( WeightedGraph::Edge e, double weight )
 	: _path( { e } ),
-	  _weight( weight ),
-	  _maxEdge( weight )
+	  _weight( weight )
 {
 
 }
@@ -175,7 +160,6 @@ ShortcutEdge::ShortcutEdge( const ShortcutEdge& first, const ShortcutEdge& secon
 	std::copy( secondPath.begin(), secondPath.end(), std::back_inserter( _path ) );
 
 	_weight  = first.weight() + second.weight();
-	_maxEdge = std::max( first.maxEdge(), second.maxEdge() );
 }
 
 const ShortcutEdge::PathType& ShortcutEdge::path() const
@@ -188,21 +172,14 @@ double ShortcutEdge::weight() const
 	return _weight;
 }
 
-double ShortcutEdge::maxEdge() const
-{
-	return _maxEdge;
-}
-
 void serialize( std::ostream& os, const ShortcutEdge& data )
 {
 	serialize( os, data._path );
 	serialize( os, data._weight );
-	serialize( os, data._maxEdge );
 }
 
 void deserialize( std::istream& is, ShortcutEdge& data )
 {
 	deserialize( is, data._path );
 	deserialize( is, data._weight );
-	deserialize( is, data._maxEdge );
 }

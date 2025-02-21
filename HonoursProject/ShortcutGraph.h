@@ -17,13 +17,31 @@ class ShortcutGraph : public BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilte
 {
 public:
 	ShortcutGraph() = default;
-	ShortcutGraph( const WeightedGraph& source );
-	ShortcutGraph( const ShortcutGraph& prev, const Vec<Vertex>& discard );
+	ShortcutGraph( const ShortcutGraph& ) = default;
+	ShortcutGraph(
+		const WeightedGraph&            source,
+		const Vec<WeightedGraph::Edge>& edges,
+		const Pair<size_t, size_t>&     edgeRange
+	);
+	ShortcutGraph(
+		const ShortcutGraph&            prev,
+		const Vec<Vertex>&              discard,
+		double                          maxEdge,
+		const WeightedGraph&            source,
+		const Vec<WeightedGraph::Edge>& edges,
+		const Pair<size_t, size_t>&     edgeRange
+	);
 
 	ShortcutGraph::Vertex fromSource( WeightedGraph::Vertex v ) const;
 	WeightedGraph::Vertex toSource( ShortcutGraph::Vertex v ) const;
 
 private:
+	void addSourceEdges(
+		const WeightedGraph&            source,
+		const Vec<WeightedGraph::Edge>& edges,
+		const Pair<size_t, size_t>&     edgeRange
+	);
+
 	void calculateMap();
 
 public:
@@ -61,16 +79,13 @@ public:
 
 	const PathType& path() const;
 	double weight() const;
-	double maxEdge() const;
 
 	friend void serialize( std::ostream& os, const ShortcutEdge& data );
 	friend void deserialize( std::istream& is, ShortcutEdge& data );
 
 private:
 	PathType _path;
-
-	double _weight;
-	double _maxEdge;
+	double   _weight;
 };
 
 #endif // SHORTCUTGRAPH_H

@@ -110,20 +110,34 @@ private:
 
 CREATE_PROFILER_SET( shortest_paths );
 
-ShortestPaths<ShortcutGraph, DijkstraResult> shortestPaths(
-	const ShortcutGraph&  graph,
-	ShortcutGraph::Vertex source,
-	double                maxDist,
-	double                minDist,
-	double                maxEdge
+enum class PredicateResponse : unsigned char
+{
+	FALSE,
+	TRUE,
+	BREAK
+};
+
+template <class Graph, template <class> class Result, class P>
+ShortestPaths<Graph, Result> dijkstra(
+	const Graph& graph,
+	typename Graph::Vertex source,
+	P                      predicate
 );
 
+template <class Graph>
 bool witnessSearch(
-	const ShortcutGraph&  graph,
+	const Graph&          graph,
 	ShortcutGraph::Vertex source,
 	ShortcutGraph::Vertex target,
 	ShortcutGraph::Vertex avoid,
 	double                maxDist
+);
+
+ShortestPaths<ShortcutGraph, DijkstraResult> shortestPaths(
+	const ShortcutGraph&  graph,
+	ShortcutGraph::Vertex source,
+	double                maxDist,
+	double                minDist
 );
 
 bool usefulEdge(

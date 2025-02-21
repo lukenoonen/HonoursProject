@@ -1,13 +1,14 @@
 #ifndef CIHIERARCHYBUILDER_H
 #define CIHIERARCHYBUILDER_H
 
-#include "ShortcutHierarchyBuilder.h"
+#include "CachedPathSolverBuilder.h"
+#include "ShortcutHierarchy.h"
 
 #include "Profiler.h"
 
 CREATE_PROFILER_SET( ci_builder );
 
-class CIHierarchyBuilder : public ShortcutHierarchyBuilder
+class CIHierarchyBuilder : public CachedPathSolverBuilder<ShortcutHierarchy>
 {
 public:
 	CIHierarchyBuilder( FilePath filepath, const WeightedGraph& graph );

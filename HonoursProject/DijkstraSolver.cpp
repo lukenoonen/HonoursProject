@@ -1,8 +1,6 @@
 #include "DijkstraSolver.h"
 #include "Dijkstra.h"
 
-#include "Logger.h"
-
 DijkstraSolver::DijkstraSolver( const WeightedGraph& g )
 	: _g( g )
 {

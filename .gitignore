@@ -369,3 +369,5 @@ FodyWeavers.xsd
 include/
 data/
 *.ci
+*.dat
+*.buch

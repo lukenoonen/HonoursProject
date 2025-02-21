@@ -11,6 +11,25 @@
 #include <optional>
 #include <iostream>
 
+template <class Edge>
+struct EdgeHash
+{
+	size_t operator() ( const Edge& edge ) const;
+};
+
+template <class Edge>
+struct EdgeCompare
+{
+	bool operator() ( const Edge& a, const Edge& b ) const
+	{
+		return (a.m_source == b.m_source && a.m_target == b.m_target)
+			|| (a.m_source == b.m_target && a.m_target == b.m_source);
+	}
+};
+
+template<class Edge>
+using EdgeSet = Set<Edge, EdgeHash<Edge>, EdgeCompare<Edge>>;
+
 template <class V, class E, template<class, class> class F>
 class BaseGraph
 {
@@ -19,11 +38,6 @@ public:
 
 	using Vertex = typename GraphType::vertex_descriptor;
 	using Edge   = typename GraphType::edge_descriptor;
-
-	struct EdgeHash
-	{
-		size_t operator() ( const Edge& edge ) const;
-	};
 
 	using FilterType = typename F<V, E>;
 
@@ -70,6 +84,8 @@ public:
 	bool edgeMap( P predicate ) const;
 	template <class P>
 	bool edgeMap( Vertex v, P predicate ) const;
+	template <class P>
+	bool neighbourEdgeMap( Vertex v, P predicate ) const;
 
 	template <class P>
 	bool dfs( Vertex v, P predicate ) const;
@@ -83,7 +99,7 @@ public:
 	template <class V_, class E_, template<class, class> class F_>
 	friend void deserialize( std::istream& is, BaseGraph<V_, E_, F_>& data );
 
-protected:
+public:
 	GraphType  _graph;
 	FilterType _filter;
 };

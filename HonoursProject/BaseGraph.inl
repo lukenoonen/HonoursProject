@@ -5,8 +5,8 @@
 #include <unordered_set>
 #include <stack>
 
-template <class V, class E, template<class, class> class F>
-inline size_t BaseGraph<V, E, F>::EdgeHash::operator()( const Edge& edge ) const
+template <class Edge>
+inline size_t EdgeHash<Edge>::operator()( const Edge& edge ) const
 {
 	const auto u = std::max( edge.m_source, edge.m_target );
 	const auto v = std::min( edge.m_source, edge.m_target );
@@ -83,7 +83,7 @@ void BaseGraph<V, E, F>::removeEdges( const Vec<Edge>& remove )
 {
 	if (remove.empty()) { return; }
 
-	const Set<Edge, EdgeHash> removeSet( remove.begin(), remove.end() );
+	const EdgeSet<Edge> removeSet( remove.begin(), remove.end() );
 	GraphType updated;
 
 	vertexMap( [this, &updated]( const auto v ) {
@@ -219,9 +219,8 @@ inline bool BaseGraph<V, E, F>::vertexMap( P predicate ) const
 	auto [it, end] = boost::vertices( _graph );
 	while (it != end)
 	{
-		const auto v = *it;
+		const auto v = *it++;
 		if (!_filter( v ) && predicate( v )) { return true; }
-		it++;
 	}
 	return false;
 }
@@ -231,12 +230,13 @@ template <class P>
 inline bool BaseGraph<V, E, F>::vertexMap( Vertex v, P predicate ) const
 {
 	if (_filter( v )) { return false; }
-	auto [it, end] = boost::adjacent_vertices( v, _graph );
+	auto [it, end] = boost::out_edges( v, _graph );
 	while (it != end)
 	{
-		const auto u = *it;
-		if (!_filter( u ) && predicate( u )) { return true; }
-		it++;
+		const auto e = *it++;
+		const auto u = other( e, v );
+		const bool filter = _filter( e ) || _filter( u );
+		if (!filter && predicate( u )) { return true; }
 	}
 	return false;
 }
@@ -248,12 +248,9 @@ inline bool BaseGraph<V, E, F>::edgeMap( P predicate ) const
 	auto [it, end] = boost::edges( _graph );
 	while (it != end)
 	{
-		const auto e = *it;
-		const auto u = source( e );
-		const auto v = target( e );
-		const bool filter = _filter( e ) || _filter( u ) || _filter( v );
-		if (!filter && predicate( e )) { return true; }
-		it++;
+		const auto e = *it++;
+		if (_filter( e ) || _filter( source( e ) ) || _filter( target( e ) )) { continue; }
+		if (predicate( e )) { return true; }
 	}
 	return false;
 }
@@ -266,12 +263,31 @@ inline bool BaseGraph<V, E, F>::edgeMap( Vertex v, P predicate ) const
 	auto [it, end] = boost::out_edges( v, _graph );
 	while (it != end)
 	{
-		const auto e = *it;
-		const auto u = other( e, v );
-		const bool filter  = _filter( e );
-		const bool filter2 = _filter( u );
-		if (!filter && !filter2 && predicate( e )) { return true; }
-		it++;
+		const auto e = *it++;
+		if (_filter( e ) || _filter( other( e, v ) )) { continue; }
+		if (predicate( e )) { return true; }
+	}
+	return false;
+}
+
+template <class V, class E, template<class, class> class F>
+template <class P>
+inline bool BaseGraph<V, E, F>::neighbourEdgeMap( Vertex v, P predicate ) const
+{
+	if (_filter( v )) { return false; }
+	auto [it, end] = boost::out_edges( v, _graph );
+	while (it != end)
+	{
+		const auto eu = *it++;
+		if (_filter( eu ) || _filter( other( eu, v ) )) { continue; }
+
+		auto itt = it;
+		while (itt != end)
+		{
+			const auto ew = *itt++;
+			if (_filter( ew ) || _filter( other( ew, v ) )) { continue; }
+			if (predicate( eu, ew )) { return true; }
+		}
 	}
 	return false;
 }
@@ -338,6 +354,8 @@ inline void serialize( std::ostream& os, const BaseGraph<V, E, F>& data )
 		serialize( os, data[e] );
 		return false;
 	} );
+
+	// serialize( os, data._filter );
 }
 
 template <class V, class E, template<class, class> class F>
@@ -365,4 +383,6 @@ inline void deserialize( std::istream& is, BaseGraph<V, E, F>& data )
 		deserialize( is, edge );
 		data.addEdge( s, t, std::move( edge ) );
 	}
+
+	// deserialize( is, data._filter );
 }

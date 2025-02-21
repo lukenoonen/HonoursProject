@@ -7,16 +7,26 @@
 #include "ShortcutGraph.h"
 #include "PathSolver.h"
 #include "Serialize.h"
-#include "Factory.h"
 
 class ShortcutHierarchy : public PathSolver
 {
 public:
 	ShortcutHierarchy() = default;
+	ShortcutHierarchy(
+		const WeightedGraph& source,
+		const Vec<WeightedGraph::Edge>& edges,
+		const Pair<size_t, size_t>& edgeRange
+	);
 
-	ShortcutHierarchy( const WeightedGraph& g );
+	void extend( 
+		const Vec<ShortcutGraph::Vertex>& discard,
+		double                            maxEdge,
+		const WeightedGraph&              source,
+		const Vec<WeightedGraph::Edge>&   edges,
+		const Pair<size_t, size_t>&       edgeRange
+	);
 
-	void extend( const Vec<ShortcutGraph::Vertex>& discard );
+	void finalize();
 
 	const ShortcutGraph& top() const;
 
@@ -30,7 +40,5 @@ private:
 	Vec<ShortcutGraph> _hierarchy;
 	Vec<size_t>        _ladder;
 };
-
-// FACTORY_CREATE_CACHE( ShortcutHierarchy, PathSolver )
 
 #endif // SHORTCUTHIERARCHY_H

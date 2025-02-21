@@ -30,7 +30,11 @@
 				[
 					{
 						"type": "ci_hierarchy",
-						"filepath": "Hongkong.ci"
+						"filepath": "hierarchies/Hongkong.ci"
+					},
+					{
+						"type": "bottomup_ch",
+						"filepath": "hierarchies/Hongkong.buch"
 					}
 				],
 				"testCases":
@@ -57,7 +61,11 @@
 				[
 					{
 						"type": "ci_hierarchy",
-						"filepath": "Haikou.ci"
+						"filepath": "hierarchies/Haikou.ci"
+					},
+					{
+						"type": "bottomup_ch",
+						"filepath": "hierarchies/Haikou.buch"
 					}
 				],
 				"testCases":
@@ -84,196 +92,11 @@
 				[
 					{
 						"type": "ci_hierarchy",
-						"filepath": "Xian.ci"
-					}
-				],
-				"testCases":
-				[
+						"filepath": "hierarchies/Xian.ci"
+					},
 					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Nanjing",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Nanjing.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Nanjing.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Shenzhen",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Shenzhen.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Shenzhen.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Tianjin",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Tianjin.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Tianjin.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Chengdu",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Chengdu.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Chengdu.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Beijing",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Beijing.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Beijing.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Guangzhou",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Guangzhou.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Guangzhou.ci"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 100,
-						"name": "random_100"
-					}
-				]
-			},
-			{
-				"name": "Chongqing",
-				"graph":
-				{
-					"type": "road-d",
-					"filepath": "data/Chongqing.road-d"
-				},
-				"authority":
-				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "Chongqing.ci"
+						"type": "bottomup_ch",
+						"filepath": "hierarchies/Xian.buch"
 					}
 				],
 				"testCases":

@@ -26,6 +26,9 @@ void serialize( std::ostream& os, const Pair<T, U>& data );
 template <class T, class U>
 void deserialize( std::istream& is, Pair<T, U>& data );
 
+void serialize( std::ostream& os, const Str& data );
+void deserialize( std::istream& is, Str& data );
+
 template <class T>
 bool serialize( FilePath filepath, const T& data );
 template <class T>

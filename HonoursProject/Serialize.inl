@@ -83,6 +83,24 @@ inline void deserialize( std::istream& is, Pair<T, U>& data )
 	deserialize( is, data.second );
 }
 
+inline void serialize( std::ostream& os, const Str& data )
+{
+	const size_t len = data.length();
+	serialize( os, len );
+	os.write( &data[0], len);
+}
+
+inline void deserialize( std::istream& is, Str& data )
+{
+	size_t len;
+	deserialize( is, len );
+	char* temp = new char[len + 1];
+	is.read( temp, len );
+	temp[len] = '\0';
+	data.assign( temp, len );
+	delete[] temp;
+}
+
 template<class T>
 inline bool serialize( FilePath filepath, const T& data )
 {

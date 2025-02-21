@@ -135,6 +135,18 @@
     <ClInclude Include="ShortcutHierarchy.h">
       <Filter>Header Files\Hierarchy</Filter>
     </ClInclude>
+    <ClInclude Include="ContractionGraph.h">
+      <Filter>Header Files\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="ContractionHierarchy.h">
+      <Filter>Header Files\Hierarchy</Filter>
+    </ClInclude>
+    <ClInclude Include="CachedPathSolverBuilder.h">
+      <Filter>Header Files\Hierarchy\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="BottomUpCHBuilder.h">
+      <Filter>Header Files\Hierarchy\Builder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl">
@@ -154,6 +166,9 @@
     </None>
     <None Include="Serialize.inl">
       <Filter>Header Files\Util</Filter>
+    </None>
+    <None Include="CachedPathSolverBuilder.inl">
+      <Filter>Header Files\Hierarchy\Builder</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +234,15 @@
     </ClCompile>
     <ClCompile Include="ShortcutHierarchy.cpp">
       <Filter>Source Files\Hierarchy</Filter>
+    </ClCompile>
+    <ClCompile Include="ContractionGraph.cpp">
+      <Filter>Source Files\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="ContractionHierarchy.cpp">
+      <Filter>Source Files\Hierarchy</Filter>
+    </ClCompile>
+    <ClCompile Include="BottomUpCHBuilder.cpp">
+      <Filter>Source Files\Hierarchy\Builder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
