@@ -368,6 +368,5 @@ FodyWeavers.xsd
 # Project specific files
 include/
 data/
-*.ci
+hierarchies/
 *.dat
-*.buch
