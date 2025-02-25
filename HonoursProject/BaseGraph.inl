@@ -38,16 +38,15 @@ inline Opt<typename BaseGraph<V, E, F>::Edge> BaseGraph<V, E, F>::addEdge( Verte
 }
 
 template <class V, class E, template<class, class> class F>
-inline void BaseGraph<V, E, F>::removeVertices( const Vec<Vertex>& remove )
+inline void BaseGraph<V, E, F>::removeVertices( const Set<Vertex>& remove )
 {
 	if (remove.empty()) { return; }
 
-	const Set<Vertex> removeSet( remove.begin(), remove.end() );
 	Map<Vertex, Vertex> toUpdated;
 	GraphType updated;
 
-	vertexMap( [this, &removeSet, &toUpdated, &updated]( const auto v ) {
-		if (removeSet.contains( v )) { return false; }
+	vertexMap( [this, &remove, &toUpdated, &updated]( const auto v ) {
+		if (remove.contains( v )) { return false; }
 		toUpdated[v] = boost::add_vertex( std::move( get( v ) ), updated );
 		return false;
 	} );
@@ -67,11 +66,11 @@ inline void BaseGraph<V, E, F>::removeVertices( const Vec<Vertex>& remove )
 template <class V, class E, template<class, class> class F>
 inline void BaseGraph<V, E, F>::removeIsolatedVertices()
 {
-	Vec<Vertex> remove;
+	Set<Vertex> remove;
 	vertexMap( [this, &remove]( const auto v ) {
 		if (degree( v ) == 0)
 		{
-			remove.push_back( v );
+			remove.insert( v );
 		}
 		return false;
 	} );
@@ -79,11 +78,10 @@ inline void BaseGraph<V, E, F>::removeIsolatedVertices()
 }
 
 template <class V, class E, template<class, class> class F>
-void BaseGraph<V, E, F>::removeEdges( const Vec<Edge>& remove )
+void BaseGraph<V, E, F>::removeEdges( const EdgeSet<Edge>& remove )
 {
 	if (remove.empty()) { return; }
 
-	const EdgeSet<Edge> removeSet( remove.begin(), remove.end() );
 	GraphType updated;
 
 	vertexMap( [this, &updated]( const auto v ) {
@@ -91,8 +89,8 @@ void BaseGraph<V, E, F>::removeEdges( const Vec<Edge>& remove )
 		return false;
 	} );
 
-	edgeMap( [this, &removeSet, &updated]( const auto e ) {
-		if (removeSet.contains( e )) { return false; }
+	edgeMap( [this, &remove, &updated]( const auto e ) {
+		if (remove.contains( e )) { return false; }
 		boost::add_edge( source( e ), target( e ), std::move( get( e ) ), updated );
 		return false;
 	} );
@@ -274,7 +272,6 @@ template <class V, class E, template<class, class> class F>
 template <class P>
 inline bool BaseGraph<V, E, F>::neighbourEdgeMap( Vertex v, P predicate ) const
 {
-	if (_filter( v )) { return false; }
 	auto [it, end] = boost::out_edges( v, _graph );
 	while (it != end)
 	{

@@ -47,10 +47,10 @@ public:
 	Vertex addVertex( V data );
 	Opt<Edge> addEdge( Vertex s, Vertex t, E data );
 
-	void removeVertices( const Vec<Vertex>& remove );
+	void removeVertices( const Set<Vertex>& remove );
 	void removeIsolatedVertices();
 
-	void removeEdges( const Vec<Edge>& remove );
+	void removeEdges( const EdgeSet<Edge>& remove );
 
 	Vertex source( Edge e ) const;
 	Vertex target( Edge e ) const;

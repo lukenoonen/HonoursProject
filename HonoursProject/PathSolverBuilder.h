@@ -1,26 +1,22 @@
 #ifndef PATHSOLVERBUILDER_H
 #define PATHSOLVERBUILDER_H
 
+#include "Util.h"
+
 #include "PathSolver.h"
+#include "WeightedGraph.h"
 
 class PathSolverBuilder
 {
 public:
-	PathSolverBuilder( const WeightedGraph& graph );
-
-	Ptr<PathSolver> create() const;
+	Ptr<PathSolver> create( const WeightedGraph& graph ) const;
 
 protected:
-	const WeightedGraph& graph() const;
-
-	virtual Ptr<PathSolver> createInternal() const = 0;
-
-private:
-	const WeightedGraph& _graph;
+	virtual Ptr<PathSolver> createInternal( const WeightedGraph& graph ) const = 0;
 };
 
-FACTORY_CREATE_BASE_JSON( PathSolverBuilder, const WeightedGraph& )
+FACTORY_CREATE_BASE_JSON( PathSolverBuilder )
 
-JSON_CREATE_FACTORY( PathSolverBuilder, const WeightedGraph& )
+JSON_CREATE_FACTORY( PathSolverBuilder )
 
 #endif // PATHSOLVERBUILDER_H

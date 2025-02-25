@@ -21,18 +21,6 @@ TestSuite::TestSuite( Vec<TestInst> testInsts )
 
 }
 
-bool TestSuite::run( Str testinst, Str testcase ) const
-{
-	g_logger.debug( "Running test case {} in test inst {}", testcase, testinst );
-
-	if (const auto search = _testInstMap.find( testinst ); search != _testInstMap.end())
-	{
-		return search->second->run( testcase );
-	}
-
-	return false;
-}
-
 bool TestSuite::run( Str testinst ) const
 {
 	g_logger.debug( "Running all test cases in test inst {}...\n", testinst );

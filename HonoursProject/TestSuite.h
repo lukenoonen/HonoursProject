@@ -12,7 +12,6 @@ public:
 	TestSuite() = default;
 	TestSuite( Vec<TestInst> testInsts );
 
-	bool run( Str testinst, Str testcase ) const;
 	bool run( Str testinst ) const;
 	bool run() const;
 

@@ -5,6 +5,7 @@
 
 #include <chrono>
 
+template <class T=std::ratio<1>>
 class Timer
 {
 private:
@@ -14,7 +15,7 @@ private:
 public:
 	Timer();
 
-	void start();
+	void start(); 
 	void stop();
 
 	void clear();
@@ -55,7 +56,7 @@ private:
 // ====================================
 //              Profiler
 // ====================================
-class Profiler : Timer
+class Profiler : Timer<std::milli>
 {
 private:
 	friend class ProfilerSet;
@@ -119,5 +120,7 @@ private:
 
 #define CLEAR_PROFILERS( set ) \
 	profiler_set_##set.clear()
+
+#include "Profiler.inl"
 
 #endif // PROFILER_H

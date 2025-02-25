@@ -4,8 +4,8 @@
 #include "Util.h"
 #include "JSON.h"
 
-#include "WeightedGraph.h"
-#include "PathSolver.h"
+#include "GraphParser.h"
+#include "PathSolverBuilder.h"
 #include "TestCase.h"
 
 class TestInst
@@ -17,14 +17,13 @@ public:
 public:
 	TestInst() = default;
 	TestInst(
-		Str                  name,
-		Ptr<WeightedGraph>   graph,
-		Ptr<PathSolver>      authority,
-		Vec<Ptr<PathSolver>> pathSolvers,
-		TestCases            testCases
+		Str                         name,
+		Ptr<GraphParser>            graphParser,
+		Ptr<PathSolverBuilder>      authorityBuilder,
+		Vec<Ptr<PathSolverBuilder>> pathSolverBuilders,
+		TestCases                   testCases
 	);
 
-	bool run( Str testcase ) const;
 	bool run() const;
 
 	const Str& name() const;
@@ -32,9 +31,9 @@ public:
 private:
 	Str _name;
 
-	Ptr<WeightedGraph>   _graph;
-	Ptr<PathSolver>      _authority;
-	Vec<Ptr<PathSolver>> _pathSolvers;
+	Ptr<GraphParser>            _graphParser;
+	Ptr<PathSolverBuilder>      _authorityBuilder;
+	Vec<Ptr<PathSolverBuilder>> _pathSolverBuilders;
 
 	TestCases   _testCases;
 	TestCaseMap _testCaseMap;

@@ -33,7 +33,7 @@
 						"filepath": "hierarchies/Hongkong.ci"
 					},
 					{
-						"type": "bottomup_ch",
+						"type": "buch",
 						"filepath": "hierarchies/Hongkong.buch"
 					}
 				],
@@ -64,7 +64,7 @@
 						"filepath": "hierarchies/Haikou.ci"
 					},
 					{
-						"type": "bottomup_ch",
+						"type": "buch",
 						"filepath": "hierarchies/Haikou.buch"
 					}
 				],
@@ -95,8 +95,225 @@
 						"filepath": "hierarchies/Xian.ci"
 					},
 					{
-						"type": "bottomup_ch",
+						"type": "buch",
 						"filepath": "hierarchies/Xian.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Nanjing",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Nanjing.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Nanjing.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Nanjing.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Shenzhen",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Shenzhen.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Shenzhen.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Shenzhen.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Tianjin",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Tianjin.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Tianjin.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Tianjin.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Chengdu",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Chengdu.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Chengdu.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Chengdu.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Beijing",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Beijing.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Beijing.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Beijing.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Guangzhou",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Guangzhou.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Guangzhou.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Guangzhou.buch"
+					}
+				],
+				"testCases":
+				[
+					{
+						"type": "random",
+						"trials": 100,
+						"name": "random_100"
+					}
+				]
+			},
+			{
+				"name": "Chongqing",
+				"graph":
+				{
+					"type": "road-d",
+					"filepath": "data/Chongqing.road-d"
+				},
+				"authority":
+				{
+					"type": "dijkstra_solver"
+				},
+				"pathSolvers":
+				[
+					{
+						"type": "ci_hierarchy",
+						"filepath": "hierarchies/Chongqing.ci"
+					},
+					{
+						"type": "buch",
+						"filepath": "hierarchies/Chongqing.buch"
 					}
 				],
 				"testCases":

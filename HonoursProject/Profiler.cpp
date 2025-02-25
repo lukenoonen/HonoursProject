@@ -3,34 +3,6 @@
 
 #include <algorithm>
 
-Timer::Timer()
-	: _duration( 0.0 )
-{
-
-}
-
-void Timer::start()
-{
-	_startTime = std::chrono::high_resolution_clock::now();
-}
-
-void Timer::stop()
-{
-	const Time finish = std::chrono::high_resolution_clock::now();
-	const std::chrono::duration<double, std::milli> ms = finish - _startTime;
-	_duration += ms.count();
-}
-
-void Timer::clear()
-{
-	_duration = 0.0;
-}
-
-double Timer::duration() const
-{
-	return _duration;
-}
-
 ProfilerSet::ProfilerSet( const char* name )
 	: _name( name )
 {
@@ -70,20 +42,24 @@ void ProfilerSet::log() const
 		return lhs->duration() < rhs->duration();
 	} );
 
-	g_logger.debug( "Performance for {}:\n", _name );
+	g_logger.debug( "\n===========================================\n" );
+	g_logger.debug( "| Performance for profiler set {}:\n", _name );
 	for (const Profiler* profiler : profilers)
 	{
-		g_logger.debug( "{}: {:.2f} ms ({:.2f}%)\n", profiler->_name, profiler->duration(), 100.0 * profiler->duration() / profilers.back()->duration() );
+		g_logger.debug( "| {}: {:.2f} ms ({:.2f}%)\n", profiler->_name, profiler->duration(), 100.0 * profiler->duration() / profilers.back()->duration() );
 	}
+	g_logger.debug( "===========================================\n\n" );
 }
 
 void ProfilerSet::clear()
 {
-	g_logger.debug( "Clearing {}...\n", _name );
+	g_logger.debug( "\n===========================================\n" );
+	g_logger.debug( "| Clearing profiler set {}...\n", _name );
+	g_logger.debug( "===========================================\n\n" );
 
 	for (Profiler* profiler : _profilers)
 	{
-		profiler->_duration = 0.0;
+		profiler->clear();
 	}
 }
 

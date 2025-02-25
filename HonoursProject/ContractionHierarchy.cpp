@@ -38,6 +38,11 @@ ContractionHierarchy::ContractionHierarchy( const WeightedGraph& source )
 
 }
 
+ContractionGraph& ContractionHierarchy::graph()
+{
+	return _contractionGraph;
+}
+
 ContractionGraph::Contraction ContractionHierarchy::contract( WeightedGraph::Vertex v )
 {
 	return _contractionGraph.contract( v );

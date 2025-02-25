@@ -19,13 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseContractionGraph.h" />
     <ClInclude Include="BaseGraph.h" />
-    <ClInclude Include="BottomUpCHBuilder.h" />
+    <ClInclude Include="BUCHBuilder.h" />
+    <ClInclude Include="BUContractionQueue.h" />
     <ClInclude Include="CachedPathSolverBuilder.h" />
     <ClInclude Include="CIHierarchyBuilder.h" />
     <ClInclude Include="ContractionGraph.h" />
     <ClInclude Include="ContractionHierarchy.h" />
     <ClInclude Include="Dijkstra.h" />
+    <ClInclude Include="DijkstraSearch.h" />
     <ClInclude Include="DijkstraSolver.h" />
     <ClInclude Include="DijkstraSolverBuilder.h" />
     <ClInclude Include="Factory.h" />
@@ -50,20 +53,23 @@
     <ClInclude Include="WeightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BaseContractionGraph.inl" />
     <None Include="BaseGraph.inl" />
+    <None Include="BUContractionQueue.inl" />
     <None Include="CachedPathSolverBuilder.inl" />
     <None Include="Dijkstra.inl" />
     <None Include="Factory.inl" />
     <None Include="JSON.inl" />
     <None Include="Logger.inl" />
+    <None Include="Profiler.inl" />
     <None Include="Serialize.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BottomUpCHBuilder.cpp" />
+    <ClCompile Include="BaseContractionGraph.cpp" />
+    <ClCompile Include="BUCHBuilder.cpp" />
     <ClCompile Include="CIHierarchyBuilder.cpp" />
     <ClCompile Include="ContractionGraph.cpp" />
     <ClCompile Include="ContractionHierarchy.cpp" />
-    <ClCompile Include="Dijkstra.cpp" />
     <ClCompile Include="DijkstraSolver.cpp" />
     <ClCompile Include="DijkstraSolverBuilder.cpp" />
     <ClCompile Include="FileOutput.cpp" />
@@ -71,7 +77,6 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Output.cpp" />
-    <ClCompile Include="PathSolver.cpp" />
     <ClCompile Include="PathSolverBuilder.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="RoadDParser.cpp" />

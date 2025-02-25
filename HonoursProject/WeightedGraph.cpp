@@ -56,11 +56,3 @@ void deserialize( std::istream& is, WeightedEdge& data )
 {
 	deserialize( is, data._weight );
 }
-
-JSON_BEGIN( Ptr<WeightedGraph> )
-
-	JSON_ARG_SINGLE( Ptr<GraphParser>, parser )
-	
-	JSON_FABRICATE( parser->create() )
-
-JSON_END()

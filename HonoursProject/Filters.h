@@ -27,10 +27,19 @@ template<class V, class E>
 class VertexFilter : public BaseFilter<V, E>
 {
 public:
-	bool operator()( VertexFilter::Vertex v ) const { return filter.contains( v ); }
+	bool operator()( VertexFilter::Vertex v ) const { return _filter.contains( v ); }
 	bool operator()( VertexFilter::Edge e ) const { return false; }
 
-	Set<typename VertexFilter::Vertex> filter;
+	void insert( VertexFilter::Vertex v ) { _filter.insert( v ); }
+	void remove( VertexFilter::Vertex v ) { _filter.erase( v ); }
+	void clear() { _filter.clear(); }
+
+	size_t size() const { return _filter.size(); }
+
+	const Set<typename VertexFilter::Vertex>& set() const { return _filter; }
+
+private:
+	Set<typename VertexFilter::Vertex> _filter;
 };
 
 #endif // FILTERS_H

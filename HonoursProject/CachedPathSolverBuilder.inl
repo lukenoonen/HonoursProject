@@ -4,20 +4,19 @@
 #define BUILD_TIMES_FILE "build_times.dat"
 
 template<class T>
-inline CachedPathSolverBuilder<T>::CachedPathSolverBuilder( FilePath filepath, const WeightedGraph& graph )
-	: PathSolverBuilder( graph ),
-	  _filepath( std::move( filepath ) )
+inline CachedPathSolverBuilder<T>::CachedPathSolverBuilder( FilePath filepath )
+	: _filepath( std::move( filepath ) )
 {
 
 }
 
 template<class T>
-inline Ptr<PathSolver> CachedPathSolverBuilder<T>::createInternal() const
+inline Ptr<PathSolver> CachedPathSolverBuilder<T>::createInternal( const WeightedGraph& graph ) const
 {
 	auto result = load();
 	if (result) { return result; }
 	g_logger.debug( "Failed to load path solver from {}!\n", _filepath.string() );
-	return build();
+	return build( graph );
 }
 
 template<class T>
@@ -30,12 +29,12 @@ inline Ptr<PathSolver> CachedPathSolverBuilder<T>::load() const
 }
 
 template<class T>
-inline Ptr<PathSolver> CachedPathSolverBuilder<T>::build() const
+inline Ptr<PathSolver> CachedPathSolverBuilder<T>::build( const WeightedGraph& graph ) const
 {
 	g_logger.debug( "Building path solver...\n" );
 	Timer buildTimer;
 	buildTimer.start();
-	Ptr<T> result = buildInternal();
+	Ptr<T> result = buildInternal( graph );
 	buildTimer.stop();
 
 	Map<Str, double> buildTimes;

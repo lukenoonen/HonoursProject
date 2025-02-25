@@ -13,9 +13,10 @@ public:
 	ContractionHierarchy() = default;
 	ContractionHierarchy( const WeightedGraph& source );
 
+	ContractionGraph& graph();
+
 	ContractionGraph::Contraction contract( WeightedGraph::Vertex v );
 	void applyContraction( ContractionGraph::Contraction contraction );
-
 	void finalize();
 
 	double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const final;

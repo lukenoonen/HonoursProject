@@ -13,22 +13,25 @@ class ShortcutHierarchy : public PathSolver
 public:
 	ShortcutHierarchy() = default;
 	ShortcutHierarchy(
-		const WeightedGraph& source,
+		const WeightedGraph&            source,
 		const Vec<WeightedGraph::Edge>& edges,
-		const Pair<size_t, size_t>& edgeRange
+		const Pair<size_t, size_t>&     edgeRange
 	);
 
-	void extend( 
+	void extend(
 		const Vec<ShortcutGraph::Vertex>& discard,
-		double                            maxEdge,
 		const WeightedGraph&              source,
 		const Vec<WeightedGraph::Edge>&   edges,
 		const Pair<size_t, size_t>&       edgeRange
 	);
 
+	ShortcutGraph::Contraction contract( ShortcutGraph::Vertex v );
+	void applyContraction( ShortcutGraph::Contraction contraction );
+	void finalizeLayer();
+
 	void finalize();
 
-	const ShortcutGraph& top() const;
+	ShortcutGraph& top();
 
 	double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const final;
 

@@ -16,7 +16,7 @@ size_t TestCase::run(
 	const Vec<Ptr<PathSolver>>& pathSolvers
 ) const
 {
-	Timer totalTimer;
+	Timer<std::milli> totalTimer;
 	size_t failures = 0;
 
 	Vec<Endpoints> eps = endpoints( graph );
@@ -55,7 +55,7 @@ const Str& TestCase::name() const
 
 double TestCase::runAuthority( const Endpoints& endpoints, const PathSolver* authority ) const
 {
-	Timer timer;
+	Timer<std::milli> timer;
 	timer.start();
 	const double distance = authority->distance( endpoints.u(), endpoints.v() );
 	timer.stop();
@@ -70,7 +70,7 @@ bool TestCase::run(
 	double            authorityDistance
 ) const
 {
-	Timer timer;
+	Timer<std::milli> timer;
 	timer.start();
 	const double distance = pathSolver->distance( endpoints.u(), endpoints.v() );
 	timer.stop();

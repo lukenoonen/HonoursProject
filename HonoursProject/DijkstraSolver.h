@@ -1,6 +1,8 @@
 #ifndef DIJKSTRASOLVER_H
 #define DIJKSTRASOLVER_H
 
+#include "Util.h"
+
 #include "PathSolver.h"
 
 class DijkstraSolver : public PathSolver

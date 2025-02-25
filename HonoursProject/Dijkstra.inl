@@ -33,7 +33,7 @@ inline void DijkstraResult<Graph>::update( Vertex prev, Edge edge, double distan
 template<class Graph>
 inline bool DijkstraResult<Graph>::operator<( const DijkstraResult<Graph>& other ) const
 {
-	return _distance > other._distance;
+	return _distance >= other._distance;
 }
 
 template<class Graph>
@@ -97,6 +97,12 @@ inline double ShortestPaths<Graph, Result>::distance( Vertex from ) const
 }
 
 template <class Graph, template <class> class Result>
+inline size_t ShortestPaths<Graph, Result>::size() const
+{
+	return _results.size();
+}
+
+template <class Graph, template <class> class Result>
 inline void ShortestPaths<Graph, Result>::filter( Vertex vertex )
 {
 	_filter.insert( vertex );
@@ -150,7 +156,7 @@ void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double d
 	{
 		Result<Graph>& entry = *(search->second);
 		entry.update( p, e, distance, std::forward<Ts>( args )... );
-		_queue.increase( search->second );
+		_queue.update( search->second );
 		_distances[v] = distance;
 	}
 	else
@@ -202,7 +208,7 @@ ShortestPaths<Graph, Result> DijkstraData<Graph, Result>::results()
 
 template <class Graph, template <class> class Result, class P>
 ShortestPaths<Graph, Result> dijkstra(
-	const Graph& graph,
+	const Graph&           graph,
 	typename Graph::Vertex source,
 	P                      predicate
 )
@@ -223,7 +229,7 @@ ShortestPaths<Graph, Result> dijkstra(
 			if (pr == PredicateResponse::BREAK) { return true; }
 			data.decrease( v, ex.vertex(), e, newDist );
 			return false;
-			} );
+		} );
 		if (result) { break; }
 	}
 
@@ -232,17 +238,15 @@ ShortestPaths<Graph, Result> dijkstra(
 
 template<class Graph>
 inline bool witnessSearch(
-	const Graph&          graph,
-	ShortcutGraph::Vertex source,
-	ShortcutGraph::Vertex target,
-	ShortcutGraph::Vertex avoid,
-	double                maxDist
+	const Graph&            graph,
+	typename Graph::Vertex source,
+	typename Graph::Vertex target,
+	double                 maxDist
 )
 {
 	bool witnessFound = false;
-	dijkstra<Graph, DijkstraResult>( graph, source, [&graph, target, avoid, maxDist, &witnessFound]( const auto v, const auto e, const double dist ) {
+	const auto test = dijkstra<Graph, DijkstraResult>( graph, source, [&graph, target, maxDist, &witnessFound]( const auto v, const auto e, const double dist ) {
 		if (dist > maxDist) { return PredicateResponse::FALSE; }
-		if (v == avoid) { return PredicateResponse::FALSE; }
 		if (v == target)
 		{
 			witnessFound = true;
@@ -252,4 +256,77 @@ inline bool witnessSearch(
 	} );
 
 	return witnessFound;
+}
+
+template <class Graph>
+ShortestPaths<Graph, DijkstraResult> shortestPaths(
+	const Graph&           graph,
+	typename Graph::Vertex source,
+	double                 maxDist,
+	double                 minDist
+)
+{
+	auto paths = dijkstra<Graph, DijkstraResult>( graph, source, [maxDist]( const auto v, const auto e, const double dist ) {
+		if (dist > maxDist) { return PredicateResponse::FALSE; }
+		return PredicateResponse::TRUE;
+	} );
+
+	paths.vertexMap( [minDist, &paths]( const auto& result ) {
+		if (result.distance() < minDist)
+		{
+			paths.filter( result.vertex() );
+		}
+		return false;
+	} );
+
+	return paths;
+}
+
+template <class Graph>
+bool usefulEdge(
+	const Graph&         graph,
+	typename Graph::Edge e
+)
+{
+	const auto source = graph.source( e );
+	const auto target = graph.target( e );
+	const double maxDist = graph[e].weight();
+
+	bool useful = true;
+	dijkstra<Graph, DijkstraResult>( graph, source, [&graph, target, maxDist, &useful]( const auto v, const auto e, const double dist ) {
+		if (dist >= maxDist) { return PredicateResponse::FALSE; }
+		if (v == target)
+		{
+			useful = false;
+			return PredicateResponse::BREAK;
+		}
+		return PredicateResponse::TRUE;
+	} );
+	return useful;
+}
+
+template <class Graph>
+ShortestPaths<Graph, DijkstraResult> dijkstraSearch(
+	const Graph&           graph,
+	typename Graph::Vertex source,
+	typename Graph::Vertex target
+)
+{
+	DijkstraData<Graph, DijkstraResult> data( source );
+
+	while (!data.empty())
+	{
+		const auto& ex = data.extract();
+		if (ex.vertex() == target) { break; }
+		graph.edgeMap( ex.vertex(), [&ex, &graph, &data](const auto e) {
+			const auto v = graph.other( e, ex.vertex() );
+			const double vDist = data.distance( v );
+			const double newDist = ex.distance() + graph[e].weight();
+			if (newDist >= vDist) { return false; }
+			data.decrease( v, ex.vertex(), e, newDist);
+			return false;
+		} );
+	}
+
+	return data.results();
 }

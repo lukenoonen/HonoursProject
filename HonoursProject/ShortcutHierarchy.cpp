@@ -4,11 +4,11 @@
 namespace
 {
 	bool dijkstraStep(
-		const Vec<ShortcutGraph>&                     hierarchy,
-		const Vec<size_t>&                            ladder,
+		const Vec<ShortcutGraph>&                    hierarchy,
+		const Vec<size_t>&                           ladder,
 		DijkstraData<ShortcutGraph, DijkstraResult>& first,
 		DijkstraData<ShortcutGraph, DijkstraResult>& second,
-		double&                                       bestDistance
+		double&                                      bestDistance
 	)
 	{
 		const auto& ex    = first.extract();
@@ -48,27 +48,33 @@ ShortcutHierarchy::ShortcutHierarchy(
 
 void ShortcutHierarchy::extend(
 	const Vec<ShortcutGraph::Vertex>& discard,
-	double                            maxEdge,
-	const WeightedGraph&              source,
-	const Vec<WeightedGraph::Edge>&   edges,
-	const Pair<size_t, size_t>&       edgeRange
+	const WeightedGraph&            source,
+	const Vec<WeightedGraph::Edge>& edges,
+	const Pair<size_t, size_t>&     edgeRange
 )
 {
 	const ShortcutGraph& current = top();
-
 	for (const auto v : discard)
 	{
 		_ladder[current.toSource( v )] = _hierarchy.size() - 1;
 	}
 
-	_hierarchy.emplace_back(
-		_hierarchy.back(),
-		discard,
-		maxEdge,
-		source,
-		edges,
-		edgeRange
-	);
+	_hierarchy.emplace_back( current, source, edges, edgeRange );
+}
+
+ShortcutGraph::Contraction ShortcutHierarchy::contract( ShortcutGraph::Vertex v )
+{
+	return _hierarchy.back().contract( v );
+}
+
+void ShortcutHierarchy::applyContraction( ShortcutGraph::Contraction contraction )
+{
+	_hierarchy.back().applyContraction( std::move( contraction ) );
+}
+
+void ShortcutHierarchy::finalizeLayer()
+{
+	_hierarchy.back().finalize();
 }
 
 void ShortcutHierarchy::finalize()
@@ -80,7 +86,7 @@ void ShortcutHierarchy::finalize()
 	} );
 }
 
-const ShortcutGraph& ShortcutHierarchy::top() const
+ShortcutGraph& ShortcutHierarchy::top()
 {
 	return _hierarchy.back();
 }

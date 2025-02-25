@@ -41,6 +41,4 @@ private:
 	double _weight;
 };
 
-JSON_CREATE( Ptr<WeightedGraph> )
-
 #endif // WEIGHTEDGRAPH_H

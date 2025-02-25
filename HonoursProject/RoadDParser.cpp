@@ -62,9 +62,9 @@ Ptr<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
 	result->removeIsolatedVertices();
 	result->normalize();
 
-	Vec<WeightedGraph::Edge> uselessEdges;
+	EdgeSet<WeightedGraph::Edge> uselessEdges;
 	result->edgeMap( [&result, &uselessEdges]( const auto e ) {
-		if (!usefulEdge( *result, e )) { uselessEdges.push_back( e ); }
+		if (!usefulEdge( *result, e )) { uselessEdges.insert( e ); }
 		return false;
 	} );
 

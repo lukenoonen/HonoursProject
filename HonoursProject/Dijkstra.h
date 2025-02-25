@@ -3,10 +3,6 @@
 
 #include "Util.h"
 
-#include "ShortcutGraph.h"
-
-#include "Profiler.h"
-
 #include <boost/heap/fibonacci_heap.hpp>
 
 template <class Graph>
@@ -57,6 +53,7 @@ public:
 
 	bool contains( Vertex v ) const;
 	double distance( Vertex from ) const;
+	size_t size() const;
 
 	void filter( Vertex vertex );
 
@@ -108,8 +105,6 @@ private:
 	ShortestPaths<Graph, Result> _results;
 };
 
-CREATE_PROFILER_SET( shortest_paths );
-
 enum class PredicateResponse : unsigned char
 {
 	FALSE,
@@ -126,29 +121,31 @@ ShortestPaths<Graph, Result> dijkstra(
 
 template <class Graph>
 bool witnessSearch(
-	const Graph&          graph,
-	ShortcutGraph::Vertex source,
-	ShortcutGraph::Vertex target,
-	ShortcutGraph::Vertex avoid,
-	double                maxDist
+	const Graph&           graph,
+	typename Graph::Vertex source,
+	typename Graph::Vertex target,
+	double                 maxDist
 );
 
-ShortestPaths<ShortcutGraph, DijkstraResult> shortestPaths(
-	const ShortcutGraph&  graph,
-	ShortcutGraph::Vertex source,
-	double                maxDist,
-	double                minDist
+template <class Graph>
+ShortestPaths<Graph, DijkstraResult> shortestPaths(
+	const Graph&           graph,
+	typename Graph::Vertex source,
+	double                 maxDist,
+	double                 minDist
 );
 
+template <class Graph>
 bool usefulEdge(
-	const WeightedGraph& graph,
-	WeightedGraph::Edge  e
+	const Graph&         graph,
+	typename Graph::Edge e
 );
 
-ShortestPaths<WeightedGraph, DijkstraResult> dijkstraSearch(
-	const WeightedGraph& graph,
-	WeightedGraph::Vertex source,
-	WeightedGraph::Vertex target
+template <class Graph>
+ShortestPaths<Graph, DijkstraResult> dijkstraSearch(
+	const Graph& graph,
+	typename Graph::Vertex source,
+	typename Graph::Vertex target
 );
 
 #include "Dijkstra.inl"

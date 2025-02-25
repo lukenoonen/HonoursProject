@@ -17,47 +17,48 @@ namespace
 }
 
 TestInst::TestInst(
-	Str                  name,
-	Ptr<WeightedGraph>   graph,
-	Ptr<PathSolver>      authority,
-	Vec<Ptr<PathSolver>> pathSolvers,
-	TestCases            testCases
+	Str                         name,
+	Ptr<GraphParser>            graphParser,
+	Ptr<PathSolverBuilder>      authorityBuilder,
+	Vec<Ptr<PathSolverBuilder>> pathSolverBuilders,
+	TestCases                   testCases
 )
 	: _name( std::move( name ) ),
-	  _graph( std::move( graph ) ),
-	  _pathSolvers( std::move( pathSolvers ) ),
-	  _authority( std::move( authority ) ),
+	  _graphParser( std::move( graphParser ) ),
+	  _authorityBuilder( std::move( authorityBuilder ) ),
+	  _pathSolverBuilders( std::move( pathSolverBuilders ) ),
 	  _testCases( std::move( testCases ) ),
 	  _testCaseMap( mapTestCases( _testCases ) )
 {
 
 }
 
-bool TestInst::run( Str testcase ) const
-{
-	if (const auto search = _testCaseMap.find( testcase ); search != _testCaseMap.end())
-	{
-		search->second->run( *_graph, _authority.get(), _pathSolvers );
-		return true;
-	}
-
-	g_logger.debug( "Warning: Unable to find TestCase {} in TestInst {}", testcase, _name );
-	return false;
-}
-
 bool TestInst::run() const
 {
-	Timer instTimer;
+	Timer<std::milli> instTimer;
 	size_t failures = 0;
 
 	g_logger.debug( "Running TestInst {}\n", _name );
 	g_logger.log( "TestInst {}\n", _name );
 
+	g_logger.debug( "Parsing graph...\n" );
+	Ptr<WeightedGraph> graph = _graphParser->create();
+
+	g_logger.debug( "Building path solvers...\n" );
+
+	Ptr<PathSolver> authority = _authorityBuilder->create( *graph );
+	Vec<Ptr<PathSolver>> pathSolvers;
+	pathSolvers.reserve( _pathSolverBuilders.size() );
+	for (const Ptr<PathSolverBuilder>& pathSolverBuilder : _pathSolverBuilders)
+	{
+		pathSolvers.emplace_back( pathSolverBuilder->create( *graph ) );
+	}
+
 	instTimer.start();
 
 	for (const auto& testCase : _testCases)
 	{
-		failures += testCase->run( *_graph, _authority.get(), _pathSolvers);
+		failures += testCase->run( *graph, authority.get(), pathSolvers );
 	}
 
 	instTimer.stop();
@@ -76,9 +77,9 @@ const Str& TestInst::name() const
 JSON_BEGIN( TestInst )
 
 	JSON_ARG( Str, name )
-	JSON_ARG( Ptr<WeightedGraph>, graph )
-	JSON_ARG( Ptr<PathSolver>, authority, *graph )
-	JSON_ARG( Vec<Ptr<PathSolver>>, pathSolvers, *graph )
+	JSON_ARG( Ptr<GraphParser>, graph )
+	JSON_ARG( Ptr<PathSolverBuilder>, authority )
+	JSON_ARG( Vec<Ptr<PathSolverBuilder>>, pathSolvers )
 	JSON_ARG( TestInst::TestCases, testCases )
 
 	JSON_FABRICATE(
