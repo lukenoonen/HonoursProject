@@ -1,17 +1,18 @@
 #include "RoadDParser.h"
 #include "Dijkstra.h"
 
-#include <string>
-#include <unordered_map>
-
-RoadDParser::RoadDParser( FilePath filepath )
-	: GraphParser( std::move( filepath ) )
+RoadDParser::RoadDParser( FilePath filepath, FilePath datapath )
+	: GraphParser( std::move( filepath ) ),
+	  _datapath( std::move( datapath ) )
 {
 
 }
 
-Ptr<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
+
+Ptr<WeightedGraph> RoadDParser::createInternal() const
 {
+	std::ifstream file( _datapath, std::ios::in );
+
 	Map<Vertex, Vertex> map;
 	Ptr<WeightedGraph> result = std::make_unique<WeightedGraph>();
 
@@ -35,7 +36,7 @@ Ptr<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
 
 		if (stream.fail())
 		{
-			return {};
+			return nullptr;
 		}
 		while (result->numVertices() <= source)
 		{
@@ -59,29 +60,14 @@ Ptr<WeightedGraph> RoadDParser::createInternal( std::ifstream file ) const
 		}
 	}
 
-	result->removeIsolatedVertices();
-	result->normalize();
-
-	EdgeSet<WeightedGraph::Edge> uselessEdges;
-	result->edgeMap( [&result, &uselessEdges]( const auto e ) {
-		if (!usefulEdge( *result, e )) { uselessEdges.insert( e ); }
-		return false;
-	} );
-
-	result->removeEdges( uselessEdges );
-
 	return result;
-}
-
-std::ios_base::openmode RoadDParser::getOpenMode() const
-{
-	return std::ios::in;
 }
 
 FACTORY_BEGIN_JSON( "road-d", RoadDParser, GraphParser )
 
 	JSON_ARG( Str, filepath )
+	JSON_ARG( Str, datapath )
 
-	FACTORY_FABRICATE( std::move( filepath ) )
+	FACTORY_FABRICATE( std::move( filepath ), std::move( datapath ) )
 
 FACTORY_END()

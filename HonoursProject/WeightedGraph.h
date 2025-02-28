@@ -15,6 +15,10 @@ class WeightedGraph : public BaseGraph<WeightedVertex, WeightedEdge, NoFilter>
 {
 public:
 	void normalize();
+
+public:
+	friend void serialize( std::ostream& os, const WeightedGraph& data );
+	friend void deserialize( std::istream& is, WeightedGraph& data );
 };
 
 class WeightedVertex

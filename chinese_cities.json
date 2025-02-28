@@ -20,7 +20,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Hongkong.road-d"
+					"datapath": "data/Hongkong.road-d",
+					"filepath": "graph/Hongkong.wg"
 				},
 				"authority":
 				{
@@ -51,7 +52,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Haikou.road-d"
+					"datapath": "data/Haikou.road-d",
+					"filepath": "graph/Haikou.wg"
 				},
 				"authority":
 				{
@@ -82,7 +84,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Xian.road-d"
+					"datapath": "data/Xian.road-d",
+					"filepath": "graph/Xian.wg"
 				},
 				"authority":
 				{
@@ -113,7 +116,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Nanjing.road-d"
+					"datapath": "data/Nanjing.road-d",
+					"filepath": "graph/Nanjing.wg"
 				},
 				"authority":
 				{
@@ -144,7 +148,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Shenzhen.road-d"
+					"datapath": "data/Shenzhen.road-d",
+					"filepath": "graph/Shenzhen.wg"
 				},
 				"authority":
 				{
@@ -175,7 +180,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Tianjin.road-d"
+					"datapath": "data/Tianjin.road-d",
+					"filepath": "graph/Tianjin.wg"
 				},
 				"authority":
 				{
@@ -206,7 +212,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Chengdu.road-d"
+					"datapath": "data/Chengdu.road-d",
+					"filepath": "graph/Chengdu.wg"
 				},
 				"authority":
 				{
@@ -237,7 +244,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Beijing.road-d"
+					"datapath": "data/Beijing.road-d",
+					"filepath": "graph/Beijing.wg"
 				},
 				"authority":
 				{
@@ -268,7 +276,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Guangzhou.road-d"
+					"datapath": "data/Guangzhou.road-d",
+					"filepath": "graph/Guangzhou.wg"
 				},
 				"authority":
 				{
@@ -299,7 +308,8 @@
 				"graph":
 				{
 					"type": "road-d",
-					"filepath": "data/Chongqing.road-d"
+					"datapath": "data/Chongqing.road-d",
+					"filepath": "graph/Chongqing.wg"
 				},
 				"authority":
 				{

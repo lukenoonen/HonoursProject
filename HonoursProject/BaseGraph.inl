@@ -211,6 +211,32 @@ inline bool BaseGraph<V, E, F>::connected() const
 }
 
 template <class V, class E, template<class, class> class F>
+inline Set<typename BaseGraph<V, E, F>::Vertex> BaseGraph<V, E, F>::connectedComponent( Vertex v ) const
+{
+	Set<Vertex> result;
+	dfs( v, [&result]( const auto v_ ) {
+		result.insert( v_ );
+		return false;
+	} );
+	return result;
+}
+
+template <class V, class E, template<class, class> class F>
+inline Vec<Set<typename BaseGraph<V, E, F>::Vertex>> BaseGraph<V, E, F>::connectedComponents() const
+{
+	Vec<Set<Vertex>> result;
+	vertexMap( [this, &result]( const auto v ) {
+		for (const auto& cc : result)
+		{
+			if (cc.contains( v )) { return false; }
+		}
+		result.emplace_back( connectedComponent( v ) );
+		return false;
+	} );
+	return result;
+}
+
+template <class V, class E, template<class, class> class F>
 template <class P>
 inline bool BaseGraph<V, E, F>::vertexMap( P predicate ) const
 {

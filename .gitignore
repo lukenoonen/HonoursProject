@@ -369,4 +369,6 @@ FodyWeavers.xsd
 include/
 data/
 hierarchies/
+graph/
+lib/
 *.dat

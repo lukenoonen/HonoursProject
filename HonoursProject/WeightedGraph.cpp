@@ -21,6 +21,18 @@ void WeightedGraph::normalize()
 	} );
 }
 
+void serialize( std::ostream& os, const WeightedGraph& data )
+{
+	using BaseType = BaseGraph<WeightedVertex, WeightedEdge, NoFilter>;
+	serialize( os, (const BaseType&)(data) );
+}
+
+void deserialize( std::istream& is, WeightedGraph& data )
+{
+	using BaseType = BaseGraph<WeightedVertex, WeightedEdge, NoFilter>;
+	deserialize( is, (BaseType&)(data) );
+}
+
 void serialize( std::ostream& os, const WeightedVertex& data )
 {
 

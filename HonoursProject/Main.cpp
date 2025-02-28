@@ -26,36 +26,5 @@ int main( int argc, const char* argv[] )
 		std::cout << e.what() << "\n";
 	}
 
-	/*
-	for (int i = 1; i < argc; i++)
-	{
-		FilePath filepath = argv[i];
-		if (filepath.extension() == ".ci")
-		{
-			CIShortcutHierarchy hierarchy;
-			std::ifstream file( filepath, std::ios::in | std::ios::binary );
-			if (file.is_open())
-			{
-				deserialize( file, hierarchy );
-				hierarchy;
-			}
-			continue;
-		}
-
-		RoadDParser parser( filepath );
-		Opt<WeightedGraph> graph = parser.create();
-		if (graph)
-		{
-			std::cout << std::filesystem::current_path() << "\n";
-			CIShortcutHierarchy hierarchy( *graph );
-			FilePath savepath = filepath.filename();
-			savepath.replace_extension( ".ci" );
-			std::ofstream file( savepath, std::ios::out | std::ios::binary );
-			serialize( file, hierarchy );
-			file.close();
-			std::cout << savepath << "\n";
-		}
-	}*/
-
 	return 0;
 }

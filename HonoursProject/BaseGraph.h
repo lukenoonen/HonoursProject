@@ -74,6 +74,8 @@ public:
 
 	double meanDegree() const;
 	bool connected() const;
+	Set<Vertex> connectedComponent( Vertex v ) const;
+	Vec<Set<Vertex>> connectedComponents() const;
 
 	template <class P>
 	bool vertexMap( P predicate ) const;

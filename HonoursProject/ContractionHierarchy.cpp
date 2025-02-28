@@ -70,6 +70,8 @@ double ContractionHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::V
 	bool forwardSearch = true;
 	bool backwardSearch = true;
 	
+	size_t count = 0;
+
 	while (forwardSearch || backwardSearch)
 	{
 		if (forwardSearch)

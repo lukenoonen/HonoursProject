@@ -171,6 +171,7 @@ Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal( const WeightedGraph& g
 		Vec<ShortcutGraph::Vertex> discard = calculateDiscard( keepSet, top );
 
 		START_PROFILER( extend, ci_builder );
+		// TODO: see if this actually helps the structure
 		result->extend( discard, graph, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
 		BUContractionQueue<ShortcutGraph> queue( result->top(), discard );
 		queue.contract();

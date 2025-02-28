@@ -153,6 +153,9 @@
     <ClInclude Include="DijkstraSearch.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="ShapefileParser.h">
+      <Filter>Header Files\Graph\Parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseGraph.inl">
@@ -183,7 +186,7 @@
       <Filter>Header Files\Graph</Filter>
     </None>
     <None Include="BUContractionQueue.inl">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Hierarchy\Builder</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -252,6 +255,9 @@
     </ClCompile>
     <ClCompile Include="BaseContractionGraph.cpp">
       <Filter>Source Files\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapefileParser.cpp">
+      <Filter>Source Files\Graph\Parser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

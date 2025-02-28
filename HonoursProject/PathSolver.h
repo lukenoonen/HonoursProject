@@ -14,6 +14,6 @@ public:
 	virtual double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const = 0;
 };
 
-JSON_CREATE( Ptr<PathSolver>, const WeightedGraph& )
+JSON_CREATE( Ptr<PathSolver> )
 
 #endif // PATHSOLVER_H

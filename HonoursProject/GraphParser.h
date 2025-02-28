@@ -15,16 +15,15 @@ protected:
 	using Edge   = WeightedGraph::Edge;
 
 public:
-	GraphParser( FilePath filepath );
+	GraphParser( FilePath cachePath );
 
 	Ptr<WeightedGraph> create() const;
 
 protected:
-	virtual Ptr<WeightedGraph> createInternal( std::ifstream file ) const = 0;
-	virtual	std::ios_base::openmode getOpenMode() const = 0;
+	virtual Ptr<WeightedGraph> createInternal() const = 0;
 
 private:
-	FilePath _filepath;
+	const FilePath _cachePath;
 };
 
 FACTORY_CREATE_BASE_JSON( GraphParser )

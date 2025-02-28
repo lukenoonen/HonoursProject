@@ -59,25 +59,17 @@ private:
 	static DerivedFactory<derived, base>                  \
 		factory_##derived( name, []() {
 
-#define FACTORY_BEGIN_PARAM( name, derived, base, types, params ) \
-	namespace detail_##derived { using Derived = derived;         \
-	static DerivedFactory<derived, base, VA_LIST types>           \
-		factory_##derived( name, []( VA_LIST params ) {
-
 #define FACTORY_FABRICATE( ... ) \
 	return std::make_unique<Derived>( __VA_ARGS__ );
 
 #define FACTORY_END() \
 	} ); }
 
-#define FACTORY_CREATE_JSON( derived, base, ... ) \
-	FACTORY_CREATE( derived, base, const JSON&, __VA_ARGS__ )
+#define FACTORY_CREATE_JSON( derived, base ) \
+	FACTORY_CREATE( derived, base, const JSON& )
 
 #define FACTORY_BEGIN_JSON( name, derived, base ) \
 	FACTORY_BEGIN_PARAM( name, derived, base, (const JSON&), (const JSON& json) )
-
-#define FACTORY_BEGIN_JSON_PARAM( name, derived, base, types, params ) \
-	FACTORY_BEGIN_PARAM( name, derived, base, (const JSON&, VA_LIST types), (const JSON& json, VA_LIST params) )
 
 #define FACTORY_CREATE_CACHE( derived, base ) \
 	FACTORY_CREATE( derived, base, FilePath )

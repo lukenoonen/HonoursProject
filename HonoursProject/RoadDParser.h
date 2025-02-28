@@ -10,11 +10,13 @@
 class RoadDParser : public GraphParser
 {
 public:
-	RoadDParser( FilePath filepath );
+	RoadDParser( FilePath filepath, FilePath datapath );
 
 protected:
-	Ptr<WeightedGraph> createInternal( std::ifstream file ) const final;
-	std::ios_base::openmode getOpenMode() const final;
+	Ptr<WeightedGraph> createInternal() const final;
+
+private:
+	const FilePath _datapath;
 };
 
 FACTORY_CREATE_JSON( RoadDParser, GraphParser )
