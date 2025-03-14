@@ -141,7 +141,7 @@ inline bool ShortestPaths<Graph, Result>::pathMap( Vertex from, P predicate ) co
 
 template <class Graph, template<class> class Result>
 template <class... Ts>
-DijkstraData<Graph, Result>::DijkstraData( Vertex to, Ts... args )
+inline DijkstraData<Graph, Result>::DijkstraData( Vertex to, Ts... args )
 	: _results( to )
 {
 	_handles[to] = _queue.emplace( to, std::forward<Ts>( args )... );
@@ -150,7 +150,7 @@ DijkstraData<Graph, Result>::DijkstraData( Vertex to, Ts... args )
 
 template <class Graph, template<class> class Result>
 template <class... Ts>
-void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args )
+inline void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args )
 {
 	if (auto search = _handles.find( v ); search != _handles.end())
 	{
@@ -167,7 +167,7 @@ void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double d
 }
 
 template <class Graph, template<class> class Result>
-const Result<Graph>& DijkstraData<Graph, Result>::extract()
+inline const Result<Graph>& DijkstraData<Graph, Result>::extract()
 {
 	const Result<Graph>& top = _queue.top();
 	const Vertex v = top.vertex();
@@ -185,7 +185,7 @@ inline bool DijkstraData<Graph, Result>::closed( Vertex v ) const
 }
 
 template <class Graph, template<class> class Result>
-double DijkstraData<Graph, Result>::distance( Vertex v ) const
+inline double DijkstraData<Graph, Result>::distance( Vertex v ) const
 {
 	if (const auto search = _distances.find( v ); search != _distances.end())
 	{
@@ -195,19 +195,19 @@ double DijkstraData<Graph, Result>::distance( Vertex v ) const
 }
 
 template <class Graph, template<class> class Result>
-bool DijkstraData<Graph, Result>::empty() const
+inline bool DijkstraData<Graph, Result>::empty() const
 {
 	return _queue.empty();
 }
 
 template <class Graph, template<class> class Result>
-ShortestPaths<Graph, Result> DijkstraData<Graph, Result>::results()
+inline ShortestPaths<Graph, Result> DijkstraData<Graph, Result>::results()
 {
 	return std::move( _results );
 }
 
 template <class Graph, template <class> class Result, class P>
-ShortestPaths<Graph, Result> dijkstra(
+inline ShortestPaths<Graph, Result> dijkstra(
 	const Graph&           graph,
 	typename Graph::Vertex source,
 	P                      predicate
@@ -234,6 +234,17 @@ ShortestPaths<Graph, Result> dijkstra(
 	}
 
 	return data.results();
+}
+
+template <class Graph, template <class> class Result>
+inline ShortestPaths<Graph, Result> dijkstra(
+	const Graph& graph,
+	typename Graph::Vertex source
+)
+{
+	return dijkstra<Graph, Result>( graph, source, []( const auto v, const auto e, const double dist ) {
+		return PredicateResponse::TRUE;
+	} );
 }
 
 template<class Graph>

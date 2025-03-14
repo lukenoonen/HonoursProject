@@ -1,4 +1,12 @@
 #include "Logger.h"
+#include "StreamOutput.h"
+
+Logger::Logger()
+	: _log( std::make_unique<StreamOutput>() ),
+	  _debug( std::make_unique<StreamOutput>() )
+{
+
+}
 
 Logger::Logger( Ptr<Output> log, Ptr<Output> debug )
 	: _log( std::move( log ) ),

@@ -68,8 +68,10 @@ private:
 #define FACTORY_CREATE_JSON( derived, base ) \
 	FACTORY_CREATE( derived, base, const JSON& )
 
-#define FACTORY_BEGIN_JSON( name, derived, base ) \
-	FACTORY_BEGIN_PARAM( name, derived, base, (const JSON&), (const JSON& json) )
+#define FACTORY_BEGIN_JSON( name, derived, base )         \
+	namespace detail_##derived { using Derived = derived; \
+	static DerivedFactory<derived, base, const JSON&>     \
+		factory_##derived( name, [](const JSON& json) {
 
 #define FACTORY_CREATE_CACHE( derived, base ) \
 	FACTORY_CREATE( derived, base, FilePath )

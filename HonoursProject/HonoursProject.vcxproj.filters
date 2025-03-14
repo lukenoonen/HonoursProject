@@ -55,6 +55,12 @@
     <Filter Include="Header Files\Util\Output">
       <UniqueIdentifier>{a8121059-0184-4a39-9ffe-685bdc12bd91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\HD">
+      <UniqueIdentifier>{7a24e63d-bec1-4802-8ff9-b0f4603e8411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HD">
+      <UniqueIdentifier>{d5bde802-52a8-4a48-a7a6-767c7d817f49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseGraph.h">
@@ -155,6 +161,12 @@
     </ClInclude>
     <ClInclude Include="ShapefileParser.h">
       <Filter>Header Files\Graph\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="HDCalculator.h">
+      <Filter>Header Files\HD</Filter>
+    </ClInclude>
+    <ClInclude Include="CICHBuilder.h">
+      <Filter>Header Files\Hierarchy\Builder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -258,6 +270,12 @@
     </ClCompile>
     <ClCompile Include="ShapefileParser.cpp">
       <Filter>Source Files\Graph\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="HDCalculator.cpp">
+      <Filter>Source Files\HD</Filter>
+    </ClCompile>
+    <ClCompile Include="CICHBuilder.cpp">
+      <Filter>Source Files\Hierarchy\Builder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

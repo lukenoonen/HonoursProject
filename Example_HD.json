@@ -1,0 +1,8 @@
+{
+	"graph":
+	{
+		"type": "road-d",
+		"datapath": "data/Example_HD.road-d",
+		"filepath": "graph/Example_HD.wg"
+	}
+}

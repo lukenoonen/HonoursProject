@@ -1,52 +1,37 @@
 {
-	"logger":
-	{
-		"log":
+	"tests":
+	[
 		{
-			"type": "file",
-			"filepath": "results.log"
-		},
-		"debug":
-		{
-			"type": "stream"
-		}
-	},
-	"suite":
-	{
-		"tests":
-		[
+			"name": "OS_OpenRoads_GB",
+			"graph":
 			{
-				"name": "OS_OpenRoads_GB",
-				"graph":
+				"type": "shapefile",
+				"directory": "data/OS_OpenRoads_GB/",
+				"filepath": "graph/OS_OpenRoads_GB.wg"
+			},
+			"authority":
+			{
+				"type": "dijkstra_solver"
+			},
+			"pathSolvers":
+			[
 				{
-					"type": "shapefile",
-					"directory": "data/OS_OpenRoads_GB/",
-					"filepath": "graph/OS_OpenRoads_GB.wg"
+					"type": "ci_hierarchy",
+					"filepath": "hierarchies/OS_OpenRoads_GB.ci"
 				},
-				"authority":
 				{
-					"type": "dijkstra_solver"
-				},
-				"pathSolvers":
-				[
-					{
-						"type": "ci_hierarchy",
-						"filepath": "hierarchies/OS_OpenRoads_GB.ci"
-					},
-					{
-						"type": "buch",
-						"filepath": "hierarchies/OS_OpenRoads_GB.buch"
-					}
-				],
-				"testCases":
-				[
-					{
-						"type": "random",
-						"trials": 1000,
-						"name": "random_1000"
-					}
-				]
-			}
-		]
-	}
+					"type": "buch",
+					"filepath": "hierarchies/OS_OpenRoads_GB.buch"
+				}
+			],
+			"testCases":
+			[
+				{
+					"type": "random",
+					"trials": 1000,
+					"name": "random_1000"
+				}
+			]
+		}
+	]
 }

@@ -33,6 +33,9 @@ public:
 
 	ShortcutGraph& top();
 
+	size_t level( ShortcutGraph::Vertex v ) const;
+	size_t levels() const;
+
 	double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const final;
 
 public:

@@ -114,9 +114,15 @@ enum class PredicateResponse : unsigned char
 
 template <class Graph, template <class> class Result, class P>
 ShortestPaths<Graph, Result> dijkstra(
-	const Graph& graph,
+	const Graph&           graph,
 	typename Graph::Vertex source,
 	P                      predicate
+);
+
+template <class Graph, template <class> class Result>
+inline ShortestPaths<Graph, Result> dijkstra(
+	const Graph&           graph,
+	typename Graph::Vertex source
 );
 
 template <class Graph>

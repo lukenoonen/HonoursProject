@@ -93,6 +93,16 @@ ShortcutGraph& ShortcutHierarchy::top()
 	return _hierarchy.back();
 }
 
+size_t ShortcutHierarchy::level( ShortcutGraph::Vertex v ) const
+{
+	return _ladder[v];
+}
+
+size_t ShortcutHierarchy::levels() const
+{
+	return _hierarchy.size();
+}
+
 namespace
 {
 	Vec<double> calculateMaxDists( double scale, size_t size )

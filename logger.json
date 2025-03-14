@@ -1,0 +1,11 @@
+{
+	"log":
+	{
+		"type": "file",
+		"filepath": "results.log"
+	},
+	"debug":
+	{
+		"type": "stream"
+	}
+}

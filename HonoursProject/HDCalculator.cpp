@@ -1,0 +1,291 @@
+#include "HDCalculator.h"
+#include "Dijkstra.h"
+
+#include "Logger.h"
+
+using Vertex = WeightedGraph::Vertex;
+using Path = Pair<Vertex, Vertex>;
+
+namespace
+{
+	class HDCalculatorWorker
+	{
+	public:
+
+	public:
+		HDCalculatorWorker( const WeightedGraph& graph );
+
+		double distance( const Path& path ) const;
+		double distance( Vertex v, const Path& path ) const;
+
+		size_t h( Vertex v, double r );
+
+	private:
+		Vec<Set<Vertex>> getClosePathVertices( const Vec<Path>& paths ) const;
+		Vec<Vertex> getPathsUnion( const Vec<Path>& paths ) const;
+		Vec<Path> getClosePaths( Vertex v, double r, double d ) const;
+		bool isSubpath( const Path& path_, const Path& path ) const;
+		bool isRWitness( const Path& path_, const Path& path, double r ) const;
+		bool isRDClose( Vertex v, const Path& path, double r, double d ) const;
+
+	private:
+		const WeightedGraph& _graph;
+		const Vec<ShortestPaths<WeightedGraph, DijkstraResult>> _shortestPaths;
+		const Vec<Vec<Vertex>> _verticesAndNeighbours;
+	};
+
+	Vec<ShortestPaths<WeightedGraph, DijkstraResult>> allShortestPaths( const WeightedGraph& graph )
+	{
+		Vec<ShortestPaths<WeightedGraph, DijkstraResult>> shortestPaths;
+		shortestPaths.reserve( graph.numVertices() );
+		graph.vertexMap( [&graph, &shortestPaths]( const auto v ) {
+			shortestPaths.emplace_back( dijkstra<WeightedGraph, DijkstraResult>( graph, v ) );
+			return false;
+		} );
+		return shortestPaths;
+	}
+
+	Vec<Vec<Vertex>> allVerticesAndNeighbours( const WeightedGraph& graph )
+	{
+		Vec<Vec<Vertex>> result;
+		result.reserve( graph.numVertices() );
+		graph.vertexMap( [&graph, &result]( const auto v ) {
+			Vec<Vertex> vertexAndNeighbours;
+			vertexAndNeighbours.reserve( 1 + graph.degree( v ) );
+			vertexAndNeighbours.push_back( v );
+			graph.vertexMap( v, [&vertexAndNeighbours]( const auto v_ ) {
+				vertexAndNeighbours.push_back( v_ );
+				return false;
+			} );
+			result.emplace_back( std::move( vertexAndNeighbours ) );
+			return false;
+		} );
+		return result;
+	}
+
+	HDCalculatorWorker::HDCalculatorWorker( const WeightedGraph& graph )
+		: _graph( graph ),
+		  _shortestPaths( allShortestPaths( graph ) ),
+		  _verticesAndNeighbours( allVerticesAndNeighbours( graph ) )
+	{
+
+	}
+
+	double HDCalculatorWorker::distance( const Path& path ) const
+	{
+		return _shortestPaths[path.first].distance( path.second );
+	}
+
+	double HDCalculatorWorker::distance( Vertex v, const Path& path ) const
+	{
+		double minDist = std::numeric_limits<double>::infinity();
+		_shortestPaths[path.first].pathMap( path.second, [this, v, &minDist]( const auto& result ) {
+			const auto dist = distance( { v, result.vertex() } );
+			if (minDist > dist) { minDist = dist; }
+			return false;
+		} );
+		return minDist;
+	}
+
+	template <class P>
+	bool subsetApplyUtil( size_t index, const Vec<Vertex>& set, Vec<Vertex>& subset, P predicate )
+	{
+		if (index == set.size())
+		{
+			return predicate( subset );
+		}
+
+		subset.push_back( set[index] );
+		if (subsetApplyUtil( index + 1, set, subset, predicate )) { return true; }
+
+		subset.pop_back();
+		if (subsetApplyUtil( index + 1, set, subset, predicate )) { return true; }
+		return false;
+	}
+
+	template <class P>
+	void subsetApply( const Vec<Vertex>& set, P predicate )
+	{
+		Vec<Vertex> subset;
+		subset.reserve( set.size() );
+		subsetApplyUtil( 0, set, subset, predicate );
+	}
+
+	bool overlaps( const Set<Vertex>& vs, const Vec<Vertex>& set )
+	{
+		for (const auto v : set)
+		{
+			if (vs.contains( v )) { return true; }
+		}
+
+		return false;
+	}
+
+	bool isHittingSet( const Vec<Set<Vertex>>& vertices, const Vec<Vertex>& set )
+	{
+		for (const auto& vs : vertices)
+		{
+			if (!overlaps( vs, set )) { return false; }
+		}
+		return true;
+	}
+
+	size_t HDCalculatorWorker::h( Vertex v, double r )
+	{
+		const Vec<Path> closePaths      = getClosePaths( v, r, 2.0 * r );
+		const Vec<Set<Vertex>> vertices = getClosePathVertices( closePaths );
+		const Vec<Vertex> unionSet      = getPathsUnion( closePaths );
+		size_t minH = std::numeric_limits<size_t>::max();
+		Vec<Vertex> minSubset;
+		subsetApply( unionSet, [&vertices, &minH, &minSubset]( const auto& subset ) {
+			if (minH > subset.size() && isHittingSet( vertices, subset ))
+			{
+				minSubset = subset;
+				minH = subset.size();
+			}
+			return false;
+		} );
+		g_logger.debug( "{}, {}\n", unionSet.size(), closePaths.size() );
+		for (const auto& path : closePaths)
+		{
+			g_logger.debug( "({}, {}) ", path.first, path.second );
+		}
+		g_logger.debug( "\n" );
+		for (const auto v_ : minSubset)
+		{
+			g_logger.debug( "{} ", v_ );
+		}
+		g_logger.debug( "\n" );
+		return minH;
+	}
+
+	Vec<Set<Vertex>> HDCalculatorWorker::getClosePathVertices( const Vec<Path>& paths ) const
+	{
+		Vec<Set<Vertex>> vertices;
+		vertices.reserve( paths.size() );
+		for (const Path& path : paths)
+		{
+			Set<Vertex> set;
+			_shortestPaths[path.first].pathMap( path.second, [&set]( const auto& result ) {
+				set.insert( result.vertex() );
+				return false;
+			} );
+			vertices.emplace_back( std::move( set ) );
+		}
+		return vertices;
+	}
+
+	Vec<Vertex> HDCalculatorWorker::getPathsUnion( const Vec<Path>& paths ) const
+	{
+		Set<Vertex> set;
+		for (const Path& path : paths)
+		{
+			_shortestPaths[path.first].pathMap( path.second, [&set]( const auto& result ) {
+				set.insert( result.vertex() );
+				return false;
+			} );
+		}
+		return { set.begin(), set.end() };
+	}
+
+	Vec<Path> HDCalculatorWorker::getClosePaths( Vertex v, double r, double d ) const
+	{
+		Vec<Path> closePaths;
+		_graph.vertexMap( [this, r, v, &closePaths]( const auto s ) {
+			_graph.vertexMap( [this, r, v, s, &closePaths]( const auto t ) {
+				if (s >= t) { return false; }
+				Path path = { s, t };
+				if (isRDClose( v, path, r, 2.0 * r ))
+				{
+					closePaths.emplace_back( std::move( path ) );
+				}
+				return false;
+			} );
+			return false;
+		} );
+		return closePaths;
+	}
+
+	bool HDCalculatorWorker::isSubpath( const Path& path_, const Path& path ) const
+	{
+		return _shortestPaths[path.first].pathMap( path.second, [&path_]( const auto& result ) {
+			const auto v = result.vertex();
+			return v == path_.first || v == path_.second;
+		} );
+	}
+
+	bool HDCalculatorWorker::isRWitness( const Path& path_, const Path& path, double r ) const
+	{
+		return distance( path_ ) >= r && isSubpath( path, path_ );
+	}
+
+	bool HDCalculatorWorker::isRDClose( Vertex v, const Path& path, double r, double d ) const
+	{
+		const Vec<Vertex>& starts = _verticesAndNeighbours[path.first];
+		const Vec<Vertex>& ends   = _verticesAndNeighbours[path.second];
+		for (const auto s : starts)
+		{
+			for (const auto t : ends)
+			{
+				const Path path_ = { s, t };
+				if (isRWitness( path_, path, r ) && distance( v, path_ ) <= d)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}
+
+HDCalculator::HDCalculator( Ptr<GraphParser> graphParser )
+	: _graphParser( std::move( graphParser ) )
+{
+
+}
+
+void HDCalculator::run() const
+{
+	Ptr<WeightedGraph> graph = _graphParser->create();
+	HDCalculatorWorker worker( *graph );
+
+	Vec<double> distances;
+	distances.reserve( graph->numVertices() * graph->numVertices() );
+	graph->vertexMap( [&graph, &worker, &distances]( const auto u ) {
+		graph->vertexMap( [&worker, u, &distances]( const auto v ) {
+			const double dist = worker.distance( { u, v } );
+			distances.push_back( dist * 0.5 );
+			distances.push_back( dist );
+			return false;
+		} );
+		return false;
+	} );
+	std::sort( distances.begin(), distances.end() );
+
+	size_t hd = 0;
+	double prevR = -1.0;
+	for (const double r : distances)
+	{
+		if (prevR == r) { continue; }
+		prevR = r;
+		graph->vertexMap( [&worker, r, &hd]( const auto v ) {
+			const size_t h = worker.h( v, r );
+			if (hd < h)
+			{
+				hd = h;
+			}
+			g_logger.debug( "{}, {}: {}\n", v, r, h );
+			return false;
+		} );
+		g_logger.debug( "\n" );
+	}
+	g_logger.debug( "{}\n", hd );
+}
+
+JSON_BEGIN( HDCalculator )
+
+	JSON_ARG( Ptr<GraphParser>, graph )
+
+	JSON_FABRICATE( std::move( graph ) )
+
+JSON_END()

@@ -8,7 +8,7 @@
 class Logger
 {
 public:
-	Logger() = default;
+	Logger();
 	Logger( Ptr<Output> log, Ptr<Output> debug );
 	Logger( Logger&& other ) = default;
 
