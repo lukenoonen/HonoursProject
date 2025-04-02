@@ -5,11 +5,9 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include <utility>
-#include <vector>
-#include <unordered_set>
-#include <optional>
-#include <iostream>
+#define USING_GRAPH( ... )                       \
+	using Vertex = typename __VA_ARGS__::Vertex; \
+	using Edge   = typename __VA_ARGS__::Edge
 
 template <class Edge>
 struct EdgeHash
@@ -43,12 +41,12 @@ public:
 
 public:
 	BaseGraph();
+	virtual ~BaseGraph() = default;
 
 	Vertex addVertex( V data );
 	Opt<Edge> addEdge( Vertex s, Vertex t, E data );
 
 	void removeVertices( const Set<Vertex>& remove );
-	void removeIsolatedVertices();
 
 	void removeEdges( const EdgeSet<Edge>& remove );
 
@@ -72,10 +70,8 @@ public:
 	size_t numEdges() const;
 	size_t degree( Vertex v ) const;
 
-	double meanDegree() const;
-	bool connected() const;
 	Set<Vertex> connectedComponent( Vertex v ) const;
-	Vec<Set<Vertex>> connectedComponents() const;
+	Pair<Set<Vertex>, Set<Vertex>> largestConnectedComponent() const;
 
 	template <class P>
 	bool vertexMap( P predicate ) const;
@@ -92,6 +88,10 @@ public:
 	template <class P>
 	bool dfs( Vertex v, P predicate ) const;
 
+protected:
+	FilterType& filter();
+	const FilterType& filter() const;
+
 public:
 	template <class V_, class E_, template<class, class> class F_>
 	friend std::ostream& operator<<( std::ostream& os, const BaseGraph<V_, E_, F_>& graph );
@@ -101,7 +101,7 @@ public:
 	template <class V_, class E_, template<class, class> class F_>
 	friend void deserialize( std::istream& is, BaseGraph<V_, E_, F_>& data );
 
-public:
+private:
 	GraphType  _graph;
 	FilterType _filter;
 };

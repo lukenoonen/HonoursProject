@@ -28,8 +28,8 @@ ShortcutGraph::ShortcutGraph(
 
 void ShortcutGraph::finalize()
 {
-	const Set<Vertex> discard = _filter.set();
-	_filter.clear();
+	const Set<Vertex> discard = filter().set();
+	filter().clear();
 	removeVertices( discard );
 	calculateMap();
 }

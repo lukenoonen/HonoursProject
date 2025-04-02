@@ -61,6 +61,12 @@
     <Filter Include="Source Files\HD">
       <UniqueIdentifier>{d5bde802-52a8-4a48-a7a6-767c7d817f49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Analysis">
+      <UniqueIdentifier>{1d2885a0-1b8d-4184-9e28-a7bf81c4d18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Analysis">
+      <UniqueIdentifier>{7f953100-e100-4d64-8b4b-6dc92a0ab5ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseGraph.h">
@@ -167,6 +173,30 @@
     </ClInclude>
     <ClInclude Include="CICHBuilder.h">
       <Filter>Header Files\Hierarchy\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="Analysis.h">
+      <Filter>Header Files\Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="ShortcutHierarchyAnalyser.h">
+      <Filter>Header Files\Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="Analyser.h">
+      <Filter>Header Files\Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="FileAnalyser.h">
+      <Filter>Header Files\Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildTimesAnalyser.h">
+      <Filter>Header Files\Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="Exec.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="OSMParser.h">
+      <Filter>Header Files\Graph\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphAnalyser.h">
+      <Filter>Header Files\Analysis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -276,6 +306,27 @@
     </ClCompile>
     <ClCompile Include="CICHBuilder.cpp">
       <Filter>Source Files\Hierarchy\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="Analysis.cpp">
+      <Filter>Source Files\Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="FileAnalyser.cpp">
+      <Filter>Source Files\Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="ShortcutHierarchyAnalyser.cpp">
+      <Filter>Source Files\Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="Analyser.cpp">
+      <Filter>Source Files\Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildTimesAnalyser.cpp">
+      <Filter>Source Files\Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="OSMParser.cpp">
+      <Filter>Source Files\Graph\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphAnalyser.cpp">
+      <Filter>Source Files\Analysis</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

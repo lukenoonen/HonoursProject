@@ -3,6 +3,8 @@
 
 #include "Util.h"
 
+#include "JSON.h"
+
 #include "GraphParser.h"
 
 class HDCalculator
@@ -16,7 +18,6 @@ public:
 private:
 	Ptr<GraphParser> _graphParser;
 };
-
 
 JSON_CREATE( HDCalculator )
 

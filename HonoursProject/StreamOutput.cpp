@@ -2,9 +2,19 @@
 
 #include <iostream>
 
-void StreamOutput::write( Str str )
+void StreamOutput::write( const Str& str )
 {
 	std::cout << str;
+}
+
+void StreamOutput::open()
+{
+
+}
+
+void StreamOutput::close()
+{
+
 }
 
 FACTORY_BEGIN_JSON( "stream", StreamOutput, Output )

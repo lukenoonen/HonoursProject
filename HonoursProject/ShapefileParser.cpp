@@ -14,6 +14,8 @@ ShapefileParser::ShapefileParser( FilePath filepath, FilePath directory )
 
 Ptr<WeightedGraph> ShapefileParser::createInternal() const
 {
+	USING_GRAPH( WeightedGraph );
+
 	namespace fs = std::filesystem;
 
 	if (!fs::is_directory( _directory )) { return nullptr; }

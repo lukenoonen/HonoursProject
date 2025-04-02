@@ -10,16 +10,16 @@ namespace
 		double&                                         bestDistance
 	)
 	{
-		const auto& ex = first.extract();
+		const auto& ex = first.extractMin();
 		const auto u   = ex.vertex();
-		graph.edgeMap( ex.vertex(), [&ex, &graph, u, &first, &second, &bestDistance]( const auto e ) {
+		graph.edgeMap( u, [&ex, &graph, u, &first, &second, &bestDistance]( const auto e ) {
 			const auto v = graph.other( e, u );
 			if (first.closed( v )) { return false; }
 			if (graph[v].importance() < graph[u].importance()) { return false; }
 			const double vDist = first.distance( v );
 			const double newDist = ex.distance() + graph[e].weight();
 			if (newDist >= vDist) { return false; }
-			first.decrease( v, ex.vertex(), e, newDist );
+			first.decreasePriority( v, u, e, newDist );
 			const double distance = newDist + second.distance( v );
 			if (bestDistance > distance)
 			{
@@ -32,30 +32,9 @@ namespace
 	}
 }
 
-ContractionHierarchy::ContractionHierarchy( const WeightedGraph& source )
-	: _contractionGraph( source )
+void ContractionHierarchy::set( ContractionGraph graph )
 {
-
-}
-
-ContractionGraph& ContractionHierarchy::graph()
-{
-	return _contractionGraph;
-}
-
-ContractionGraph::Contraction ContractionHierarchy::contract( WeightedGraph::Vertex v )
-{
-	return _contractionGraph.contract( v );
-}
-
-void ContractionHierarchy::applyContraction( ContractionGraph::Contraction contraction )
-{
-	_contractionGraph.applyContraction( std::move( contraction ) );
-}
-
-void ContractionHierarchy::finalize()
-{
-	_contractionGraph.finalize();
+	_contractionGraph = std::move( graph );
 }
 
 double ContractionHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const
@@ -83,6 +62,17 @@ double ContractionHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::V
 	}
 
 	return bestDistance;
+}
+
+Vec<double> ContractionHierarchy::distances( Vertex s, const Vec<Vertex>& ts ) const
+{
+	Vec<double> result;
+	result.reserve( ts.size() );
+	for (const auto t : ts)
+	{
+		result.push_back( distance( s, t ) );
+	}
+	return result;
 }
 
 void serialize( std::ostream& os, const ContractionHierarchy& data )

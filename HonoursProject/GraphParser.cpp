@@ -11,45 +11,45 @@ GraphParser::GraphParser( FilePath cachePath )
 
 Ptr<WeightedGraph> GraphParser::create() const
 {
-	g_logger.debug( "Creating weighted graph...\n" );
+	USING_GRAPH( WeightedGraph );
+
+	g_logger.log( "Creating weighted graph...\n" );
 	if (!_cachePath.empty())
 	{
 		Ptr<WeightedGraph> result = std::make_unique<WeightedGraph>();
 		const bool success = deserialize( _cachePath, *result );
 		if (success) { return result; }
-		g_logger.debug( "No cache found at {}, rebuilding...\n", _cachePath.string() );
+		g_logger.log( "Failed to load cached weighted graph from {}\n", _cachePath.string() );
 	}
+
+	g_logger.log( "Building weighted graph...\n" );
 
 	Ptr<WeightedGraph> result = createInternal();
 
-	Vec<Set<Vertex>> ccs = result->connectedComponents();
-	const Set<Vertex>& island
-		= *std::max_element( ccs.begin(), ccs.end(), []( const auto a, const auto b ) {
-		return a.size() < b.size();
-	} );
-	Set<Vertex> disconnected;
-	result->vertexMap( [&island, &disconnected]( const auto v ) {
-		if (!island.contains( v )) { disconnected.insert( v ); }
-		return false;
-	} );
+	g_logger.log( "Identifying largest connected component...\n" );
+	const auto& [inside, outside] = result->largestConnectedComponent();
+	result->removeVertices( outside );
 
-	result->removeVertices( disconnected );
-
+	g_logger.log( "Identifying all useless edges...\n" );
 	EdgeSet<WeightedGraph::Edge> uselessEdges;
 	result->edgeMap( [&result, &uselessEdges]( const auto e ) {
 		if (!usefulEdge( *result, e )) { uselessEdges.insert( e ); }
 		return false;
 	} );
+
+	g_logger.log( "Removing all useless edges...\n" );
 	result->removeEdges( uselessEdges );
 
+	g_logger.log( "Normalizing graph...\n" );
 	result->normalize();
 
 	if (!_cachePath.empty())
 	{
+		g_logger.log( "Caching graph...\n" );
 		const bool success = serialize( _cachePath, *result );
 		if (!success)
 		{
-			g_logger.debug( "Failed to cache finalized graph at {}\n", _cachePath.string() );
+			g_logger.log( "Failed to cache weighted graph at {}\n", _cachePath.string() );
 		}
 	}
 

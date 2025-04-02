@@ -1,0 +1,9 @@
+{
+	"analysers":
+	[
+		{
+			"type": "shortcut_hierarchy",
+			"filepath": "hierarchies/Example_HD.ci"
+		}
+	]
+}

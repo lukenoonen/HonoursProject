@@ -1,5 +1,6 @@
 #include "TestSuite.h"
 #include "HDCalculator.h"
+#include "Analysis.h"
 
 namespace
 {
@@ -29,6 +30,7 @@ namespace
 	{
 		LOGGER,
 		TEST,
+		ANALYSE,
 		CALC_HD,
 
 		COUNT,
@@ -45,6 +47,7 @@ namespace
 			const Str cmp( arg + 1 );
 			if (cmp == "l") { return Option::LOGGER; }
 			if (cmp == "t") { return Option::TEST; }
+			if (cmp == "a") { return Option::ANALYSE; }
 			if (cmp == "h") { return Option::CALC_HD; }
 			break;
 		}
@@ -53,6 +56,7 @@ namespace
 			const Str cmp( arg + 2 );
 			if (cmp == "logger")  { return Option::LOGGER; }
 			if (cmp == "test")    { return Option::TEST; }
+			if (cmp == "ANALYSE") { return Option::ANALYSE; }
 			if (cmp == "calc_hd") { return Option::CALC_HD; }
 			break;
 		}
@@ -60,12 +64,12 @@ namespace
 		return Option::INVALID;
 	}
 
-	Opt<std::ifstream> openFile( FilePath filepath )
+	Opt<std::ifstream> openFile( const FilePath& filepath )
 	{
-		std::ifstream file( std::move( filepath ), std::ios::in );
+		std::ifstream file( filepath, std::ios::in );
 		if (!file.is_open())
 		{
-			g_logger.debug( "Unable to open test file {}\n", filepath.string() );
+			g_logger.log( "Failed to open file {}\n", filepath.string() );
 			return {};
 		}
 
@@ -84,9 +88,10 @@ namespace
 		}
 		catch (JSON::exception e)
 		{
-			g_logger.debug( "Unable to parse test file {}: \n", arg, e.what() );
-			return;
+			g_logger.log( "Failed to parse logger file {}: {}\n", arg, e.what() );
 		}
+
+		file->close();
 	}
 
 	void test( const char* arg )
@@ -102,9 +107,29 @@ namespace
 		}
 		catch (JSON::exception e)
 		{
-			g_logger.debug( "Unable to parse test file {}: \n", arg, e.what() );
-			return;
+			g_logger.log( "Failed to parse test file {}: {}\n", arg, e.what() );
 		}
+
+		file->close();
+	}
+
+	void analyse( const char* arg )
+	{
+		auto file = openFile( arg );
+		if (!file) { return; }
+
+		try
+		{
+			const JSON json = JSON::parse( *file );
+			const Analysis analysis = json.get<Analysis>();
+			analysis.analyse();
+		}
+		catch (JSON::exception e)
+		{
+			g_logger.log( "Failed to parse analyser file {}: {}\n", arg, e.what() );
+		}
+
+		file->close();
 	}
 
 	void calcHD( const char* arg )
@@ -120,9 +145,10 @@ namespace
 		}
 		catch (JSON::exception e)
 		{
-			g_logger.debug( "Unable to parse test file {}: \n", arg, e.what() );
-			return;
+			g_logger.log( "Failed to parse hd file {}: {}\n", arg, e.what() );
 		}
+
+		file->close();
 	}
 }
 
@@ -130,7 +156,7 @@ int main( int argc, const char* argv[] )
 {
 	if (argc < 2)
 	{
-		g_logger.debug( "No options provided\n" );
+		g_logger.log( "No options provided\n" );
 		return -1;
 	}
 
@@ -143,12 +169,13 @@ int main( int argc, const char* argv[] )
 		{
 		case Option::LOGGER:
 		case Option::TEST:
+		case Option::ANALYSE:
 		case Option::CALC_HD:
 		{
 			i++;
 			if (i >= argc)
 			{
-				g_logger.debug( "No parameter provided for {}th argument {}\n", i, arg );
+				g_logger.log( "No parameter provided for {}th argument {}\n", i, arg );
 				continue;
 			}
 		}
@@ -166,6 +193,11 @@ int main( int argc, const char* argv[] )
 			test( argv[i] );
 			break;
 		}
+		case Option::ANALYSE:
+		{
+			analyse( argv[i] );
+			break;
+		}
 		case Option::CALC_HD:
 		{
 			calcHD( argv[i] );
@@ -173,7 +205,7 @@ int main( int argc, const char* argv[] )
 		}
 		default:
 		{
-			g_logger.debug( "Unable to parse option {}\n", arg );
+			g_logger.log( "Failed to parse option {}\n", arg );
 			break;
 		}
 		}

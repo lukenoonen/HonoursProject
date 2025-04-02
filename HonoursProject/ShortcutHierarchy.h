@@ -10,33 +10,27 @@
 
 class ShortcutHierarchy : public PathSolver
 {
+private:
+	friend class ShortcutHierarchyAnalyser;
+
+private:
+	USING_GRAPH( WeightedGraph );
+
 public:
 	ShortcutHierarchy() = default;
-	ShortcutHierarchy(
-		const WeightedGraph&            source,
-		const Vec<WeightedGraph::Edge>& edges,
-		const Pair<size_t, size_t>&     edgeRange
-	);
+	ShortcutHierarchy( const WeightedGraph& source, double scale );
 
-	void extend(
-		const Vec<ShortcutGraph::Vertex>& discard,
-		const WeightedGraph&              source,
-		const Vec<WeightedGraph::Edge>&   edges,
-		const Pair<size_t, size_t>&       edgeRange
-	);
+	void extend( ShortcutGraph layer, const Vec<ShortcutGraph::Vertex>& discard );
 
-	ShortcutGraph::Contraction contract( ShortcutGraph::Vertex v );
-	void applyContraction( ShortcutGraph::Contraction contraction );
-	void finalizeLayer();
+	const ShortcutGraph& top() const;
 
 	void finalize();
 
-	ShortcutGraph& top();
-
-	size_t level( ShortcutGraph::Vertex v ) const;
-	size_t levels() const;
+	size_t vertexLevel( Vertex v ) const;
+	size_t height() const;
 
 	double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const final;
+	Vec<double> distances( Vertex s, const Vec<Vertex>& ts ) const final;
 
 public:
 	friend void serialize( std::ostream& os, const ShortcutHierarchy& data );
@@ -45,6 +39,7 @@ public:
 private:
 	Vec<ShortcutGraph> _hierarchy;
 	Vec<size_t>        _ladder;
+	double             _scale;
 };
 
 #endif // SHORTCUTHIERARCHY_H

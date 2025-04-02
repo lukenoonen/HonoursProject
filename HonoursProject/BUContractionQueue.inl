@@ -43,7 +43,7 @@ inline BUContractionQueue<Graph>::Contraction BUContractionQueue<Graph>::pop()
 	while (true)
 	{
 		const Heuristic& top = _queue.top();
-		contraction = _graph.contract( top.vertex() );
+		contraction = _graph.getContraction( top.vertex() );
 		const int edgeDifference = contraction.edgeDifference();
 		Heuristic edit = { top.vertex(), contraction.edgeDifference(), _contractedNeighbours };
 		if (edit.heuristic() <= top.heuristic()) { break; }
@@ -53,7 +53,7 @@ inline BUContractionQueue<Graph>::Contraction BUContractionQueue<Graph>::pop()
 		_queue.update( handle );
 	}
 
-	_graph.vertexMap( contraction.contracted(), [this]( const auto v ) {
+	_graph.vertexMap( contraction.contractedVertex(), [this]( const auto v ) {
 		_contractedNeighbours[v]++;
 		return false;
 	} );
@@ -72,7 +72,7 @@ inline bool BUContractionQueue<Graph>::empty() const
 template<class Graph>
 inline void BUContractionQueue<Graph>::initVertex( Vertex v )
 {
-	const auto contraction = _graph.contract( v );
+	const auto contraction = _graph.getContraction( v );
 	_contractedNeighbours[v] = 0;
 	_handles[v] = _queue.emplace( v, contraction.edgeDifference(), _contractedNeighbours );
 }

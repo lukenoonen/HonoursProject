@@ -13,10 +13,10 @@ CREATE_PROFILER_SET( cich_builder );
 class CICHBuilder : public CachedPathSolverBuilder<ContractionHierarchy>
 {
 public:
-	CICHBuilder( FilePath filepath, FilePath hierarchyFilepath );
+	CICHBuilder( FilePath filepath, FilePath buildTimesFilepath, FilePath hierarchyFilepath );
 
 protected:
-	Ptr<ContractionHierarchy> buildInternal( const WeightedGraph& graph ) const final;
+	Build buildInternal( const WeightedGraph& graph ) const final;
 
 private:
 	FilePath _hierarchyFilepath;

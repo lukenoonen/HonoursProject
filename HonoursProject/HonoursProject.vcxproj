@@ -19,10 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Analysis.h" />
+    <ClInclude Include="Analyser.h" />
     <ClInclude Include="BaseContractionGraph.h" />
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="BUCHBuilder.h" />
     <ClInclude Include="BUContractionQueue.h" />
+    <ClInclude Include="BuildTimesAnalyser.h" />
     <ClInclude Include="CachedPathSolverBuilder.h" />
     <ClInclude Include="CICHBuilder.h" />
     <ClInclude Include="CIHierarchyBuilder.h" />
@@ -32,13 +35,17 @@
     <ClInclude Include="DijkstraSearch.h" />
     <ClInclude Include="DijkstraSolver.h" />
     <ClInclude Include="DijkstraSolverBuilder.h" />
+    <ClInclude Include="Exec.h" />
     <ClInclude Include="Factory.h" />
+    <ClInclude Include="FileAnalyser.h" />
     <ClInclude Include="FileOutput.h" />
     <ClInclude Include="Filters.h" />
+    <ClInclude Include="GraphAnalyser.h" />
     <ClInclude Include="GraphParser.h" />
     <ClInclude Include="HDCalculator.h" />
     <ClInclude Include="JSON.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="OSMParser.h" />
     <ClInclude Include="Output.h" />
     <ClInclude Include="PathSolver.h" />
     <ClInclude Include="PathSolverBuilder.h" />
@@ -48,6 +55,7 @@
     <ClInclude Include="ShapefileParser.h" />
     <ClInclude Include="ShortcutGraph.h" />
     <ClInclude Include="ShortcutHierarchy.h" />
+    <ClInclude Include="ShortcutHierarchyAnalyser.h" />
     <ClInclude Include="StreamOutput.h" />
     <ClInclude Include="TestCase.h" />
     <ClInclude Include="TestInst.h" />
@@ -68,19 +76,25 @@
     <None Include="Serialize.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Analyser.cpp" />
+    <ClCompile Include="Analysis.cpp" />
     <ClCompile Include="BaseContractionGraph.cpp" />
     <ClCompile Include="BUCHBuilder.cpp" />
+    <ClCompile Include="BuildTimesAnalyser.cpp" />
     <ClCompile Include="CICHBuilder.cpp" />
     <ClCompile Include="CIHierarchyBuilder.cpp" />
     <ClCompile Include="ContractionGraph.cpp" />
     <ClCompile Include="ContractionHierarchy.cpp" />
     <ClCompile Include="DijkstraSolver.cpp" />
     <ClCompile Include="DijkstraSolverBuilder.cpp" />
+    <ClCompile Include="FileAnalyser.cpp" />
     <ClCompile Include="FileOutput.cpp" />
+    <ClCompile Include="GraphAnalyser.cpp" />
     <ClCompile Include="GraphParser.cpp" />
     <ClCompile Include="HDCalculator.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="OSMParser.cpp" />
     <ClCompile Include="Output.cpp" />
     <ClCompile Include="PathSolverBuilder.cpp" />
     <ClCompile Include="Profiler.cpp" />
@@ -88,6 +102,7 @@
     <ClCompile Include="ShapefileParser.cpp" />
     <ClCompile Include="ShortcutGraph.cpp" />
     <ClCompile Include="ShortcutHierarchy.cpp" />
+    <ClCompile Include="ShortcutHierarchyAnalyser.cpp" />
     <ClCompile Include="StreamOutput.cpp" />
     <ClCompile Include="TestCase.cpp" />
     <ClCompile Include="TestInst.cpp" />
@@ -188,6 +203,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -216,7 +232,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>shp.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
       <Profile>false</Profile>

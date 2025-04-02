@@ -110,14 +110,14 @@ namespace
 		current.vertexMap( [&keepSet, discardSize, &discard]( const auto v ) {
 			if (!keepSet.contains( v )) { discard.push_back( v ); }
 			return discard.size() == discardSize;
-			} );
+		} );
 
 		return discard;
 	}
 }
 
-CIHierarchyBuilder::CIHierarchyBuilder( FilePath filepath, double scale )
-	: CachedPathSolverBuilder<ShortcutHierarchy>( std::move( filepath ) ),
+CIHierarchyBuilder::CIHierarchyBuilder( FilePath filepath, FilePath buildTimesFilepath, double scale )
+	: CachedPathSolverBuilder<ShortcutHierarchy>( std::move( filepath ), std::move( buildTimesFilepath ) ),
 	  _scale( scale )
 {
 
@@ -127,9 +127,9 @@ CREATE_GLOBAL_PROFILER( total, ci_builder );
 CREATE_GLOBAL_PROFILER( select_vertices, ci_builder );
 CREATE_GLOBAL_PROFILER( extend, ci_builder );
 
-Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal( const WeightedGraph& graph ) const
+CIHierarchyBuilder::Build CIHierarchyBuilder::buildInternal( const WeightedGraph& graph ) const
 {
-	g_logger.debug( "Constructing CI hierarchy...\n" );
+	g_logger.log( "Constructing CI hierarchy...\n" );
 
 	START_PROFILER( total, ci_builder );
 	 
@@ -141,7 +141,8 @@ Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal( const WeightedGraph& g
 	size_t maxEdgeIndex   = 0;
 	size_t maxWeightIndex = incrementEdgeIndexToWeight( maxWeight, graph, edges, maxEdgeIndex );
 
-	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>( graph, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
+	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>( graph, _scale );
+	result->extend( ShortcutGraph{ graph, edges, Pair{ maxEdgeIndex, maxWeightIndex } }, {} );
 
 	while (true)
 	{
@@ -171,11 +172,13 @@ Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal( const WeightedGraph& g
 		Vec<ShortcutGraph::Vertex> discard = calculateDiscard( keepSet, top );
 
 		START_PROFILER( extend, ci_builder );
+
 		// TODO: see if this actually helps the structure
-		result->extend( discard, graph, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
-		BUContractionQueue<ShortcutGraph> queue( result->top(), discard );
+		ShortcutGraph layer( top, graph, edges, Pair{ maxEdgeIndex, maxWeightIndex } );
+		BUContractionQueue<ShortcutGraph> queue( layer, discard );
 		queue.contract();
-		result->finalizeLayer();
+		layer.finalize();
+		result->extend( std::move( layer ), discard );
 
 		STOP_PROFILER( extend, ci_builder );
 	}
@@ -185,16 +188,18 @@ Ptr<ShortcutHierarchy> CIHierarchyBuilder::buildInternal( const WeightedGraph& g
 	STOP_PROFILER( total, ci_builder );
 
 	LOG_PROFILERS( ci_builder );
+	auto times = READ_PROFILERS( ci_builder );
 	CLEAR_PROFILERS( ci_builder );
 	
-	return result;
+	return Pair{ std::move( result ), std::move( times ) };
 }
 
 FACTORY_BEGIN_JSON( "ci_hierarchy", CIHierarchyBuilder, PathSolverBuilder )
 	
 	JSON_ARG_FALLBACK( Str, filepath, "" )
+	JSON_ARG_FALLBACK( Str, buildtimes, "" )
 	JSON_ARG_FALLBACK( double, scale, 8.0 )
 	
-	FACTORY_FABRICATE( std::move( filepath ), scale )
+	FACTORY_FABRICATE( std::move( filepath ), std::move( buildtimes ), scale )
 
 FACTORY_END()

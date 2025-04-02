@@ -8,12 +8,18 @@
 
 #include "PathSolver.h"
 
+#include "Logger.h"
+
 class TestCase
 {
 public:
+
 	class Endpoints;
+	using RunArg = Pair<Endpoints, Vec<double>>;
 
 protected:
+	USING_GRAPH( WeightedGraph );
+
 	class Result;
 	class Results;
 
@@ -21,24 +27,20 @@ protected:
 	TestCase( Str name );
 
 public:
-	size_t run(
-		const WeightedGraph&        graph,
-		const PathSolver*           authority,
-		const Vec<Ptr<PathSolver>>& pathSolvers
-	) const;
+	virtual ~TestCase() = default;
 
 	const Str& name() const;
 
-private:
-	double runAuthority(
-		const Endpoints&  endpoints,
-		const PathSolver* authority
+	Vec<RunArg> runAuthority(
+		const WeightedGraph& graph,
+		const PathSolver*    authority,
+		const Logger&        results
 	) const;
 
-	bool run(
-		const Endpoints& endpoints,
-		const PathSolver* pathSolver,
-		double            authorityDistance
+	size_t run(
+		const Vec<RunArg>& args,
+		const PathSolver*  pathSolver,
+		const Logger&      results
 	) const;
 
 protected:
@@ -52,14 +54,14 @@ class TestCase::Endpoints
 {
 public:
 	Endpoints() = default;
-	Endpoints( size_t u, size_t v );
+	Endpoints( Vertex u, Vec<Vertex> vs );
 
-	size_t u() const;
-	size_t v() const;
+	Vertex u() const;
+	const Vec<Vertex>& vs() const;
 
 private:
-	size_t _u;
-	size_t _v;
+	Vertex      _u;
+	Vec<Vertex> _vs;
 };
 
 JSON_CREATE( TestCase::Endpoints )
@@ -123,6 +125,22 @@ public:
 
 private:
 	const size_t _trials;
+};
+
+FACTORY_CREATE_JSON( RandomTestCase, TestCase )
+
+class RandomOneToManyTestCase : public TestCase
+{
+public:
+	RandomOneToManyTestCase( size_t trials, size_t start, size_t factor, size_t count, Str name );
+
+	Vec<Endpoints> endpoints( const WeightedGraph& graph ) const final;
+
+private:
+	const size_t _trials;
+	const size_t _start;
+	const size_t _factor;
+	const size_t _count;
 };
 
 FACTORY_CREATE_JSON( RandomTestCase, TestCase )

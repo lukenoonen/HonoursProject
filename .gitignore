@@ -371,4 +371,5 @@ data/
 hierarchies/
 graph/
 lib/
+results/
 *.dat

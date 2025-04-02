@@ -1,11 +1,16 @@
 #include "Logger.h"
 #include "Profiler.h"
 
-#define BUILD_TIMES_FILE "build_times.dat"
+template<class T>
+inline CachedPathSolverBuilder<T>::CachedPathSolverBuilder( FilePath filepath, FilePath buildTimesFilepath )
+	: _filepath( std::move( filepath ) ),
+	  _buildTimesFilepath( std::move( buildTimesFilepath ) )
+{
+
+}
 
 template<class T>
-inline CachedPathSolverBuilder<T>::CachedPathSolverBuilder( FilePath filepath )
-	: _filepath( std::move( filepath ) )
+inline CachedPathSolverBuilder<T>::~CachedPathSolverBuilder()
 {
 
 }
@@ -15,33 +20,40 @@ inline Ptr<PathSolver> CachedPathSolverBuilder<T>::createInternal( const Weighte
 {
 	auto result = load();
 	if (result) { return result; }
-	g_logger.debug( "Failed to load path solver from {}!\n", _filepath.string() );
+	g_logger.log( "Failed to load path solver {}\n", _filepath.string() );
 	return build( graph );
 }
 
 template<class T>
 inline Ptr<PathSolver> CachedPathSolverBuilder<T>::load() const
 {
-	g_logger.debug( "Loading path solver...\n" );
+	g_logger.log( "Loading path solver {}...\n", _filepath.string() );
 	Ptr<T> result = std::make_unique<T>();
-	if (!_filepath.empty() && deserialize( _filepath, *result )) { return result; }
+	if (!_filepath.empty() && deserialize( _filepath, *result ))
+	{
+		if (!_buildTimesFilepath.empty())
+		{
+			ProfilerSet::Times times;
+			deserialize( _buildTimesFilepath, times );
+			g_logger.log( "Path solver took {:.4f}s to build\n", times["total"].first * 0.001 );
+		}
+		return result;
+	}
 	return nullptr;
 }
 
 template<class T>
 inline Ptr<PathSolver> CachedPathSolverBuilder<T>::build( const WeightedGraph& graph ) const
 {
-	g_logger.debug( "Building path solver...\n" );
-	Timer buildTimer;
-	buildTimer.start();
-	Ptr<T> result = buildInternal( graph );
-	buildTimer.stop();
+	g_logger.log( "Building path solver {}...\n", _filepath.string() );
+	Build result = buildInternal( graph );
+	if (!result) { return nullptr; }
 
-	Map<Str, double> buildTimes;
-	deserialize( BUILD_TIMES_FILE, buildTimes );
-	buildTimes[_filepath.string()] = buildTimer.duration();
-	serialize( BUILD_TIMES_FILE, buildTimes );
+	auto& [solver, times] = *result;
 
-	if (!_filepath.empty()) { serialize( _filepath, *result ); }
-	return result;
+	g_logger.log( "Path solver took {:.4f}s to build\n", times["total"].first * 0.001 );
+
+	if (!_filepath.empty()) { serialize( _filepath, *solver ); }
+	if (!_buildTimesFilepath.empty()) { serialize( _buildTimesFilepath, times ); }
+	return std::move( solver );
 }

@@ -11,6 +11,8 @@ RoadDParser::RoadDParser( FilePath filepath, FilePath datapath )
 
 Ptr<WeightedGraph> RoadDParser::createInternal() const
 {
+	USING_GRAPH( WeightedGraph );
+
 	std::ifstream file( _datapath, std::ios::in );
 
 	Map<Vertex, Vertex> map;
@@ -59,6 +61,8 @@ Ptr<WeightedGraph> RoadDParser::createInternal() const
 			result->addEdge( source, target, { weight } );
 		}
 	}
+
+	file.close();
 
 	return result;
 }

@@ -14,6 +14,7 @@ private:
 
 public:
 	Timer();
+	virtual ~Timer() = default;
 
 	void start(); 
 	void stop();
@@ -35,6 +36,9 @@ class Profiler;
 class ProfilerSet
 {
 public:
+	using Times = Map<Str, Pair<double, double>>;
+
+public:
 	ProfilerSet( const char* name );
 
 	void append( Profiler* profiler );
@@ -46,6 +50,8 @@ public:
 	void clear();
 
 	const char* name() const;
+
+	Times times() const;
 
 private:
 	const char*      _name;
@@ -114,6 +120,9 @@ private:
 
 #define STOP_PROFILER( name, set ) \
 	profiler_##set##_##name.stop()
+
+#define READ_PROFILERS( set ) \
+	profiler_set_##set.times()
 
 #define LOG_PROFILERS( set ) \
 	profiler_set_##set.log()

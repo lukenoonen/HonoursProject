@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <stack>
 #include <queue>
+#include <array>
 
 #define VA_LIST(...) __VA_ARGS__
 
@@ -44,5 +45,8 @@ using Stack = std::stack<T>;
 
 template <class T>
 using Queue = std::queue<T>;
+
+template <class T, size_t N>
+using Arr = std::array<T, N>;
 
 #endif // UTIL_H

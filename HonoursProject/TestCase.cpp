@@ -10,81 +10,95 @@ TestCase::TestCase( Str name )
 
 }
 
-size_t TestCase::run(
-	const WeightedGraph&        graph,
-	const PathSolver*           authority,
-	const Vec<Ptr<PathSolver>>& pathSolvers
-) const
-{
-	Timer<std::milli> totalTimer;
-	size_t failures = 0;
-
-	Vec<Endpoints> eps = endpoints( graph );
-
-	g_logger.debug( "Running TestCase {}\n", _name );
-	g_logger.log( "TestCase {}\n", _name );
-
-	totalTimer.start();
-
-	for (const auto& ep : eps)
-	{
-		const double authorityDistance = runAuthority( ep, authority );
-		for (const auto& pathSolver : pathSolvers)
-		{
-			const bool success = run( ep, pathSolver.get(), authorityDistance );
-			if (!success)
-			{
-				g_logger.debug( "Failed {} to {} ", ep.u(), ep.v() );
-				failures++;
-			}
-		}
-	}
-
-	totalTimer.stop();
-
-	g_logger.log( "{:.4f}\t{}\n", totalTimer.duration(), failures );
-	g_logger.debug( "Finished TestCase {}\n", _name );
-
-	return failures;
-}
-
 const Str& TestCase::name() const
 {
 	return _name;
 }
 
-double TestCase::runAuthority( const Endpoints& endpoints, const PathSolver* authority ) const
-{
-	Timer<std::milli> timer;
-	timer.start();
-	const double distance = authority->distance( endpoints.u(), endpoints.v() );
-	timer.stop();
-
-	g_logger.log( "{:.4f}\t{:.4f}\n", timer.duration(), distance );
-	return distance;
-}
-
-bool TestCase::run(
-	const Endpoints&  endpoints,
-	const PathSolver* pathSolver,
-	double            authorityDistance
+Vec<TestCase::RunArg> TestCase::runAuthority( 
+	const WeightedGraph& graph,
+	const PathSolver*    authority,
+	const Logger&        results
 ) const
 {
-	Timer<std::milli> timer;
-	timer.start();
-	const double distance = pathSolver->distance( endpoints.u(), endpoints.v() );
-	timer.stop();
+	g_logger.log( "Running TestCase {} (authority)\n", _name );
+	results.log( "# TestCase {} (authority):\n", _name );
 
-	const bool success = std::abs( authorityDistance - distance ) < 1.0;
-	g_logger.log( "{:.4f}\t{:.4f}\t{}\n", timer.duration(), distance, (int)success );
-	return success;
+	Vec<Endpoints> eps = endpoints( graph );
+	Vec<TestCase::RunArg> result;
+	result.reserve( eps.size() );
+
+	double totalTime = 0.0;
+
+	size_t count = 0;
+	for (Endpoints& ep : eps)
+	{
+		count++;
+		g_logger.log( "{} {}\n", count, ep.vs().size() );
+
+		Timer<std::milli> timer;
+		timer.start();
+		Vec<double> distances = authority->distances( ep.u(), ep.vs() );
+		timer.stop();
+		result.emplace_back( std::move( ep ), std::move( distances ) );
+
+		results.log( "{:.4f}\n", timer.duration() );
+		totalTime += timer.duration();
+	}
+
+	results.log( "{:.4f}\n", totalTime );
+
+	return result;
+}
+
+size_t TestCase::run(
+	const Vec<RunArg>& args,
+	const PathSolver*  pathSolver,
+	const Logger&      results
+) const
+{
+	g_logger.log( "Running TestCase {} (path solver)\n", _name );
+	results.log( "# TestCase {} (path solver):\n", _name );
+
+	size_t failures = 0;
+	double totalTime = 0.0;
+
+	size_t count = 0;
+	for (const auto& [ep, ds] : args)
+	{
+		count++;
+		g_logger.log( "{}\n", count );
+		const Vec<Vertex>& vs = ep.vs();
+		Timer<std::milli> timer;
+		timer.start();
+		const Vec<double> distances = pathSolver->distances( ep.u(), vs );
+		timer.stop();
+
+		for (size_t i = 0; i < distances.size(); i++)
+		{
+			const double distance = distances[i];
+			const double d = ds[i];
+			if (std::abs( d - distance ) >= 1.0)
+			{
+				g_logger.log( "Failed {} to {}: {} vs {}\n", ep.u(), vs[i], d, distance);
+				failures++;
+			}
+		}
+
+		results.log( "{:.4f}\n", timer.duration() );
+		totalTime += timer.duration();
+	}
+
+	results.log( "{:.4f}\n", totalTime );
+
+	return failures;
 }
 
 JSON_DEFINE_FACTORY( TestCase )
 
-TestCase::Endpoints::Endpoints( size_t u, size_t v )
+TestCase::Endpoints::Endpoints( Vertex u, Vec<Vertex> vs )
 	: _u( u ),
-	  _v( v )
+	  _vs( std::move( vs ) )
 {
 
 }
@@ -94,9 +108,9 @@ size_t TestCase::Endpoints::u() const
 	return _u;
 }
 
-size_t TestCase::Endpoints::v() const
+const Vec<size_t>& TestCase::Endpoints::vs() const
 {
-	return _v;
+	return _vs;
 }
 
 JSON_BEGIN( TestCase::Endpoints )
@@ -104,7 +118,7 @@ JSON_BEGIN( TestCase::Endpoints )
 	JSON_ARG( size_t, u )
 	JSON_ARG( size_t, v )
 
-	JSON_FABRICATE( u, v )
+	JSON_FABRICATE( u, { v } )
 
 JSON_END()
 
@@ -134,11 +148,11 @@ AllTestCase::AllTestCase( Str name )
 Vec<TestCase::Endpoints> AllTestCase::endpoints( const WeightedGraph& g ) const
 {
 	Vec<TestCase::Endpoints> result;
-	for (size_t v = 0; v < g.numVertices(); v++)
+	for (Vertex v = 0; v < g.numVertices(); v++)
 	{
-		for (size_t u = v + 1; u < g.numVertices(); u++)
+		for (Vertex u = v + 1; u < g.numVertices(); u++)
 		{
-			result.emplace_back( v, u );
+			result.emplace_back( v, Vec{ u } );
 		}
 	}
 	return result;
@@ -182,14 +196,14 @@ RandomTestCase::RandomTestCase( size_t trials, Str name )
 
 Vec<TestCase::Endpoints> RandomTestCase::endpoints( const WeightedGraph& graph ) const
 { 
-	std::mt19937 rng( std::random_device{}() );
-	std::uniform_int_distribution<size_t> dist( 0, graph.numVertices() - 1 );
+	static std::mt19937 rng( std::random_device{}() );
+	std::uniform_int_distribution<Vertex> dist( 0, graph.numVertices() - 1 );
 
 	Vec<Endpoints> endpoints;
 	endpoints.reserve( _trials );
 	for (size_t i = 0; i < _trials; i++)
 	{
-		endpoints.emplace_back( dist( rng ), dist( rng ) );
+		endpoints.emplace_back( dist( rng ), Vec{ dist( rng ) } );
 	}
 
 	return endpoints;
@@ -201,5 +215,53 @@ FACTORY_BEGIN_JSON( "random", RandomTestCase, TestCase )
 	JSON_ARG( Str,    name )
 
 	FACTORY_FABRICATE( trials, std::move( name ) )
+
+FACTORY_END()
+
+RandomOneToManyTestCase::RandomOneToManyTestCase( size_t trials, size_t start, size_t factor, size_t count, Str name )
+	: TestCase( std::move( name ) ),
+	  _trials( trials ),
+	  _start( start ),
+	  _factor( factor ),
+	  _count( count )
+{
+
+}
+
+Vec<TestCase::Endpoints> RandomOneToManyTestCase::endpoints( const WeightedGraph& graph ) const
+{
+	static std::mt19937 rng( std::random_device{}() );
+	std::uniform_int_distribution<Vertex> dist( 0, graph.numVertices() - 1 );
+
+	Vec<Endpoints> endpoints;
+	endpoints.reserve( _trials * _count );
+	size_t generator = _start;
+	for (size_t i = 0; i < _count; i++)
+	{
+		for (size_t i = 0; i < _trials; i++)
+		{
+			Vec<Vertex> vs;
+			vs.reserve( generator );
+			for (size_t j = 0; j < generator; j++)
+			{
+				vs.emplace_back( dist( rng ) );
+			}
+			endpoints.emplace_back( dist( rng ), std::move( vs ) );
+		}
+		generator *= _factor;
+	}
+
+	return endpoints;
+}
+
+FACTORY_BEGIN_JSON( "random_one_to_many", RandomOneToManyTestCase, TestCase )
+
+	JSON_ARG( size_t, trials )
+	JSON_ARG( size_t, start )
+	JSON_ARG( size_t, factor )
+	JSON_ARG( size_t, count )
+	JSON_ARG( Str,    name )
+
+	FACTORY_FABRICATE( trials, start, factor, count, std::move( name ) )
 
 FACTORY_END()

@@ -15,8 +15,9 @@ public:
 	class Contraction;
 
 public:
+	virtual ~BaseContractionGraph() = default;
 	size_t currentImportance() const;
-	Contraction contract( BaseContractionGraph<V>::Vertex v );
+	Contraction getContraction( BaseContractionGraph<V>::Vertex v );
 	void applyContraction( Contraction contraction );
 };
 
@@ -40,11 +41,11 @@ public:
 		Vec<Shortcut> shortcuts
 	);
 
-	Vertex contracted() const;
+	Vertex contractedVertex() const;
 	int edgeDifference() const;
 
 private:
-	Vertex        _contracted;
+	Vertex        _contractedVertex;
 	int           _edgeDifference;
 	Vec<Shortcut> _shortcuts;
 };

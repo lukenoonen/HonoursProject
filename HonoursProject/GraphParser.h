@@ -10,12 +10,9 @@
 
 class GraphParser
 {
-protected:
-	using Vertex = WeightedGraph::Vertex;
-	using Edge   = WeightedGraph::Edge;
-
 public:
 	GraphParser( FilePath cachePath );
+	virtual ~GraphParser() = default;
 
 	Ptr<WeightedGraph> create() const;
 

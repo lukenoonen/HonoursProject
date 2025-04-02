@@ -8,7 +8,10 @@
 class StreamOutput : public Output
 {
 public:
-	void write( Str str ) final;
+	void write( const Str& str ) final;
+
+	void open() final;
+	void close() final;
 };
 
 FACTORY_CREATE_JSON( StreamOutput, Output )

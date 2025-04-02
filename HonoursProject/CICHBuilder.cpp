@@ -4,8 +4,8 @@
 #include "Profiler.h"
 #include "Logger.h"
 
-CICHBuilder::CICHBuilder( FilePath filepath, FilePath hierarchyFilepath )
-	: CachedPathSolverBuilder<ContractionHierarchy>( std::move( filepath ) ),
+CICHBuilder::CICHBuilder( FilePath filepath, FilePath buildTimesFilepath, FilePath hierarchyFilepath )
+	: CachedPathSolverBuilder<ContractionHierarchy>( std::move( filepath ), std::move( buildTimesFilepath ) ),
 	  _hierarchyFilepath( std::move( hierarchyFilepath ) )
 {
 
@@ -13,47 +13,65 @@ CICHBuilder::CICHBuilder( FilePath filepath, FilePath hierarchyFilepath )
 
 CREATE_GLOBAL_PROFILER( total, cich_builder );
 
-Ptr<ContractionHierarchy> CICHBuilder::buildInternal( const WeightedGraph& graph ) const
+namespace
 {
-	g_logger.debug( "Constructing contraction hierarchy (from hierarchy)...\n" );
-
-	ShortcutHierarchy hierarchy;
-	const bool success = deserialize( _hierarchyFilepath, hierarchy );
-	if (!success)
+	Vec<Vec<WeightedGraph::Vertex>> calculateQs( const FilePath& filepath, const WeightedGraph& graph )
 	{
-		g_logger.debug( "Failed to deserialize hierarchy {}\n", _hierarchyFilepath.string() );
-		return nullptr;
+		ShortcutHierarchy hierarchy;
+		const bool success = deserialize( filepath, hierarchy );
+		if (!success)
+		{
+			return {};
+		}
+		
+		Vec<Vec<WeightedGraph::Vertex>> qs( hierarchy.height(), {} );
+		graph.vertexMap( [&hierarchy, &qs]( const auto v ) {
+			qs[hierarchy.vertexLevel( v )].push_back( v );
+			return false;
+		} );
+
+		return qs;
 	}
+}
+
+CICHBuilder::Build CICHBuilder::buildInternal( const WeightedGraph& graph ) const
+{
+	g_logger.log( "Constructing contraction hierarchy (from hierarchy)...\n" );
 
 	START_PROFILER( total, cich_builder );
 
-	Vec<Vec<WeightedGraph::Vertex>> qs( hierarchy.levels(), {} );
-	graph.vertexMap( [&hierarchy, &qs]( const auto v ) {
-		qs[hierarchy.level( v )].push_back( v );
-		return false;
-	} );
+	Vec<Vec<WeightedGraph::Vertex>> qs = calculateQs( _hierarchyFilepath, graph );
+	if (qs.empty())
+	{
+		g_logger.log( "Failed to load hierarchy from {}\n", _hierarchyFilepath.string() );
+		return {};
+	}
 
-	Ptr<ContractionHierarchy> result = std::make_unique<ContractionHierarchy>( graph );
+	Ptr<ContractionHierarchy> result = std::make_unique<ContractionHierarchy>();
+	ContractionGraph contractionGraph( graph );
 	for (const auto& q : qs)
 	{
-		BUContractionQueue<ContractionGraph> queue( result->graph(), q );
+		BUContractionQueue<ContractionGraph> queue( contractionGraph, q );
 		queue.contract();
 	}
-	result->finalize();
+	contractionGraph.finalize();
+	result->set( std::move( contractionGraph ) );
 
 	STOP_PROFILER( total, cich_builder );
 
 	LOG_PROFILERS( cich_builder );
+	auto times = READ_PROFILERS( cich_builder );
 	CLEAR_PROFILERS( cich_builder );
 
-	return result;
+	return Pair{ std::move( result ), std::move( times ) };
 }
 
 FACTORY_BEGIN_JSON( "cich", CICHBuilder, PathSolverBuilder )
 
 	JSON_ARG_FALLBACK( Str, filepath, "" )
+	JSON_ARG_FALLBACK( Str, buildtimes, "" )
 	JSON_ARG( Str, hierarchy )
 
-	FACTORY_FABRICATE( std::move( filepath ), std::move( hierarchy ) )
+	FACTORY_FABRICATE( std::move( filepath ), std::move( buildtimes ), std::move( hierarchy ) )
 
 FACTORY_END()

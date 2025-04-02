@@ -1,49 +1,60 @@
 #include "Logger.h"
-#include "StreamOutput.h"
 
-Logger::Logger()
-	: _log( std::make_unique<StreamOutput>() ),
-	  _debug( std::make_unique<StreamOutput>() )
+Logger::Logger( Ptr<Output> log )
+	: _log( std::move( log ) )
 {
 
 }
 
-Logger::Logger( Ptr<Output> log, Ptr<Output> debug )
-	: _log( std::move( log ) ),
-	  _debug( std::move( debug ) )
+void Logger::open() const
 {
-
+	_log->open();
 }
 
-
-Logger& Logger::operator=( Logger&& other )
+void Logger::close() const
 {
-	_log   = std::move( other._log );
-	_debug = std::move( other._debug );
+	_log->close();
+}
 
-	while (!_logQueue.empty())
-	{
-		_log->write( _logQueue.front() );
-		_logQueue.pop();
-	}
+void Logger::logInternal( const Str& str ) const
+{
+	_log->write( str );
+}
 
-	while (!_debugQueue.empty())
-	{
-		_debug->write( _debugQueue.front() );
-		_debugQueue.pop();
-	}
-
-	return *this;
+bool Logger::ready() const
+{
+	return _log != nullptr;
 }
 
 JSON_BEGIN( Logger )
 
 	JSON_ARG( Ptr<Output>, log )
-	JSON_ARG( Ptr<Output>, debug )
 
-	JSON_FABRICATE(
-		std::move( log ),
-		std::move( debug )
-	)
+	JSON_FABRICATE( std::move( log ) )
 
 JSON_END()
+
+GlobalLogger::GlobalLogger()
+	: Logger( nullptr )
+{
+
+}
+
+GlobalLogger::GlobalLogger( Ptr<Output> log )
+	: Logger( std::move( log ) )
+{
+
+}
+
+GlobalLogger& GlobalLogger::operator=( Logger&& other )
+{
+	static_cast<Logger&>(*this) = std::move( other );
+
+	while (!_queue.empty())
+	{
+		logInternal( _queue.front() );
+		_queue.pop();
+	}
+
+	return *this;
+}

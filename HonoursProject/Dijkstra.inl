@@ -150,7 +150,7 @@ inline DijkstraData<Graph, Result>::DijkstraData( Vertex to, Ts... args )
 
 template <class Graph, template<class> class Result>
 template <class... Ts>
-inline void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args )
+inline void DijkstraData<Graph, Result>::decreasePriority( Vertex v, Vertex p, Edge e, double distance, Ts... args )
 {
 	if (auto search = _handles.find( v ); search != _handles.end())
 	{
@@ -167,11 +167,10 @@ inline void DijkstraData<Graph, Result>::decrease( Vertex v, Vertex p, Edge e, d
 }
 
 template <class Graph, template<class> class Result>
-inline const Result<Graph>& DijkstraData<Graph, Result>::extract()
+inline const Result<Graph>& DijkstraData<Graph, Result>::extractMin()
 {
 	const Result<Graph>& top = _queue.top();
 	const Vertex v = top.vertex();
-	const double dist = top.distance();
 	const Result<Graph>& extracted = _results.insert( v, top );
 	_queue.pop();
 	_handles.erase( v );
@@ -217,7 +216,7 @@ inline ShortestPaths<Graph, Result> dijkstra(
 
 	while (!data.empty())
 	{
-		const auto ex = data.extract();
+		const auto ex = data.extractMin();
 		const bool result = graph.edgeMap( ex.vertex(), [&ex, &graph, &predicate, &data]( const auto e ) {
 			const auto v = graph.other( e, ex.vertex() );
 			if (data.closed( v )) { return false; }
@@ -227,7 +226,7 @@ inline ShortestPaths<Graph, Result> dijkstra(
 			const PredicateResponse pr = predicate( v, e, newDist );
 			if (pr == PredicateResponse::FALSE) { return false; }
 			if (pr == PredicateResponse::BREAK) { return true; }
-			data.decrease( v, ex.vertex(), e, newDist );
+			data.decreasePriority( v, ex.vertex(), e, newDist );
 			return false;
 		} );
 		if (result) { break; }
@@ -238,7 +237,7 @@ inline ShortestPaths<Graph, Result> dijkstra(
 
 template <class Graph, template <class> class Result>
 inline ShortestPaths<Graph, Result> dijkstra(
-	const Graph& graph,
+	const Graph&           graph,
 	typename Graph::Vertex source
 )
 {
@@ -318,23 +317,31 @@ bool usefulEdge(
 
 template <class Graph>
 ShortestPaths<Graph, DijkstraResult> dijkstraSearch(
-	const Graph&           graph,
-	typename Graph::Vertex source,
-	typename Graph::Vertex target
+	const Graph&                       graph,
+	typename Graph::Vertex             source,
+	const Vec<typename Graph::Vertex>& targets
 )
 {
+	USING_GRAPH( Graph );
+
+	Set<Vertex> targetSet( targets.begin(), targets.end() );
+
 	DijkstraData<Graph, DijkstraResult> data( source );
 
 	while (!data.empty())
 	{
-		const auto& ex = data.extract();
-		if (ex.vertex() == target) { break; }
-		graph.edgeMap( ex.vertex(), [&ex, &graph, &data](const auto e) {
+		const auto& ex = data.extractMin();
+		if (auto search = targetSet.find( ex.vertex() ); search != targetSet.end())
+		{
+			targetSet.erase( search );
+			if (targetSet.empty()) { break; }
+		}
+		graph.edgeMap( ex.vertex(), [&ex, &graph, &data]( const auto e ) {
 			const auto v = graph.other( e, ex.vertex() );
 			const double vDist = data.distance( v );
 			const double newDist = ex.distance() + graph[e].weight();
 			if (newDist >= vDist) { return false; }
-			data.decrease( v, ex.vertex(), e, newDist);
+			data.decreasePriority( v, ex.vertex(), e, newDist);
 			return false;
 		} );
 	}

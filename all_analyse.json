@@ -1,0 +1,1119 @@
+{
+	"analysers":
+	[
+		{
+			"type": "buildtimes",
+			"entries":
+			[
+				{
+					"name": "alabama",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/alabama.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/alabama.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/alabama.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "alaska",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/alaska.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/alaska.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/alaska.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "arizona",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/arizona.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/arizona.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/arizona.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "arkansas",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/arkansas.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/arkansas.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/arkansas.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "california",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/california.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/california.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/california.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "colorado",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/colorado.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/colorado.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/colorado.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "connecticut",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/connecticut.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/connecticut.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/connecticut.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "delaware",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/delaware.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/delaware.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/delaware.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "florida",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/florida.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/florida.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/florida.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "georgia",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/georgia.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/georgia.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/georgia.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "hawaii",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/hawaii.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/hawaii.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/hawaii.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "idaho",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/idaho.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/idaho.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/idaho.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "illinois",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/illinois.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/illinois.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/illinois.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "indiana",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/indiana.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/indiana.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/indiana.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "iowa",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/iowa.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/iowa.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/iowa.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "kansas",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/kansas.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/kansas.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/kansas.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "kentucky",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/kentucky.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/kentucky.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/kentucky.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "louisiana",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/louisiana.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/louisiana.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/louisiana.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "maine",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/maine.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/maine.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/maine.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "maryland",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/maryland.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/maryland.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/maryland.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "massachusetts",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/massachusetts.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/massachusetts.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/massachusetts.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "michigan",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/michigan.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/michigan.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/michigan.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "minnesota",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/minnesota.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/minnesota.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/minnesota.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "mississippi",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/mississippi.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/mississippi.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/mississippi.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "missouri",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/missouri.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/missouri.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/missouri.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "montana",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/montana.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/montana.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/montana.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "nebraska",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/nebraska.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/nebraska.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/nebraska.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "nevada",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/nevada.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/nevada.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/nevada.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "new-hampshire",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/new-hampshire.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/new-hampshire.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/new-hampshire.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "new-jersey",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/new-jersey.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/new-jersey.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/new-jersey.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "new-mexico",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/new-mexico.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/new-mexico.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/new-mexico.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "new-york",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/new-york.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/new-york.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/new-york.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "north-carolina",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/north-carolina.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/north-carolina.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/north-carolina.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "north-dakota",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/north-dakota.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/north-dakota.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/north-dakota.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "ohio",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/ohio.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/ohio.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/ohio.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "oklahoma",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/oklahoma.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/oklahoma.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/oklahoma.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "oregon",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/oregon.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/oregon.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/oregon.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "pennsylvania",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/pennsylvania.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/pennsylvania.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/pennsylvania.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "rhode-island",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/rhode-island.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/rhode-island.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/rhode-island.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "south-carolina",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/south-carolina.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/south-carolina.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/south-carolina.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "south-dakota",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/south-dakota.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/south-dakota.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/south-dakota.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "tennessee",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/tennessee.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/tennessee.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/tennessee.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "texas",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/texas.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/texas.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/texas.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "utah",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/utah.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/utah.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/utah.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "vermont",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/vermont.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/vermont.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/vermont.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "virginia",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/virginia.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/virginia.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/virginia.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "washington",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/washington.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/washington.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/washington.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "west-virginia",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/west-virginia.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/west-virginia.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/west-virginia.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "wisconsin",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/wisconsin.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/wisconsin.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/wisconsin.cich.bt"
+						}
+					]
+				},
+				{
+					"name": "wyoming",
+					"files":
+					[
+						{
+							"type": "ci_hierarchy",
+							"filepath": "hierarchies/us_states/wyoming.ci.bt"
+						},
+						{
+							"type": "buch",
+							"filepath": "hierarchies/us_states/wyoming.buch.bt"
+						},
+						{
+							"type": "cich",
+							"filepath": "hierarchies/us_states/wyoming.cich.bt"
+						}
+					]
+				}
+			],
+			"output": "results/buildtimes.json"
+		},
+		{
+			"type": "graph",
+			"entries":
+			[
+				{
+					"name": "alabama",
+					"filepath": "graph/us_states/alabama.wg"
+				},
+				{
+					"name": "alaska",
+					"filepath": "graph/us_states/alaska.wg"
+				},
+				{
+					"name": "arizona",
+					"filepath": "graph/us_states/arizona.wg"
+				},
+				{
+					"name": "arkansas",
+					"filepath": "graph/us_states/arkansas.wg"
+				},
+				{
+					"name": "california",
+					"filepath": "graph/us_states/california.wg"
+				},
+				{
+					"name": "colorado",
+					"filepath": "graph/us_states/colorado.wg"
+				},
+				{
+					"name": "connecticut",
+					"filepath": "graph/us_states/connecticut.wg"
+				},
+				{
+					"name": "delaware",
+					"filepath": "graph/us_states/delaware.wg"
+				},
+				{
+					"name": "florida",
+					"filepath": "graph/us_states/florida.wg"
+				},
+				{
+					"name": "georgia",
+					"filepath": "graph/us_states/georgia.wg"
+				},
+				{
+					"name": "hawaii",
+					"filepath": "graph/us_states/hawaii.wg"
+				},
+				{
+					"name": "idaho",
+					"filepath": "graph/us_states/idaho.wg"
+				},
+				{
+					"name": "illinois",
+					"filepath": "graph/us_states/illinois.wg"
+				},
+				{
+					"name": "indiana",
+					"filepath": "graph/us_states/indiana.wg"
+				},
+				{
+					"name": "iowa",
+					"filepath": "graph/us_states/iowa.wg"
+				},
+				{
+					"name": "kansas",
+					"filepath": "graph/us_states/kansas.wg"
+				},
+				{
+					"name": "kentucky",
+					"filepath": "graph/us_states/kentucky.wg"
+				},
+				{
+					"name": "louisiana",
+					"filepath": "graph/us_states/louisiana.wg"
+				},
+				{
+					"name": "maine",
+					"filepath": "graph/us_states/maine.wg"
+				},
+				{
+					"name": "maryland",
+					"filepath": "graph/us_states/maryland.wg"
+				},
+				{
+					"name": "massachusetts",
+					"filepath": "graph/us_states/massachusetts.wg"
+				},
+				{
+					"name": "michigan",
+					"filepath": "graph/us_states/michigan.wg"
+				},
+				{
+					"name": "minnesota",
+					"filepath": "graph/us_states/minnesota.wg"
+				},
+				{
+					"name": "mississippi",
+					"filepath": "graph/us_states/mississippi.wg"
+				},
+				{
+					"name": "missouri",
+					"filepath": "graph/us_states/missouri.wg"
+				},
+				{
+					"name": "montana",
+					"filepath": "graph/us_states/montana.wg"
+				},
+				{
+					"name": "nebraska",
+					"filepath": "graph/us_states/nebraska.wg"
+				},
+				{
+					"name": "nevada",
+					"filepath": "graph/us_states/nevada.wg"
+				},
+				{
+					"name": "new-hampshire",
+					"filepath": "graph/us_states/new-hampshire.wg"
+				},
+				{
+					"name": "new-jersey",
+					"filepath": "graph/us_states/new-jersey.wg"
+				},
+				{
+					"name": "new-mexico",
+					"filepath": "graph/us_states/new-mexico.wg"
+				},
+				{
+					"name": "new-york",
+					"filepath": "graph/us_states/new-york.wg"
+				},
+				{
+					"name": "north-carolina",
+					"filepath": "graph/us_states/north-carolina.wg"
+				},
+				{
+					"name": "north-dakota",
+					"filepath": "graph/us_states/north-dakota.wg"
+				},
+				{
+					"name": "ohio",
+					"filepath": "graph/us_states/ohio.wg"
+				},
+				{
+					"name": "oklahoma",
+					"filepath": "graph/us_states/oklahoma.wg"
+				},
+				{
+					"name": "oregon",
+					"filepath": "graph/us_states/oregon.wg"
+				},
+				{
+					"name": "pennsylvania",
+					"filepath": "graph/us_states/pennsylvania.wg"
+				},
+				{
+					"name": "rhode-island",
+					"filepath": "graph/us_states/rhode-island.wg"
+				},
+				{
+					"name": "south-carolina",
+					"filepath": "graph/us_states/south-carolina.wg"
+				},
+				{
+					"name": "south-dakota",
+					"filepath": "graph/us_states/south-dakota.wg"
+				},
+				{
+					"name": "tennessee",
+					"filepath": "graph/us_states/tennessee.wg"
+				},
+				{
+					"name": "texas",
+					"filepath": "graph/us_states/texas.wg"
+				},
+				{
+					"name": "utah",
+					"filepath": "graph/us_states/utah.wg"
+				},
+				{
+					"name": "vermont",
+					"filepath": "graph/us_states/vermont.wg"
+				},
+				{
+					"name": "virginia",
+					"filepath": "graph/us_states/virginia.wg"
+				},
+				{
+					"name": "washington",
+					"filepath": "graph/us_states/washington.wg"
+				},
+				{
+					"name": "west-virginia",
+					"filepath": "graph/us_states/west-virginia.wg"
+				},
+				{
+					"name": "wisconsin",
+					"filepath": "graph/us_states/wisconsin.wg"
+				},
+				{
+					"name": "wyoming",
+					"filepath": "graph/us_states/wyoming.wg"
+				}
+			],
+			"output": "results/graphs.json"
+		}
+	]
+}

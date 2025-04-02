@@ -23,7 +23,7 @@ TestSuite::TestSuite( Vec<TestInst> testInsts )
 
 bool TestSuite::run( Str testinst ) const
 {
-	g_logger.debug( "Running all test cases in test inst {}...\n", testinst );
+	g_logger.log( "Running TestInst {}...\n", testinst );
 
 	if (const auto search = _testInstMap.find( testinst ); search != _testInstMap.end())
 	{
@@ -35,7 +35,7 @@ bool TestSuite::run( Str testinst ) const
 
 bool TestSuite::run() const
 {
-	g_logger.debug( "Running all test cases...\n" );
+	g_logger.log( "Running all TestInsts...\n" );
 
 	bool result = true;
 

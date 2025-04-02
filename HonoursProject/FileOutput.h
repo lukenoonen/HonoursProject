@@ -14,9 +14,13 @@ public:
 	FileOutput( FilePath filepath );
 	virtual ~FileOutput();
 
-	void write( Str str ) final;
+	void write( const Str& str ) final;
+
+	void open() final;
+	void close() final;
 
 private:
+	const FilePath _filepath;
 	std::ofstream _file;
 };
 

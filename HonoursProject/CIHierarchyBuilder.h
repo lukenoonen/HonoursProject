@@ -11,10 +11,10 @@ CREATE_PROFILER_SET( ci_builder );
 class CIHierarchyBuilder : public CachedPathSolverBuilder<ShortcutHierarchy>
 {
 public:
-	CIHierarchyBuilder( FilePath filepath, double scale );
+	CIHierarchyBuilder( FilePath filepath, FilePath buildTimesFilepath, double scale );
 
 protected:
-	Ptr<ShortcutHierarchy> buildInternal( const WeightedGraph& graph ) const final;
+	Build buildInternal( const WeightedGraph& graph ) const final;
 
 private:
 	const double _scale;

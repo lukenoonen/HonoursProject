@@ -3,7 +3,8 @@
 
 #include "Logger.h"
 
-using Vertex = WeightedGraph::Vertex;
+USING_GRAPH( WeightedGraph );
+
 using Path = Pair<Vertex, Vertex>;
 
 namespace
@@ -145,17 +146,17 @@ namespace
 			}
 			return false;
 		} );
-		g_logger.debug( "{}, {}\n", unionSet.size(), closePaths.size() );
+		g_logger.log( "{}, {}\n", unionSet.size(), closePaths.size() );
 		for (const auto& path : closePaths)
 		{
-			g_logger.debug( "({}, {}) ", path.first, path.second );
+			g_logger.log( "({}, {}) ", path.first, path.second );
 		}
-		g_logger.debug( "\n" );
+		g_logger.log( "\n" );
 		for (const auto v_ : minSubset)
 		{
-			g_logger.debug( "{} ", v_ );
+			g_logger.log( "{} ", v_ );
 		}
-		g_logger.debug( "\n" );
+		g_logger.log( "\n" );
 		return minH;
 	}
 
@@ -274,12 +275,12 @@ void HDCalculator::run() const
 			{
 				hd = h;
 			}
-			g_logger.debug( "{}, {}: {}\n", v, r, h );
+			g_logger.log( "{}, {}: {}\n", v, r, h );
 			return false;
 		} );
-		g_logger.debug( "\n" );
+		g_logger.log( "\n" );
 	}
-	g_logger.debug( "{}\n", hd );
+	g_logger.log( "{}\n", hd );
 }
 
 JSON_BEGIN( HDCalculator )

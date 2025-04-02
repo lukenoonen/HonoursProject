@@ -6,7 +6,7 @@
 ProfilerSet::ProfilerSet( const char* name )
 	: _name( name )
 {
-	g_logger.debug( "Creating profiler set {}\n", name );
+	g_logger.log( "Creating profiler set {}\n", name );
 }
 
 void ProfilerSet::append( Profiler* profiler )
@@ -42,20 +42,20 @@ void ProfilerSet::log() const
 		return lhs->duration() < rhs->duration();
 	} );
 
-	g_logger.debug( "\n===========================================\n" );
-	g_logger.debug( "| Performance for profiler set {}:\n", _name );
+	g_logger.log( "\n===========================================\n" );
+	g_logger.log( "| Performance for profiler set {}:\n", _name );
 	for (const Profiler* profiler : profilers)
 	{
-		g_logger.debug( "| {}: {:.2f} ms ({:.2f}%)\n", profiler->_name, profiler->duration(), 100.0 * profiler->duration() / profilers.back()->duration() );
+		g_logger.log( "| {}: {:.4f} ms ({:.4f}%)\n", profiler->_name, profiler->duration(), 100.0 * profiler->duration() / profilers.back()->duration() );
 	}
-	g_logger.debug( "===========================================\n\n" );
+	g_logger.log( "===========================================\n\n" );
 }
 
 void ProfilerSet::clear()
 {
-	g_logger.debug( "\n===========================================\n" );
-	g_logger.debug( "| Clearing profiler set {}...\n", _name );
-	g_logger.debug( "===========================================\n\n" );
+	g_logger.log( "\n===========================================\n" );
+	g_logger.log( "| Clearing profiler set {}...\n", _name );
+	g_logger.log( "===========================================\n\n" );
 
 	for (Profiler* profiler : _profilers)
 	{
@@ -68,6 +68,19 @@ const char* ProfilerSet::name() const
 	return _name;
 }
 
+ProfilerSet::Times ProfilerSet::times() const
+{
+	const Profiler* max = *std::max_element( _profilers.begin(), _profilers.end(), []( const Profiler* a, const Profiler* b ) {
+		return a->duration() < b->duration();
+	} );
+	Times result;
+	for (const Profiler* profiler : _profilers)
+	{
+		result[profiler->_name] = { profiler->duration(), 100.0 * profiler->duration() / max->duration() };
+	}
+	return result;
+}
+
 ProfilerSet Profiler::_defaultSet( "default" );
 
 Profiler::Profiler( const char* name, bool global, ProfilerSet* set )
@@ -76,7 +89,7 @@ Profiler::Profiler( const char* name, bool global, ProfilerSet* set )
 	  _duration( 0.0 ),
 	  _set( set ? set : &_defaultSet )
 {
-	g_logger.debug( "Creating {} profiler {} in set {}\n", global ? "global" : "local", name, _set->name() );
+	g_logger.log( "Creating {} profiler {} in set {}\n", global ? "global" : "local", name, _set->name() );
 	_set->append( this );
 }
 

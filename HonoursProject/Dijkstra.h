@@ -8,9 +8,8 @@
 template <class Graph>
 class DijkstraResult
 {
-public:
-	using Vertex = typename Graph::Vertex;
-	using Edge   = typename Graph::Edge;
+private:
+	USING_GRAPH( Graph );
 
 public:
 	DijkstraResult() = default;
@@ -43,8 +42,8 @@ private:
 template <class Graph, template <class> class Result>
 class ShortestPaths
 {
-public:
-	using Vertex = typename Graph::Vertex;
+private:
+	USING_GRAPH( Graph );
 
 public:
 	ShortestPaths( Vertex to );
@@ -73,8 +72,7 @@ template <class Graph, template <class> class Result>
 class DijkstraData
 {
 private:
-	using Vertex = typename Graph::Vertex;
-	using Edge = typename Graph::Edge;
+	USING_GRAPH( Graph );
 
 	using Heap = boost::heap::fibonacci_heap<Result<Graph>>;
 	using HeapHandle = DijkstraData<Graph, Result>::Heap::handle_type;
@@ -86,9 +84,9 @@ public:
 	DijkstraData( Vertex to, Ts... args );
 
 	template <class... Ts>
-	void decrease( Vertex v, Vertex p, Edge e, double distance, Ts... args );
+	void decreasePriority( Vertex v, Vertex p, Edge e, double distance, Ts... args );
 
-	const Result<Graph>& extract();
+	const Result<Graph>& extractMin();
 
 	bool closed( Vertex v ) const;
 	double distance( Vertex v ) const;
@@ -149,9 +147,9 @@ bool usefulEdge(
 
 template <class Graph>
 ShortestPaths<Graph, DijkstraResult> dijkstraSearch(
-	const Graph& graph,
-	typename Graph::Vertex source,
-	typename Graph::Vertex target
+	const Graph&                       graph,
+	typename Graph::Vertex             source,
+	const Vec<typename Graph::Vertex>& targets
 );
 
 #include "Dijkstra.inl"

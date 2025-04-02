@@ -21,50 +21,68 @@ TestInst::TestInst(
 	Ptr<GraphParser>            graphParser,
 	Ptr<PathSolverBuilder>      authorityBuilder,
 	Vec<Ptr<PathSolverBuilder>> pathSolverBuilders,
-	TestCases                   testCases
+	TestCases                   testCases,
+	Logger                      results
 )
 	: _name( std::move( name ) ),
 	  _graphParser( std::move( graphParser ) ),
 	  _authorityBuilder( std::move( authorityBuilder ) ),
 	  _pathSolverBuilders( std::move( pathSolverBuilders ) ),
 	  _testCases( std::move( testCases ) ),
-	  _testCaseMap( mapTestCases( _testCases ) )
+	  _testCaseMap( mapTestCases( _testCases ) ),
+	  _results( std::move( results ) )
 {
 
 }
 
 bool TestInst::run() const
 {
-	Timer<std::milli> instTimer;
-	size_t failures = 0;
-
-	g_logger.debug( "Running TestInst {}\n", _name );
-	g_logger.log( "TestInst {}\n", _name );
-
-	g_logger.debug( "Parsing graph...\n" );
-	Ptr<WeightedGraph> graph = _graphParser->create();
-
-	g_logger.debug( "Building path solvers...\n" );
-
-	Ptr<PathSolver> authority = _authorityBuilder->create( *graph );
-	Vec<Ptr<PathSolver>> pathSolvers;
-	pathSolvers.reserve( _pathSolverBuilders.size() );
-	for (const Ptr<PathSolverBuilder>& pathSolverBuilder : _pathSolverBuilders)
-	{
-		pathSolvers.emplace_back( pathSolverBuilder->create( *graph ) );
-	}
+	Timer<> instTimer;
 
 	instTimer.start();
 
+	_results.open();
+
+	g_logger.log( "Running TestInst {}\n", _name );
+
+	g_logger.log( "Parsing graph...\n" );
+	Ptr<WeightedGraph> graph = _graphParser->create();
+
+	g_logger.log( "Building authority path solver...\n" );
+	Ptr<PathSolver> authority = _authorityBuilder->create( *graph );
+
+	Vec<Vec<TestCase::RunArg>> allArgs;
+	allArgs.reserve( _testCases.size() );
 	for (const auto& testCase : _testCases)
 	{
-		failures += testCase->run( *graph, authority.get(), pathSolvers );
+		allArgs.emplace_back( testCase->runAuthority( *graph, authority.get(), _results ) );
+	}
+
+	for (const Ptr<PathSolverBuilder>& pathSolverBuilder : _pathSolverBuilders)
+	{
+		size_t failures = 0;
+		g_logger.log( "Building path solver...\n" );
+		Ptr<PathSolver> pathSolver = pathSolverBuilder->create( *graph );
+		for (size_t i = 0; i < _testCases.size(); i++)
+		{
+			const auto& testCase = _testCases[i];
+			const auto& args     = allArgs[i];
+
+			failures += testCase->run( args, pathSolver.get(), _results );
+		}
+		g_logger.log( "{} failures detected\n", failures );
+		_results.log( "# {} failures detected\n", failures );
+		pathSolver.reset();
 	}
 
 	instTimer.stop();
 
-	g_logger.log( "{:.4f}\t{}\n", instTimer.duration(), failures );
-	g_logger.debug( "Finished TestInst {}\n", _name );
+	g_logger.log( "Finished TestInst {} in {} seconds\n", _name, instTimer.duration() );
+
+	authority.reset();
+	graph.reset();
+
+	_results.close();
 
 	return true;
 }
@@ -81,13 +99,15 @@ JSON_BEGIN( TestInst )
 	JSON_ARG( Ptr<PathSolverBuilder>, authority )
 	JSON_ARG( Vec<Ptr<PathSolverBuilder>>, pathSolvers )
 	JSON_ARG( TestInst::TestCases, testCases )
+	JSON_ARG( Logger, results )
 
 	JSON_FABRICATE(
 		std::move( name ),
 		std::move( graph ),
 		std::move( authority ),
 		std::move( pathSolvers ),
-		std::move( testCases )
+		std::move( testCases ),
+		std::move( results )
 	)
 
 JSON_END()

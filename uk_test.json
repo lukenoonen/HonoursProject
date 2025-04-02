@@ -1,0 +1,56 @@
+{
+	"tests":
+	[
+		{
+			"name": "uk",
+			"results":
+			{
+				"log":
+				{
+					"type": "file",
+					"filepath": "results/uk.log"
+				}
+			},
+			"graph":
+			{
+				"type": "shapefile",
+				"directory": "data/OS_OpenRoads_GB/",
+				"filepath": "graph/uk.wg"
+			},
+			"authority":
+			{
+				"type": "dijkstra_solver"
+			},
+			"pathSolvers":
+			[
+				{
+					"type": "ci_hierarchy",
+					"filepath": "hierarchies/us_states/uk.ci",
+					"buildtimes": "hierarchies/us_states/uk.ci.bt"
+				},
+				{
+					"type": "buch",
+					"filepath": "hierarchies/us_states/uk.buch",
+					"buildtimes": "hierarchies/us_states/uk.buch.bt"
+				},
+				{
+					"type": "cich",
+					"hierarchy": "hierarchies/us_states/uk.ci",
+					"filepath": "hierarchies/us_states/uk.cich",
+					"buildtimes": "hierarchies/us_states/uk.cich.bt"
+				}
+			],
+			"testCases":
+			[
+				{
+					"type": "random_one_to_many",
+					"trials": 100,
+					"start": 1,
+					"factor": 2,
+					"count": 10,
+					"name": "one_to_many"
+				}
+			]
+		}
+	]
+}

@@ -44,7 +44,7 @@ template <class Graph>
 class BUContractionQueue<Graph>::Heuristic
 {
 private:
-	using Vertex = typename Graph::Vertex;
+	USING_GRAPH( Graph );
 
 public:
 	Heuristic(

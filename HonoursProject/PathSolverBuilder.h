@@ -9,6 +9,8 @@
 class PathSolverBuilder
 {
 public:
+	virtual ~PathSolverBuilder() = default;
+
 	Ptr<PathSolver> create( const WeightedGraph& graph ) const;
 
 protected:

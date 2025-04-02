@@ -8,10 +8,19 @@
 #include "WeightedGraph.h"
 #include "Factory.h"
 
+#include "Logger.h"
+
 class PathSolver
 {
+private:
+	USING_GRAPH( WeightedGraph );
+
 public:
-	virtual double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const = 0;
+	virtual ~PathSolver() = default;
+
+public:
+	virtual double distance( Vertex s, Vertex t ) const = 0;
+	virtual Vec<double> distances( Vertex s, const Vec<Vertex>& ts ) const = 0;
 };
 
 JSON_CREATE( Ptr<PathSolver> )

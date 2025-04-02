@@ -12,7 +12,7 @@ namespace
 		const Vec<double>&                           maxDists
 	)
 	{
-		const auto& ex    = first.extract();
+		const auto& ex    = first.extractMin();
 		const auto  uS    = ex.vertex();
 		const auto& graph = hierarchy[ladder[uS]];
 		const auto  u     = graph.fromSource( uS );
@@ -25,7 +25,7 @@ namespace
 			const double newDist = ex.distance() + graph[e].weight();
 			if (newDist >= vDist) { return false; }
 			if (newDist > maxDists[ladder[vS]]) { return false; }
-			first.decrease( vS, uS, e, newDist );
+			first.decreasePriority( vS, uS, e, newDist );
 			const double distance = newDist + second.distance( vS );
 			if (bestDistance > distance)
 			{
@@ -38,67 +38,50 @@ namespace
 	}
 }
 
-ShortcutHierarchy::ShortcutHierarchy(
-	const WeightedGraph&            source,
-	const Vec<WeightedGraph::Edge>& edges,
-	const Pair<size_t, size_t>&     edgeRange
-)
-	: _ladder( source.numVertices(), 0 )
+ShortcutHierarchy::ShortcutHierarchy( const WeightedGraph& source, double scale )
+	: _ladder( source.numVertices(), 0 ),
+	  _scale( scale )
 {
-	_hierarchy.emplace_back( source, edges, edgeRange );
+
 }
 
-void ShortcutHierarchy::extend(
-	const Vec<ShortcutGraph::Vertex>& discard,
-	const WeightedGraph&              source,
-	const Vec<WeightedGraph::Edge>&   edges,
-	const Pair<size_t, size_t>&       edgeRange
-)
+void ShortcutHierarchy::extend( ShortcutGraph layer, const Vec<ShortcutGraph::Vertex>& discard )
 {
-	const ShortcutGraph& current = top();
-	for (const auto v : discard)
+	if (!_hierarchy.empty())
 	{
-		_ladder[current.toSource( v )] = _hierarchy.size() - 1;
+		const size_t idx = _hierarchy.size() - 1;
+		const ShortcutGraph& prev = top();
+		for (const auto v : discard)
+		{
+			_ladder[prev.toSource( v )] = idx;
+		}
 	}
 
-	_hierarchy.emplace_back( current, source, edges, edgeRange );
+	_hierarchy.emplace_back( std::move( layer ) );
 }
 
-ShortcutGraph::Contraction ShortcutHierarchy::contract( ShortcutGraph::Vertex v )
-{
-	return _hierarchy.back().contract( v );
-}
 
-void ShortcutHierarchy::applyContraction( ShortcutGraph::Contraction contraction )
-{
-	_hierarchy.back().applyContraction( std::move( contraction ) );
-}
-
-void ShortcutHierarchy::finalizeLayer()
-{
-	_hierarchy.back().finalize();
-}
-
-void ShortcutHierarchy::finalize()
-{
-	const ShortcutGraph& current = top();
-	current.vertexMap( [&current, this]( const auto v ) {
-		_ladder[current.toSource( v )] = _hierarchy.size() - 1;
-		return false;
-	} );
-}
-
-ShortcutGraph& ShortcutHierarchy::top()
+const ShortcutGraph& ShortcutHierarchy::top() const
 {
 	return _hierarchy.back();
 }
 
-size_t ShortcutHierarchy::level( ShortcutGraph::Vertex v ) const
+void ShortcutHierarchy::finalize()
+{
+	const size_t idx = _hierarchy.size() - 1;
+	const ShortcutGraph& current = top();
+	current.vertexMap( [&current, idx, this]( const auto v ) {
+		_ladder[current.toSource( v )] = idx;
+		return false;
+	} );
+}
+
+size_t ShortcutHierarchy::vertexLevel( Vertex v ) const
 {
 	return _ladder[v];
 }
 
-size_t ShortcutHierarchy::levels() const
+size_t ShortcutHierarchy::height() const
 {
 	return _hierarchy.size();
 }
@@ -118,11 +101,11 @@ namespace
 	}
 }
 
-double ShortcutHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const
+double ShortcutHierarchy::distance( Vertex s, Vertex t ) const
 {
 	if (s == t) { return 0.0; }
 
-	static const Vec<double> maxDists = calculateMaxDists( 8.0, _hierarchy.size() );
+	const Vec<double> maxDists = calculateMaxDists( _scale, _hierarchy.size() );
 
 	DijkstraData<ShortcutGraph, DijkstraResult> forward( s );
 	DijkstraData<ShortcutGraph, DijkstraResult> backward( t );
@@ -147,14 +130,27 @@ double ShortcutHierarchy::distance( WeightedGraph::Vertex s, WeightedGraph::Vert
 	return bestDistance;
 }
 
+Vec<double> ShortcutHierarchy::distances( Vertex s, const Vec<Vertex>& ts ) const
+{
+	Vec<double> result;
+	result.reserve( ts.size() );
+	for (const auto t : ts)
+	{
+		result.push_back( distance( s, t ) );
+	}
+	return result;
+}
+
 void serialize( std::ostream& os, const ShortcutHierarchy& data )
 {
 	serialize( os, data._hierarchy );
 	serialize( os, data._ladder );
+	serialize( os, data._scale );
 }
 
 void deserialize( std::istream& is, ShortcutHierarchy& data )
 {
 	deserialize( is, data._hierarchy );
 	deserialize( is, data._ladder );
+	deserialize( is, data._scale );
 }

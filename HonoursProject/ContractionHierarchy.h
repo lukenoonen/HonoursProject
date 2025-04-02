@@ -9,17 +9,16 @@
 
 class ContractionHierarchy : public PathSolver
 {
+private:
+	USING_GRAPH( WeightedGraph );
+
 public:
 	ContractionHierarchy() = default;
-	ContractionHierarchy( const WeightedGraph& source );
 
-	ContractionGraph& graph();
+	void set( ContractionGraph graph );
 
-	ContractionGraph::Contraction contract( WeightedGraph::Vertex v );
-	void applyContraction( ContractionGraph::Contraction contraction );
-	void finalize();
-
-	double distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const final;
+	double distance( Vertex s, Vertex t ) const final;
+	Vec<double> distances( Vertex s, const Vec<Vertex>& ts ) const final;
 
 public:
 	friend void serialize( std::ostream& os, const ContractionHierarchy& data );

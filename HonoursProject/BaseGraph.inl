@@ -64,20 +64,6 @@ inline void BaseGraph<V, E, F>::removeVertices( const Set<Vertex>& remove )
 }
 
 template <class V, class E, template<class, class> class F>
-inline void BaseGraph<V, E, F>::removeIsolatedVertices()
-{
-	Set<Vertex> remove;
-	vertexMap( [this, &remove]( const auto v ) {
-		if (degree( v ) == 0)
-		{
-			remove.insert( v );
-		}
-		return false;
-	} );
-	removeVertices( remove );
-}
-
-template <class V, class E, template<class, class> class F>
 void BaseGraph<V, E, F>::removeEdges( const EdgeSet<Edge>& remove )
 {
 	if (remove.empty()) { return; }
@@ -192,25 +178,6 @@ inline size_t BaseGraph<V, E, F>::degree( Vertex v ) const
 }
 
 template <class V, class E, template<class, class> class F>
-inline double BaseGraph<V, E, F>::meanDegree() const
-{
-	const double e = static_cast<double>(numEdges());
-	const double n = static_cast<double>(numVertices());
-	return 2.0 * e / n;
-}
-
-template <class V, class E, template<class, class> class F>
-inline bool BaseGraph<V, E, F>::connected() const
-{
-	size_t count = 0;
-	dfs( 0, [&count]( const auto v ) {
-		count++;
-		return false;
-	} );
-	return count == numVertices();
-}
-
-template <class V, class E, template<class, class> class F>
 inline Set<typename BaseGraph<V, E, F>::Vertex> BaseGraph<V, E, F>::connectedComponent( Vertex v ) const
 {
 	Set<Vertex> result;
@@ -222,18 +189,26 @@ inline Set<typename BaseGraph<V, E, F>::Vertex> BaseGraph<V, E, F>::connectedCom
 }
 
 template <class V, class E, template<class, class> class F>
-inline Vec<Set<typename BaseGraph<V, E, F>::Vertex>> BaseGraph<V, E, F>::connectedComponents() const
+inline Pair<Set<typename BaseGraph<V, E, F>::Vertex>, Set<typename BaseGraph<V, E, F>::Vertex>> BaseGraph<V, E, F>::largestConnectedComponent() const
 {
-	Vec<Set<Vertex>> result;
-	vertexMap( [this, &result]( const auto v ) {
-		for (const auto& cc : result)
+	Set<Vertex> outside;
+	Set<Vertex> inside;
+	vertexMap( [this, &inside, &outside]( const auto v ) {
+		if (outside.contains( v )) { return false; }
+		if (inside.contains( v )) { return false; }
+		Set<Vertex> current = connectedComponent( v );
+		if (current.size() > inside.size())
 		{
-			if (cc.contains( v )) { return false; }
+			outside.insert( inside.begin(), inside.end() );
+			inside = std::move( current );
 		}
-		result.emplace_back( connectedComponent( v ) );
+		else
+		{
+			outside.insert( current.begin(), current.end() );
+		}
 		return false;
 	} );
-	return result;
+	return { inside, outside };
 }
 
 template <class V, class E, template<class, class> class F>
@@ -340,6 +315,18 @@ inline bool BaseGraph<V, E, F>::dfs( Vertex v, P predicate ) const
 }
 
 template <class V, class E, template<class, class> class F>
+inline BaseGraph<V, E, F>::FilterType& BaseGraph<V, E, F>::filter()
+{
+	return _filter;
+}
+
+template <class V, class E, template<class, class> class F>
+inline const BaseGraph<V, E, F>::FilterType& BaseGraph<V, E, F>::filter() const
+{
+	return _filter;
+}
+
+template <class V, class E, template<class, class> class F>
 inline std::ostream& operator<<( std::ostream& os, const BaseGraph<V, E, F>& graph )
 {
 	os << "(|V|, |E|) = (" << graph.numVertices() << ", " << graph.numEdges() << ")\n";
@@ -384,7 +371,7 @@ inline void serialize( std::ostream& os, const BaseGraph<V, E, F>& data )
 template <class V, class E, template<class, class> class F>
 inline void deserialize( std::istream& is, BaseGraph<V, E, F>& data )
 {
-	using Vertex = BaseGraph<V, E, F>::Vertex;
+	USING_GRAPH( BaseGraph<V, E, F> );
 
 	size_t numVertices;
 	deserialize( is, numVertices );

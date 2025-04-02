@@ -7,6 +7,7 @@
 #include "GraphParser.h"
 #include "PathSolverBuilder.h"
 #include "TestCase.h"
+#include "Logger.h"
 
 class TestInst
 {
@@ -21,7 +22,8 @@ public:
 		Ptr<GraphParser>            graphParser,
 		Ptr<PathSolverBuilder>      authorityBuilder,
 		Vec<Ptr<PathSolverBuilder>> pathSolverBuilders,
-		TestCases                   testCases
+		TestCases                   testCases,
+		Logger                      results
 	);
 
 	bool run() const;
@@ -37,6 +39,8 @@ private:
 
 	TestCases   _testCases;
 	TestCaseMap _testCaseMap;
+
+	Logger _results;
 };
 
 JSON_CREATE( TestInst )

@@ -3,15 +3,15 @@
 template<class V>
 inline size_t BaseContractionGraph<V>::currentImportance() const
 {
-	return this->_filter.size();
+	return this->filter().size();
 }
 
 template<class V>
-inline BaseContractionGraph<V>::Contraction BaseContractionGraph<V>::contract( BaseContractionGraph<V>::Vertex v )
+inline BaseContractionGraph<V>::Contraction BaseContractionGraph<V>::getContraction( BaseContractionGraph<V>::Vertex v )
 {
-	using Vertex = BaseContractionGraph<V>::Vertex;
+	USING_GRAPH( BaseContractionGraph<V> );
 
-	this->_filter.insert( v );
+	this->filter().insert( v );
 	Vec<Contraction::Shortcut> shortcuts;
 	this->neighbourEdgeMap( v, [v, this, &shortcuts]( const auto e1, const auto e2 ) {
 		const Vertex v1 = this->other( e1, v );
@@ -27,7 +27,7 @@ inline BaseContractionGraph<V>::Contraction BaseContractionGraph<V>::contract( B
 		return false;
 	} );
 
-	this->_filter.remove( v );
+	this->filter().remove( v );
 	size_t edgeCount = 0;
 	this->edgeMap( v, [&edgeCount]( const auto e ) {
 		edgeCount++;
@@ -40,7 +40,7 @@ inline BaseContractionGraph<V>::Contraction BaseContractionGraph<V>::contract( B
 template<class V>
 inline void BaseContractionGraph<V>::applyContraction( Contraction contraction )
 {
-	this->_filter.insert( contraction._contracted );
+	this->filter().insert( contraction._contractedVertex );
 
 	for (auto& [v1, v2, edge] : contraction._shortcuts)
 	{
@@ -50,11 +50,11 @@ inline void BaseContractionGraph<V>::applyContraction( Contraction contraction )
 
 template<class V>
 inline BaseContractionGraph<V>::Contraction::Contraction(
-	Vertex        contracted,
+	Vertex        contractedVertex,
 	size_t        edgeCount,
 	Vec<Shortcut> shortcuts
 )
-	: _contracted( contracted ),
+	: _contractedVertex( contractedVertex ),
 	  _edgeDifference( (int)shortcuts.size() - (int)edgeCount ),
 	  _shortcuts( std::move( shortcuts ) )
 {
@@ -62,9 +62,9 @@ inline BaseContractionGraph<V>::Contraction::Contraction(
 }
 
 template<class V>
-inline BaseContractionGraph<V>::Vertex BaseContractionGraph<V>::Contraction::contracted() const
+inline BaseContractionGraph<V>::Vertex BaseContractionGraph<V>::Contraction::contractedVertex() const
 {
-	return _contracted;
+	return _contractedVertex;
 }
 
 template<class V>

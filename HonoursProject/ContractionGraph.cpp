@@ -15,13 +15,13 @@ ContractionGraph::ContractionGraph( const WeightedGraph& source )
 
 void ContractionGraph::applyContraction( Contraction contraction )
 {
-	get( contraction.contracted() ).setImportance( currentImportance() );
+	get( contraction.contractedVertex() ).setImportance( currentImportance() );
 	BaseContractionGraph<ContractionVertex>::applyContraction( std::move( contraction ) );
 }
 
 void ContractionGraph::finalize()
 {
-	_filter.clear();
+	filter().clear();
 }
 
 void serialize( std::ostream& os, const ContractionGraph& data )

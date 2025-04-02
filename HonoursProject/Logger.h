@@ -8,30 +8,41 @@
 class Logger
 {
 public:
-	Logger();
-	Logger( Ptr<Output> log, Ptr<Output> debug );
-	Logger( Logger&& other ) = default;
-
-	Logger& operator=( Logger&& other );
+	Logger() = default;
+	Logger( Ptr<Output> log );
 
 	template <class... Ts>
-	void log( const std::format_string<Ts...> fmt, Ts&&... args );
-	template <class... Ts>
-	void debug( const std::format_string<Ts...> fmt, Ts&&... args );
+	void log( const std::format_string<Ts...> fmt, Ts&&... args ) const;
 
-private:
+	void open() const;
+	void close() const;
+
+protected:
+	void logInternal( const Str& str ) const;
+	bool ready() const;
+
+protected:
 	Ptr<Output> _log;
-	Ptr<Output> _debug;
-
-	Queue<Str> _logQueue;
-	Queue<Str> _debugQueue;
 };
-
-
 
 JSON_CREATE( Logger )
 
-inline Logger g_logger{};
+class GlobalLogger : private Logger
+{
+public:
+	GlobalLogger();
+	GlobalLogger( Ptr<Output> log );
+
+	GlobalLogger& operator=( Logger&& other );
+
+	template <class... Ts>
+	void log( const std::format_string<Ts...> fmt, Ts&&... args );
+
+private:
+	Queue<Str> _queue;
+};
+
+inline GlobalLogger g_logger{};
 
 #include "Logger.inl"
 
