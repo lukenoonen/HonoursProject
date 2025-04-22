@@ -18,8 +18,7 @@ inline BaseContractionGraph<V>::Contraction BaseContractionGraph<
 	Vec<typename Contraction::Shortcut> shortcuts;
 	this->neighbourEdgeMap(
 		v,
-		[v, this, &shortcuts](const auto e1, const auto e2)
-		{
+		[v, this, &shortcuts](const auto e1, const auto e2) {
 			const Vertex        v1            = this->other(e1, v);
 			const Vertex        v2            = this->other(e2, v);
 			const ShortcutEdge& edge1         = this->get(e1);
@@ -40,8 +39,7 @@ inline BaseContractionGraph<V>::Contraction BaseContractionGraph<
 	size_t edgeCount = 0;
 	this->edgeMap(
 		v,
-		[&edgeCount](const auto)
-		{
+		[&edgeCount](const auto) {
 			edgeCount++;
 			return false;
 		}

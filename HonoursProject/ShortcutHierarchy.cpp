@@ -29,8 +29,7 @@ namespace
 			 &second,
 			 &bestDistance,
 			 &ladder,
-			 &maxDists](const auto e)
-			{
+			 &maxDists](const auto e) {
 				const auto v  = graph.other(e, u);
 				const auto vS = graph.toSource(v);
 
@@ -85,8 +84,7 @@ void ShortcutHierarchy::finalize()
 	const size_t         idx     = _hierarchy.size() - 1;
 	const ShortcutGraph& current = top();
 	current.vertexMap(
-		[&current, idx, this](const auto v)
-		{
+		[&current, idx, this](const auto v) {
 			_ladder[current.toSource(v)] = idx;
 			return false;
 		}

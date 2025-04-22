@@ -14,8 +14,7 @@ namespace
 		Vec<WeightedGraph::Edge> edges;
 		edges.reserve(source.numEdges());
 		source.edgeMap(
-			[&edges](const auto e)
-			{
+			[&edges](const auto e) {
 				edges.push_back(e);
 				return false;
 			}
@@ -23,8 +22,9 @@ namespace
 
 		std::ranges::sort(
 			edges,
-			[&source](const auto e1, const auto e2)
-			{ return source[e1].weight() < source[e2].weight(); }
+			[&source](const auto e1, const auto e2) {
+				return source[e1].weight() < source[e2].weight();
+			}
 		);
 
 		return edges;
@@ -139,8 +139,7 @@ namespace
 		discard.reserve(discardSize);
 
 		current.vertexMap(
-			[&keepSet, discardSize, &discard](const auto v)
-			{
+			[&keepSet, discardSize, &discard](const auto v) {
 				if (!keepSet.contains(v)) { discard.push_back(v); }
 				return discard.size() == discardSize;
 			}

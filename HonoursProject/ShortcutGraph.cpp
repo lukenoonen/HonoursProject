@@ -64,8 +64,7 @@ void ShortcutGraph::calculateMap()
 {
 	_map.clear();
 	vertexMap(
-		[this](const auto v)
-		{
+		[this](const auto v) {
 			_map[get(v).mapped()] = v;
 			return false;
 		}

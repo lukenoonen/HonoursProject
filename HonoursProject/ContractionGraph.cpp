@@ -3,16 +3,14 @@
 ContractionGraph::ContractionGraph(const WeightedGraph& source)
 {
 	source.vertexMap(
-		[&source, this](const auto)
-		{
+		[&source, this](const auto) {
 			addVertex({});
 			return false;
 		}
 	);
 
 	source.edgeMap(
-		[&source, this](const auto e)
-		{
+		[&source, this](const auto e) {
 			addEdge(
 				source.source(e), source.target(e), {e, source[e].weight()}
 			);

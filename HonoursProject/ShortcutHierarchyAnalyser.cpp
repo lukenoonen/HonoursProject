@@ -30,8 +30,7 @@ void ShortcutHierarchyAnalyser::analyseFile(const FilePath& filepath) const
 		);
 		g_logger.log("V = \n[\n");
 		layer.vertexMap(
-			[&layer](const auto v)
-			{
+			[&layer](const auto v) {
 				g_logger.log("\t{}\n", layer.toSource(v) + 1);
 				return false;
 			}
@@ -39,8 +38,7 @@ void ShortcutHierarchyAnalyser::analyseFile(const FilePath& filepath) const
 		g_logger.log("]\n");
 		g_logger.log("E = \n[\n");
 		layer.edgeMap(
-			[&layer](const auto e)
-			{
+			[&layer](const auto e) {
 				const auto u = layer.source(e);
 				const auto v = layer.target(e);
 				g_logger.log(

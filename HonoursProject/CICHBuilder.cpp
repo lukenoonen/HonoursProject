@@ -34,8 +34,7 @@ namespace
 			hierarchy.height(), Vec<WeightedGraph::Vertex>{}
 		);
 		graph.vertexMap(
-			[&hierarchy, &qs](const auto v)
-			{
+			[&hierarchy, &qs](const auto v) {
 				qs[hierarchy.vertexLevel(v)].push_back(v);
 				return false;
 			}

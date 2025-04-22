@@ -58,8 +58,7 @@ namespace
 		Vec<ShortestPaths<WeightedGraph, DijkstraResult>> shortestPaths;
 		shortestPaths.reserve(graph.numVertices());
 		graph.vertexMap(
-			[&graph, &shortestPaths](const auto v)
-			{
+			[&graph, &shortestPaths](const auto v) {
 				shortestPaths.emplace_back(
 					dijkstra<WeightedGraph, DijkstraResult>(graph, v)
 				);
@@ -74,15 +73,13 @@ namespace
 		Vec<Vec<Vertex>> result;
 		result.reserve(graph.numVertices());
 		graph.vertexMap(
-			[&graph, &result](const auto v)
-			{
+			[&graph, &result](const auto v) {
 				Vec<Vertex> vertexAndNeighbours;
 				vertexAndNeighbours.reserve(1 + graph.degree(v));
 				vertexAndNeighbours.push_back(v);
 				graph.vertexMap(
 					v,
-					[&vertexAndNeighbours](const auto v_)
-					{
+					[&vertexAndNeighbours](const auto v_) {
 						vertexAndNeighbours.push_back(v_);
 						return false;
 					}
@@ -111,8 +108,7 @@ namespace
 		double minDist = std::numeric_limits<double>::infinity();
 		_shortestPaths[path.first].pathMap(
 			path.second,
-			[this, v, &minDist](const auto& result)
-			{
+			[this, v, &minDist](const auto& result) {
 				const auto dist = distance({v, result.vertex()});
 				if (minDist > dist) { minDist = dist; }
 				return false;
@@ -177,8 +173,7 @@ namespace
 		Vec<Vertex>            minSubset;
 		subsetApply(
 			unionSet,
-			[&vertices, &minH, &minSubset](const auto& subset)
-			{
+			[&vertices, &minH, &minSubset](const auto& subset) {
 				if (minH > subset.size() && isHittingSet(vertices, subset))
 				{
 					minSubset = subset;
@@ -248,11 +243,9 @@ namespace
 	{
 		Vec<Path> closePaths;
 		_graph->vertexMap(
-			[this, r, d, v, &closePaths](const auto s)
-			{
+			[this, r, d, v, &closePaths](const auto s) {
 				_graph->vertexMap(
-					[this, r, d, v, s, &closePaths](const auto t)
-					{
+					[this, r, d, v, s, &closePaths](const auto t) {
 						if (s >= t) { return false; }
 						Path path = {s, t};
 						if (isRDClose(v, path, r, d))
@@ -273,8 +266,7 @@ namespace
 	{
 		return _shortestPaths[path.first].pathMap(
 			path.second,
-			[&path_](const auto& result)
-			{
+			[&path_](const auto& result) {
 				const auto v = result.vertex();
 				return v == path_.first || v == path_.second;
 			}
@@ -327,11 +319,9 @@ void HDCalculator::run() const
 	Vec<double> distances;
 	distances.reserve(graph->numVertices() * graph->numVertices());
 	graph->vertexMap(
-		[&graph, &worker, &distances](const auto u)
-		{
+		[&graph, &worker, &distances](const auto u) {
 			graph->vertexMap(
-				[&worker, u, &distances](const auto v)
-				{
+				[&worker, u, &distances](const auto v) {
 					const double dist = worker.distance({u, v});
 					distances.push_back(dist * 0.5);
 					distances.push_back(dist);
@@ -350,8 +340,7 @@ void HDCalculator::run() const
 		if (prevR == r) { continue; }
 		prevR = r;
 		graph->vertexMap(
-			[&worker, r, &hd](const auto v)
-			{
+			[&worker, r, &hd](const auto v) {
 				const size_t h = worker.h(v, r);
 				hd = std::max(hd, h);
 				g_logger.log("{}, {}: {}\n", v, r, h);

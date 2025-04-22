@@ -34,8 +34,9 @@ void ProfilerSet::log() const
 
 	std::ranges::sort(
 		profilers,
-		[](const Profiler* lhs, const Profiler* rhs)
-		{ return lhs->duration() < rhs->duration(); }
+		[](const Profiler* lhs, const Profiler* rhs) {
+			return lhs->duration() < rhs->duration();
+		}
 	);
 
 	g_logger.log("\n===========================================\n");
@@ -68,11 +69,11 @@ const char* ProfilerSet::name() const
 
 ProfilerSet::Times ProfilerSet::times() const
 {
-	const Profiler* max = *std::max_element(
-		_profilers.begin(),
-		_profilers.end(),
-		[](const Profiler* a, const Profiler* b)
-		{ return a->duration() < b->duration(); }
+	const Profiler* max = *std::ranges::max_element(
+		_profilers,
+		[](const Profiler* a, const Profiler* b) {
+			return a->duration() < b->duration();
+		}
 	);
 	Times result;
 	for (const Profiler* profiler : _profilers)

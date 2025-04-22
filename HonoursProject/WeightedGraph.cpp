@@ -9,8 +9,7 @@ void WeightedGraph::normalize()
 	double minWeight = std::numeric_limits<double>::infinity();
 
 	edgeMap(
-		[&minWeight, this](const auto e)
-		{
+		[&minWeight, this](const auto e) {
 			const double weight = get(e).weight();
 			minWeight = std::min(minWeight, weight);
 			return false;
@@ -18,8 +17,7 @@ void WeightedGraph::normalize()
 	);
 
 	edgeMap(
-		[&minWeight, this](const auto e)
-		{
+		[&minWeight, this](const auto e) {
 			get(e).normalize(minWeight);
 			return false;
 		}

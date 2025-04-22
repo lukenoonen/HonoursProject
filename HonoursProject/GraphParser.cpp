@@ -35,8 +35,7 @@ Ptr<WeightedGraph> GraphParser::create() const
 	g_logger.log("Identifying all useless edges...\n");
 	EdgeSet<WeightedGraph::Edge> uselessEdges;
 	result->edgeMap(
-		[&result, &uselessEdges](const auto e)
-		{
+		[&result, &uselessEdges](const auto e) {
 			if (!usefulEdge(*result, e)) { uselessEdges.insert(e); }
 			return false;
 		}

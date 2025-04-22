@@ -262,8 +262,9 @@ inline ShortestPaths<Graph, Result> dijkstra(
 	return dijkstra<Graph, Result>(
 		graph,
 		source,
-		[](const auto, const auto, const double)
-		{ return PredicateResponse::TRUE; }
+		[](const auto, const auto, const double) {
+			return PredicateResponse::TRUE;
+		}
 	);
 }
 
@@ -282,8 +283,7 @@ inline bool witnessSearch(
         source,
         [&graph, target, maxDist, &witnessFound](
             const auto v, const auto, const double dist
-        )
-        {
+        ) {
             if (dist > maxDist) { return PredicateResponse::FALSE; }
             if (v == target)
             {
@@ -324,8 +324,7 @@ ShortestPaths<Graph, DijkstraResult> shortestPaths(
 	auto t2 = high_resolution_clock::now();
 
 	paths.vertexMap(
-		[minDist, &paths](const auto& result)
-		{
+		[minDist, &paths](const auto& result) {
 			if (result.distance() < minDist) { paths.filter(result.vertex()); }
 			return false;
 		}
@@ -347,8 +346,7 @@ bool usefulEdge(const Graph& graph, typename Graph::Edge e)
 		source,
 		[&graph, target, maxDist, &useful](
 			const auto v, const auto, const double dist
-		)
-		{
+		) {
 			if (dist >= maxDist) { return PredicateResponse::FALSE; }
 			if (v == target)
 			{

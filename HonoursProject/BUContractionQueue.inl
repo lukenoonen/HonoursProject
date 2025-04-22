@@ -8,8 +8,7 @@ inline BUContractionQueue<Graph>::BUContractionQueue(Graph& graph)
 	: _graph(&graph)
 {
 	_graph->vertexMap(
-		[this](const auto v)
-		{
+		[this](const auto v) {
 			initVertex(v);
 			return false;
 		}

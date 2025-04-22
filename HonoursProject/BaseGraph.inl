@@ -47,8 +47,7 @@ inline void BaseGraph<V, E, F>::removeVertices(const Set<Vertex>& remove)
 	GraphType           updated;
 
 	vertexMap(
-		[this, &remove, &toUpdated, &updated](const auto v)
-		{
+		[this, &remove, &toUpdated, &updated](const auto v) {
 			if (remove.contains(v)) { return false; }
 			toUpdated[v] = boost::add_vertex(std::move(get(v)), updated);
 			return false;
@@ -56,8 +55,7 @@ inline void BaseGraph<V, E, F>::removeVertices(const Set<Vertex>& remove)
 	);
 
 	edgeMap(
-		[this, &toUpdated, &updated](const auto e)
-		{
+		[this, &toUpdated, &updated](const auto e) {
 			auto uSearch = toUpdated.find(source(e));
 			if (uSearch == toUpdated.end()) { return false; }
 			auto vSearch = toUpdated.find(target(e));
@@ -80,16 +78,14 @@ void BaseGraph<V, E, F>::removeEdges(const EdgeSet<Edge>& remove)
 	GraphType updated;
 
 	vertexMap(
-		[this, &updated](const auto v)
-		{
+		[this, &updated](const auto v) {
 			boost::add_vertex(std::move(get(v)), updated);
 			return false;
 		}
 	);
 
 	edgeMap(
-		[this, &remove, &updated](const auto e)
-		{
+		[this, &remove, &updated](const auto e) {
 			if (remove.contains(e)) { return false; }
 			boost::add_edge(source(e), target(e), std::move(get(e)), updated);
 			return false;
@@ -201,8 +197,7 @@ inline Set<typename BaseGraph<V, E, F>::Vertex> BaseGraph<V, E, F>::
 {
 	Set<Vertex> result;
 	dfs(v,
-		[&result](const auto v_)
-		{
+		[&result](const auto v_) {
 			result.insert(v_);
 			return false;
 		});
@@ -218,8 +213,7 @@ BaseGraph<V, E, F>::largestConnectedComponent() const
 	Set<Vertex> outside;
 	Set<Vertex> inside;
 	vertexMap(
-		[this, &inside, &outside](const auto v)
-		{
+		[this, &inside, &outside](const auto v) {
 			if (outside.contains(v)) { return false; }
 			if (inside.contains(v)) { return false; }
 
@@ -337,8 +331,7 @@ inline bool BaseGraph<V, E, F>::dfs(Vertex v, P predicate) const
 		if (predicate(u)) { return true; }
 		vertexMap(
 			u,
-			[this, &visited, &stack](const auto w)
-			{
+			[this, &visited, &stack](const auto w) {
 				if (visited[w]) { return false; }
 				visited[w] = true;
 				stack.push(w);
@@ -367,19 +360,16 @@ inline std::ostream& operator<<(
 	const BaseGraph<V, E, F>& graph
 )
 {
-	os << "(|V|, |E|) = (" << graph.numVertices() << ", " << graph.numEdges()
-	   << ")\n";
+	os << "(|V|, |E|) = (" << graph.numVertices() << ", " << graph.numEdges() << ")\n";
 	graph.vertexMap(
-		[&graph, &os](const auto v)
-		{
+		[&graph, &os](const auto v) {
 			os << v << " ->";
 			if (graph.degree(v) == 0) { os << "n/a"; }
 			else
 			{
 				graph.vertexMap(
 					v,
-					[&graph, &os](const auto u)
-					{
+					[&graph, &os](const auto u) {
 						os << ' ' << u;
 						return false;
 					}
@@ -396,8 +386,7 @@ inline void serialize(std::ostream& os, const BaseGraph<V, E, F>& data)
 {
 	serialize(os, data.numVertices());
 	data.vertexMap(
-		[&data, &os](const auto v)
-		{
+		[&data, &os](const auto v) {
 			serialize(os, data[v]);
 			return false;
 		}
@@ -405,8 +394,7 @@ inline void serialize(std::ostream& os, const BaseGraph<V, E, F>& data)
 
 	serialize(os, data.numEdges());
 	data.edgeMap(
-		[&data, &os](const auto e)
-		{
+		[&data, &os](const auto e) {
 			serialize(os, data.source(e));
 			serialize(os, data.target(e));
 			serialize(os, data[e]);
