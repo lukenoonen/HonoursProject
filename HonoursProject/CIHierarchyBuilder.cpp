@@ -187,6 +187,7 @@ CIHierarchyBuilder::Build CIHierarchyBuilder::buildInternal(
 	Ptr<ShortcutHierarchy> result = std::make_unique<ShortcutHierarchy>(
 		graph, _scale
 	);
+
 	result->extend(
 		{graph, edges, Pair{maxEdgeIndex, maxWeightIndex}},
 		{}
@@ -203,16 +204,10 @@ CIHierarchyBuilder::Build CIHierarchyBuilder::buildInternal(
 		);
 
 		const ShortcutGraph& top = result->top();
-		
-		g_logger.log("(|V|, |E|) = ({}, {})\n", top.numVertices(), top.numEdges());
-		
-		g_logger.log("Gathering edge vertices...\n");
 
 		Set<ShortcutGraph::Vertex> keepSet = gatherEdgeVertices(
 			maxEdgeIndex, edges, graph, top
 		);
-		
-		g_logger.log("Selecting vertices...\n");
 
 		START_PROFILER(select_vertices, ci_builder);
 		const Set<ShortcutGraph::Vertex> selectedSet = selectVertices(
@@ -223,21 +218,20 @@ CIHierarchyBuilder::Build CIHierarchyBuilder::buildInternal(
 		for (const auto v : selectedSet) { keepSet.insert(v); }
 
 		if (keepSet.empty()) { break; }
-		
-		g_logger.log("Calculating discard...\n");
 
 		Vec<ShortcutGraph::Vertex> const discard = calculateDiscard(keepSet, top);
 
 		START_PROFILER(extend, ci_builder);
-
 		
-		g_logger.log("Extending hierarchy...\n");
 		ShortcutGraph layer(
 			top, graph, edges, Pair{maxEdgeIndex, maxWeightIndex}
 		);
 		BUContractionQueue<ShortcutGraph> queue(layer, discard);
 		queue.contract();
 		layer.finalize();
+
+		g_logger.log("Adding layer {} with (V, E) = ({}, {})\n", result->height(), layer.numVertices(), layer.numEdges());
+
 		result->extend(std::move(layer), discard);
 		
 		STOP_PROFILER(extend, ci_builder);

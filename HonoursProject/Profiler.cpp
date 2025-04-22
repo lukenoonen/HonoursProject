@@ -39,25 +39,21 @@ void ProfilerSet::log() const
 		}
 	);
 
-	g_logger.log("\n===========================================\n");
-	g_logger.log("| Performance for profiler set {}:\n", _name);
+	g_logger.log("Performance for profiler set {}:\n", _name);
 	for (const Profiler* profiler : profilers)
 	{
 		g_logger.log(
-			"| {}: {:.4f} ms ({:.4f}%)\n",
+			"  {}: {:.4f} ms ({:.4f}%)\n",
 			profiler->_name,
 			profiler->duration(),
 			100.0 * profiler->duration() / profilers.back()->duration()
 		);
 	}
-	g_logger.log("===========================================\n\n");
 }
 
 void ProfilerSet::clear()
 {
-	g_logger.log("\n===========================================\n");
-	g_logger.log("| Clearing profiler set {}...\n", _name);
-	g_logger.log("===========================================\n\n");
+	g_logger.log("Clearing profiler set {}...\n", _name);
 
 	for (Profiler* profiler : _profilers) { profiler->clear(); }
 }
