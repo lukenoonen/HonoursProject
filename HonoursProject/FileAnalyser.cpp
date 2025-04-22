@@ -1,17 +1,16 @@
-#include "FileAnalyser.h"
+#include "FileAnalyser.hpp"
 
-#include "Logger.h"
+#include "Logger.hpp"
 
-FileAnalyser::FileAnalyser( FilePath filepath )
-	: _filepath( std::move( filepath ) )
+FileAnalyser::FileAnalyser(FilePath filepath)
+	: _filepath(std::move(filepath))
 {
-
 }
 
 void FileAnalyser::analyse() const
 {
-	g_logger.log( "Analysing file {}...\n", _filepath.string() );
-	analyseFile( _filepath );
+	g_logger.log("Analysing file {}...\n", _filepath.string());
+	analyseFile(_filepath);
 }
 
 const FilePath& FileAnalyser::filepath() const

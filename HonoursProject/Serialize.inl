@@ -1,114 +1,106 @@
+#include "Serialize.hpp"
+
 #include <fstream>
 
-#include <vector>
-#include <unordered_map>
-
-template<class T>
-inline void serialize( std::ostream& os, const T& data )
+template <class T>
+inline void serialize(std::ostream& os, const T& data)
 {
-	os.write( reinterpret_cast<const char*>(&data), sizeof( T ) );
-}
-
-template<class T>
-inline void deserialize( std::istream& is, T& data )
-{
-	is.read( reinterpret_cast<char*>(&data), sizeof( T ) );
+	os.write(reinterpret_cast<const char*>(&data), sizeof(T));
 }
 
 template <class T>
-inline void serialize( std::ostream& os, const Vec<T>& data )
+inline void deserialize(std::istream& is, T& data)
 {
-	serialize( os, data.size() );
-
-	for (const T& item : data)
-	{
-		serialize( os, item );
-	}
+	is.read(reinterpret_cast<char*>(&data), sizeof(T));
 }
 
 template <class T>
-inline void deserialize( std::istream& is, Vec<T>& data )
+inline void serialize(std::ostream& os, const Vec<T>& data)
 {
-	size_t size;
-	deserialize( is, size );
-	data.resize( size );
+	serialize(os, data.size());
 
-	for (T& item : data)
-	{
-		deserialize( is, item );
-	}
+	for (const T& item : data) { serialize(os, item); }
+}
+
+template <class T>
+inline void deserialize(std::istream& is, Vec<T>& data)
+{
+	size_t size{};
+	deserialize(is, size);
+	data.resize(size);
+
+	for (T& item : data) { deserialize(is, item); }
 }
 
 template <class T, class U>
-inline void serialize( std::ostream& os, const Map<T, U>& data )
+inline void serialize(std::ostream& os, const Map<T, U>& data)
 {
-	serialize( os, data.size() );
+	serialize(os, data.size());
 
 	for (const auto& item : data)
 	{
-		serialize( os, item.first );
-		serialize( os, item.second );
+		serialize(os, item.first);
+		serialize(os, item.second);
 	}
 }
 
 template <class T, class U>
-inline void deserialize( std::istream& is, Map<T, U>& data )
+inline void deserialize(std::istream& is, Map<T, U>& data)
 {
-	size_t size;
-	deserialize( is, size );
+	size_t size{};
+	deserialize(is, size);
 
 	for (size_t i = 0; i < size; i++)
 	{
 		T key;
-		deserialize( is, key );
+		deserialize(is, key);
 
 		U value;
-		deserialize( is, value );
+		deserialize(is, value);
 
-		data[std::move( key )] = std::move( value );
+		data[std::move(key)] = std::move(value);
 	}
 }
 
-template<class T, class U>
-inline void serialize( std::ostream& os, const Pair<T, U>& data )
+template <class T, class U>
+inline void serialize(std::ostream& os, const Pair<T, U>& data)
 {
-	serialize( os, data.first );
-	serialize( os, data.second );
+	serialize(os, data.first);
+	serialize(os, data.second);
 }
 
-template<class T, class U>
-inline void deserialize( std::istream& is, Pair<T, U>& data )
+template <class T, class U>
+inline void deserialize(std::istream& is, Pair<T, U>& data)
 {
-	deserialize( is, data.first );
-	deserialize( is, data.second );
+	deserialize(is, data.first);
+	deserialize(is, data.second);
 }
 
-inline void serialize( std::ostream& os, const Str& data )
+inline void serialize(std::ostream& os, const Str& data)
 {
 	const size_t len = data.length();
-	serialize( os, len );
-	os.write( &data[0], len);
+	serialize(os, len);
+	os.write(data.data(), len);
 }
 
-inline void deserialize( std::istream& is, Str& data )
+inline void deserialize(std::istream& is, Str& data)
 {
-	size_t len;
-	deserialize( is, len );
-	char* temp = new char[len + 1];
-	is.read( temp, len );
+	size_t len{};
+	deserialize(is, len);
+	const std::unique_ptr<char[]> temp(new char[len + 1]);
+	is.read(temp.get(), len);
 	temp[len] = '\0';
-	data.assign( temp, len );
-	delete[] temp;
+	data.assign(temp.get(), len);
 }
 
-template<class T>
-inline bool serialize( FilePath filepath, const T& data )
+template <class T>
+inline bool serialize(FilePath filepath, const T& data)
 {
-	std::ofstream file( filepath, std::ios::out | std::ios::binary );
+	std::ofstream file(filepath, std::ios::out | std::ios::binary);
 	if (!file.is_open()) { return false; }
 	try
 	{
-		serialize( file, data );
+		serialize(file, data);
 	}
 	catch (...)
 	{
@@ -118,14 +110,14 @@ inline bool serialize( FilePath filepath, const T& data )
 	return true;
 }
 
-template<class T>
-inline bool deserialize( FilePath filepath, T& data )
+template <class T>
+inline bool deserialize(FilePath filepath, T& data)
 {
-	std::ifstream file( filepath, std::ios::in | std::ios::binary );
+	std::ifstream file(filepath, std::ios::in | std::ios::binary);
 	if (!file.is_open()) { return false; }
 	try
 	{
-		deserialize( file, data );
+		deserialize(file, data);
 	}
 	catch (...)
 	{

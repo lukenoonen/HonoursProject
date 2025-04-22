@@ -1,26 +1,27 @@
-#include "DijkstraSolver.h"
-#include "Dijkstra.h"
+#include "DijkstraSolver.hpp"
+#include "Dijkstra.hpp"
 
-DijkstraSolver::DijkstraSolver( const WeightedGraph& g )
-	: _graph( g )
+DijkstraSolver::DijkstraSolver(const WeightedGraph& g)
+	: _graph(&g)
 {
-
 }
 
-double DijkstraSolver::distance( WeightedGraph::Vertex s, WeightedGraph::Vertex t ) const
+double DijkstraSolver::distance(
+	WeightedGraph::Vertex s,
+	WeightedGraph::Vertex t
+) const
 {
-	const auto searchResults = dijkstraSearch( _graph, s, { t }  );
-	return searchResults.distance( t );
+	const auto searchResults = dijkstraSearch(*_graph, s, {t});
+	return searchResults.distance(t);
 }
 
-Vec<double> DijkstraSolver::distances( Vertex s, const Vec<Vertex>& ts ) const
+Vec<double> DijkstraSolver::distances(Vertex s, const Vec<Vertex>& ts) const
 {
-	const auto searchResults = dijkstraSearch( _graph, s, ts );
+	const auto searchResults = dijkstraSearch(*_graph, s, ts);
+
 	Vec<double> result;
-	result.reserve( ts.size() );
-	for (const auto t : ts)
-	{
-		result.push_back( searchResults.distance( t ) );
-	}
+	result.reserve(ts.size());
+	for (const auto t : ts) { result.push_back(searchResults.distance(t)); }
+	
 	return result;
 }

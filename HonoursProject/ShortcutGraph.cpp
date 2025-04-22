@@ -1,5 +1,4 @@
-#include "ShortcutGraph.h"
-#include "Dijkstra.h"
+#include "ShortcutGraph.hpp"
 
 ShortcutGraph::ShortcutGraph(
 	const WeightedGraph&            source,
@@ -7,12 +6,14 @@ ShortcutGraph::ShortcutGraph(
 	const Pair<size_t, size_t>&     edgeRange
 )
 {
-	source.vertexMap( [&source, this]( const auto v ) {
-		addVertex( { v } );
-		return false;
-	} );
+	source.vertexMap(
+		[&source, this](const auto v) {
+			addVertex(ShortcutVertex{v});
+			return false;
+		}
+	);
 	calculateMap();
-	addSourceEdges( source, edges, edgeRange );
+	addSourceEdges(source, edges, edgeRange);
 }
 
 ShortcutGraph::ShortcutGraph(
@@ -21,27 +22,27 @@ ShortcutGraph::ShortcutGraph(
 	const Vec<WeightedGraph::Edge>& edges,
 	const Pair<size_t, size_t>&     edgeRange
 )
-	: ShortcutGraph( prev )
+	: ShortcutGraph(prev)
 {
-	addSourceEdges( source, edges, edgeRange );
+	addSourceEdges(source, edges, edgeRange);
 }
 
 void ShortcutGraph::finalize()
 {
 	const Set<Vertex> discard = filter().set();
 	filter().clear();
-	removeVertices( discard );
+	removeVertices(discard);
 	calculateMap();
 }
 
-ShortcutGraph::Vertex ShortcutGraph::fromSource( WeightedGraph::Vertex v ) const
+ShortcutGraph::Vertex ShortcutGraph::fromSource(WeightedGraph::Vertex v) const
 {
-	return _map.find( v )->second;
+	return _map.find(v)->second;
 }
 
-WeightedGraph::Vertex ShortcutGraph::toSource( ShortcutGraph::Vertex v ) const
+WeightedGraph::Vertex ShortcutGraph::toSource(ShortcutGraph::Vertex v) const
 {
-	return get( v ).mapped();
+	return get(v).mapped();
 }
 
 void ShortcutGraph::addSourceEdges(
@@ -53,39 +54,41 @@ void ShortcutGraph::addSourceEdges(
 	for (size_t i = edgeRange.first; i < edgeRange.second; i++)
 	{
 		const auto& e = edges[i];
-		const auto u = fromSource( source.source( e ) );
-		const auto v = fromSource( source.target( e ) );
-		addEdge( u, v, { e, source[e].weight() } );
+		const auto  u = fromSource(source.source(e));
+		const auto  v = fromSource(source.target(e));
+		addEdge(u, v, {e, source[e].weight()});
 	}
 }
 
 void ShortcutGraph::calculateMap()
 {
 	_map.clear();
-	vertexMap( [this]( const auto v ) {
-		_map[get( v ).mapped()] = v;
-		return false;
-	} );
+	vertexMap(
+		[this](const auto v)
+		{
+			_map[get(v).mapped()] = v;
+			return false;
+		}
+	);
 }
 
-void serialize( std::ostream& os, const ShortcutGraph& data )
+void serialize(std::ostream& os, const ShortcutGraph& data)
 {
 	using BaseType = BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>;
-	serialize( os, data._map );
-	serialize( os, (const BaseType&)(data) );
+	serialize(os, data._map);
+	serialize(os, static_cast<const BaseType&>(data));
 }
 
-void deserialize( std::istream& is, ShortcutGraph& data )
+void deserialize(std::istream& is, ShortcutGraph& data)
 {
 	using BaseType = BaseGraph<ShortcutVertex, ShortcutEdge, VertexFilter>;
-	deserialize( is, data._map );
-	deserialize( is, (BaseType&)(data) );
+	deserialize(is, data._map);
+	deserialize(is, static_cast<BaseType&>(data));
 }
 
-ShortcutVertex::ShortcutVertex( WeightedGraph::Vertex mapped )
-	: _mapped( mapped )
+ShortcutVertex::ShortcutVertex(WeightedGraph::Vertex mapped)
+	: _mapped(mapped)
 {
-
 }
 
 WeightedGraph::Vertex ShortcutVertex::mapped() const
@@ -93,12 +96,12 @@ WeightedGraph::Vertex ShortcutVertex::mapped() const
 	return _mapped;
 }
 
-void serialize( std::ostream& os, const ShortcutVertex& data )
+void serialize(std::ostream& os, const ShortcutVertex& data)
 {
-	serialize( os, data._mapped );
+	serialize(os, data._mapped);
 }
 
-void deserialize( std::istream& is, ShortcutVertex& data )
+void deserialize(std::istream& is, ShortcutVertex& data)
 {
-	deserialize( is, data._mapped );
+	deserialize(is, data._mapped);
 }

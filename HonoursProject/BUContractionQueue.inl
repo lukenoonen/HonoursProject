@@ -1,38 +1,35 @@
-#include "BUContractionQueue.h"
+#include "BUContractionQueue.hpp"
 // From Geisberger et al. [2008]
-#define EDGE_DIFFERENCE_WEIGHT			19
-#define NEIGHBOURS_CONTRACTED_WEIGHT	12
+#define EDGE_DIFFERENCE_WEIGHT       19
+#define NEIGHBOURS_CONTRACTED_WEIGHT 12
 
 template <class Graph>
-inline BUContractionQueue<Graph>::BUContractionQueue( Graph& graph )
-	: _graph( graph )
+inline BUContractionQueue<Graph>::BUContractionQueue(Graph& graph)
+	: _graph(&graph)
 {
-	graph.vertexMap( [&graph, this]( const auto v ) {
-		initVertex( v );
-		return false;
-	} );
+	_graph->vertexMap(
+		[this](const auto v)
+		{
+			initVertex(v);
+			return false;
+		}
+	);
 }
 
-template<class Graph>
+template <class Graph>
 inline BUContractionQueue<Graph>::BUContractionQueue(
 	Graph&             graph,
 	const Vec<Vertex>& contractions
 )
-	: _graph( graph )
+	: _graph(&graph)
 {
-	for (const auto v : contractions)
-	{
-		initVertex( v );
-	}
+	for (const auto v : contractions) { initVertex(v); }
 }
 
-template<class Graph>
+template <class Graph>
 inline void BUContractionQueue<Graph>::contract()
 {
-	while (!empty())
-	{
-		_graph.applyContraction( pop() );
-	}
+	while (!empty()) { _graph->applyContraction(pop()); }
 }
 
 template <class Graph>
@@ -43,20 +40,27 @@ inline BUContractionQueue<Graph>::Contraction BUContractionQueue<Graph>::pop()
 	while (true)
 	{
 		const Heuristic& top = _queue.top();
-		contraction = _graph.getContraction( top.vertex() );
+		contraction          = _graph->getContraction(top.vertex());
+
 		const int edgeDifference = contraction.edgeDifference();
-		Heuristic edit = { top.vertex(), contraction.edgeDifference(), _contractedNeighbours };
+
+		Heuristic edit = {
+			top.vertex(), contraction.edgeDifference(), _contractedNeighbours
+		};
 		if (edit.heuristic() <= top.heuristic()) { break; }
 		HeapHandle& handle = _handles[top.vertex()];
-		*handle = std::move( edit );
-		edit.update( edgeDifference );
-		_queue.update( handle );
+		*handle            = std::move(edit);
+		edit.update(edgeDifference);
+		_queue.update(handle);
 	}
 
-	_graph.vertexMap( contraction.contractedVertex(), [this]( const auto v ) {
-		_contractedNeighbours[v]++;
-		return false;
-	} );
+	_graph->vertexMap(
+		contraction.contractedVertex(),
+		[this](const auto v) {
+			_contractedNeighbours[v]++;
+			return false;
+		}
+	);
 
 	_queue.pop();
 
@@ -69,12 +73,16 @@ inline bool BUContractionQueue<Graph>::empty() const
 	return _queue.empty();
 }
 
-template<class Graph>
-inline void BUContractionQueue<Graph>::initVertex( Vertex v )
+template <class Graph>
+inline void BUContractionQueue<Graph>::initVertex(Vertex v)
 {
-	const auto contraction = _graph.getContraction( v );
+	const auto contraction = _graph->getContraction(v);
+
 	_contractedNeighbours[v] = 0;
-	_handles[v] = _queue.emplace( v, contraction.edgeDifference(), _contractedNeighbours );
+
+	_handles[v] = _queue.emplace(
+        v, contraction.edgeDifference(), _contractedNeighbours
+    );
 }
 
 template <class Graph>
@@ -83,27 +91,29 @@ inline BUContractionQueue<Graph>::Heuristic::Heuristic(
 	int                        edgeDifference,
 	const Map<Vertex, size_t>& contractedNeighbours
 )
-	: _vertex( vertex ),
-      _edgeDifference( edgeDifference ),
-	  _contractedNeighbours( &contractedNeighbours )
+	: _vertex(vertex),
+	  _edgeDifference(edgeDifference),
+	  _contractedNeighbours(&contractedNeighbours)
 {
-
 }
 
 template <class Graph>
-inline void BUContractionQueue<Graph>::Heuristic::update( int edgeDifference )
+inline void BUContractionQueue<Graph>::Heuristic::update(int edgeDifference)
 {
 	_edgeDifference = edgeDifference;
 }
 
 template <class Graph>
-inline bool BUContractionQueue<Graph>::Heuristic::operator<( const Heuristic& other ) const
+inline bool BUContractionQueue<Graph>::Heuristic::operator<(
+	const Heuristic& other
+) const
 {
 	return heuristic() >= other.heuristic();
 }
 
 template <class Graph>
-inline BUContractionQueue<Graph>::Heuristic::Vertex BUContractionQueue<Graph>::Heuristic::vertex() const
+inline BUContractionQueue<Graph>::Heuristic::Vertex BUContractionQueue<
+	Graph>::Heuristic::vertex() const
 {
 	return _vertex;
 }
@@ -117,6 +127,6 @@ inline int BUContractionQueue<Graph>::Heuristic::edgeDifference() const
 template <class Graph>
 inline int BUContractionQueue<Graph>::Heuristic::heuristic() const
 {
-	return EDGE_DIFFERENCE_WEIGHT       * _edgeDifference
-		 + NEIGHBOURS_CONTRACTED_WEIGHT * (int)_contractedNeighbours->at( _vertex );
+	return (EDGE_DIFFERENCE_WEIGHT * _edgeDifference) +
+		   (NEIGHBOURS_CONTRACTED_WEIGHT * _contractedNeighbours->at(_vertex));
 }

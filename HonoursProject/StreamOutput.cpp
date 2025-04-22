@@ -1,24 +1,18 @@
-#include "StreamOutput.h"
+#include "StreamOutput.hpp"
 
 #include <iostream>
 
-void StreamOutput::write( const Str& str )
+void StreamOutput::write(const Str& str)
 {
 	std::cout << str;
 }
 
-void StreamOutput::open()
-{
+void StreamOutput::open() {}
 
-}
+void StreamOutput::close() {}
 
-void StreamOutput::close()
-{
+FACTORY_BEGIN_JSON("stream", StreamOutput, Output)
 
-}
-
-FACTORY_BEGIN_JSON( "stream", StreamOutput, Output )
-	
 	FACTORY_FABRICATE()
 
 FACTORY_END()

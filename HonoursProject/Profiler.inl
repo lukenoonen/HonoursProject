@@ -1,8 +1,9 @@
+#include "Profiler.hpp"
+
 template <class T>
 Timer<T>::Timer()
-	: _duration( 0.0 )
+	: _duration(0.0)
 {
-
 }
 
 template <class T>

@@ -1,8 +1,8 @@
-#include "PathSolverBuilder.h"
+#include "PathSolverBuilder.hpp"
 
-Ptr<PathSolver> PathSolverBuilder::create( const WeightedGraph& graph ) const
+Ptr<PathSolver> PathSolverBuilder::create(const WeightedGraph& graph) const
 {
-	return createInternal( graph );
+	return createInternal(graph);
 }
 
-JSON_DEFINE_FACTORY( PathSolverBuilder )
+JSON_DEFINE_FACTORY(PathSolverBuilder)

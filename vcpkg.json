@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "boost-graph",
+    "nlohmann-json",
+    "shapelib",
+    "boost-heap"
+  ]
+}

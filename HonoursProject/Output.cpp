@@ -1,3 +1,3 @@
-#include "Output.h"
+#include "Output.hpp"
 
-JSON_DEFINE_FACTORY( Output )
+JSON_DEFINE_FACTORY(Output)

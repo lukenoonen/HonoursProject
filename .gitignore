@@ -365,6 +365,30 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# vscode
+.vscode/
+/installed*/
+/vcpkg_installed*/
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+CMakeUserPresets.json
+
+# clangd
+.clang-format
+.clang-tidy
+.clangd
+
 # Project specific files
 include/
 data/
@@ -372,4 +396,4 @@ hierarchies/
 graph/
 lib/
 results/
-*.dat
+util/

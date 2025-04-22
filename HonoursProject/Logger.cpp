@@ -1,9 +1,8 @@
-#include "Logger.h"
+#include "Logger.hpp"
 
-Logger::Logger( Ptr<Output> log )
-	: _log( std::move( log ) )
+Logger::Logger(Ptr<Output> log)
+	: _log(std::move(log))
 {
-
 }
 
 void Logger::open() const
@@ -16,9 +15,9 @@ void Logger::close() const
 	_log->close();
 }
 
-void Logger::logInternal( const Str& str ) const
+void Logger::logInternal(const Str& str) const
 {
-	_log->write( str );
+	_log->write(str);
 }
 
 bool Logger::ready() const
@@ -26,33 +25,31 @@ bool Logger::ready() const
 	return _log != nullptr;
 }
 
-JSON_BEGIN( Logger )
+JSON_BEGIN(Logger)
 
-	JSON_ARG( Ptr<Output>, log )
+	JSON_ARG(Ptr<Output>, log)
 
-	JSON_FABRICATE( std::move( log ) )
+	JSON_FABRICATE(std::move(log))
 
 JSON_END()
 
 GlobalLogger::GlobalLogger()
-	: Logger( nullptr )
+	: Logger(nullptr)
 {
-
 }
 
-GlobalLogger::GlobalLogger( Ptr<Output> log )
-	: Logger( std::move( log ) )
+GlobalLogger::GlobalLogger(Ptr<Output> log)
+	: Logger(std::move(log))
 {
-
 }
 
-GlobalLogger& GlobalLogger::operator=( Logger&& other )
+GlobalLogger& GlobalLogger::operator=(Logger&& other)
 {
-	static_cast<Logger&>(*this) = std::move( other );
+	static_cast<Logger&>(*this) = std::move(other);
 
 	while (!_queue.empty())
 	{
-		logInternal( _queue.front() );
+		logInternal(_queue.front());
 		_queue.pop();
 	}
 

@@ -1,31 +1,31 @@
-#include "TestSuite.h"
-#include "JSON.h"
+#include "TestSuite.hpp"
+#include "JSON.hpp"
 
 namespace
 {
-	Map<Str, const TestInst*> mapTestInsts( const Vec<TestInst>& testInsts )
+	Map<Str, const TestInst*> mapTestInsts(const Vec<TestInst>& testInsts)
 	{
 		Map<Str, const TestInst*> result;
-		for (auto& testInst : testInsts)
+		for (const auto& testInst : testInsts)
 		{
 			result[testInst.name()] = &testInst;
 		}
 		return result;
 	}
+}  // namespace
+
+TestSuite::TestSuite(Vec<TestInst> testInsts)
+	: _testInsts(std::move(testInsts)),
+	  _testInstMap(mapTestInsts(_testInsts))
+{
 }
 
-TestSuite::TestSuite( Vec<TestInst> testInsts )
-	: _testInsts( std::move( testInsts ) ),
-	  _testInstMap( mapTestInsts( _testInsts ) )
+bool TestSuite::run(Str testinst) const
 {
+	g_logger.log("Running TestInst {}...\n", testinst);
 
-}
-
-bool TestSuite::run( Str testinst ) const
-{
-	g_logger.log( "Running TestInst {}...\n", testinst );
-
-	if (const auto search = _testInstMap.find( testinst ); search != _testInstMap.end())
+	if (const auto search = _testInstMap.find(testinst);
+		search != _testInstMap.end())
 	{
 		return search->second->run();
 	}
@@ -35,7 +35,7 @@ bool TestSuite::run( Str testinst ) const
 
 bool TestSuite::run() const
 {
-	g_logger.log( "Running all TestInsts...\n" );
+	g_logger.log("Running all TestInsts...\n");
 
 	bool result = true;
 
@@ -47,10 +47,10 @@ bool TestSuite::run() const
 	return result;
 }
 
-JSON_BEGIN( TestSuite )
+JSON_BEGIN(TestSuite)
 
-	JSON_ARG( Vec<TestInst>, tests )
+	JSON_ARG(Vec<TestInst>, tests)
 
-	JSON_FABRICATE( std::move( tests ) )
+	JSON_FABRICATE(std::move(tests))
 
 JSON_END()

@@ -1,22 +1,25 @@
+#include "Logger.hpp"
+
 #include <format>
 
-template<class ...Ts>
-inline void Logger::log( const std::format_string<Ts...> fmt, Ts&& ...args ) const
+template <class... Ts>
+inline void Logger::log(const std::format_string<Ts...>& fmt, Ts&&... args)
+	const
 {
-    Str message = std::vformat( fmt.get(), std::make_format_args( args... ) );
-    logInternal( message );
+	const Str message = std::format(fmt, std::forward<Ts>(args)...);
+	logInternal(message);
 }
 
-template<class ...Ts>
-inline void GlobalLogger::log( const std::format_string<Ts...> fmt, Ts&& ...args )
+template <class... Ts>
+inline void GlobalLogger::log(const std::format_string<Ts...>& fmt, Ts&&... args)
 {
-    Str message = std::vformat( fmt.get(), std::make_format_args( args... ) );
-    if (ready())
+	Str message = std::format(fmt, std::forward<Ts>(args)...);
+	if (ready())
     {
-        logInternal( message );
+        logInternal(message);
     }
-    else
+	else
     {
-        _queue.emplace( std::move( message ) );
+        _queue.emplace(std::move(message));
     }
 }
