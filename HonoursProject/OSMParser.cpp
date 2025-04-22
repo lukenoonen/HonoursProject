@@ -15,9 +15,11 @@ namespace
 	template <class T>
 	T convert(const Str& str)
 	{
+		T result;
+
 		std::stringstream stream(str);
-		T                 result;
 		stream >> result;
+		
 		return result;
 	}
 }  // namespace

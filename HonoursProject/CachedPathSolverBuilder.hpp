@@ -21,6 +21,8 @@ public:
 	CachedPathSolverBuilder(CachedPathSolverBuilder&&)                 = default;
 	CachedPathSolverBuilder& operator=(CachedPathSolverBuilder&&)      = default;
 
+	void clearCache() const final;
+
 protected:
 	[[nodiscard]] Ptr<PathSolver> createInternal(
 		const WeightedGraph& graph

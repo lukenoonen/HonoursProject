@@ -62,4 +62,9 @@ Ptr<WeightedGraph> GraphParser::create() const
 	return result;
 }
 
+void GraphParser::clearCache() const
+{
+	std::filesystem::remove(_cachePath);
+}
+
 JSON_DEFINE_FACTORY(GraphParser)

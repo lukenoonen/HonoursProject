@@ -1,7 +1,7 @@
 #include "Analysis.hpp"
 #include "HDCalculator.hpp"
 #include "TestSuite.hpp"
-
+#include "Interactor.hpp"
 
 namespace
 {
@@ -30,6 +30,7 @@ namespace
 		LOGGER,
 		TEST,
 		ANALYSE,
+		INTERACT,
 		CALC_HD,
 
 		COUNT,
@@ -47,6 +48,7 @@ namespace
 				if (cmp == "l") { return Option::LOGGER; }
 				if (cmp == "t") { return Option::TEST; }
 				if (cmp == "a") { return Option::ANALYSE; }
+				if (cmp == "i") { return Option::INTERACT; }
 				if (cmp == "h") { return Option::CALC_HD; }
 				break;
 			}
@@ -55,7 +57,8 @@ namespace
 				const Str cmp(arg + 2);
 				if (cmp == "logger") { return Option::LOGGER; }
 				if (cmp == "test") { return Option::TEST; }
-				if (cmp == "ANALYSE") { return Option::ANALYSE; }
+				if (cmp == "analyse") { return Option::ANALYSE; }
+				if (cmp == "interact") { return Option::INTERACT; }
 				if (cmp == "calc_hd") { return Option::CALC_HD; }
 				break;
 			}
@@ -135,6 +138,25 @@ namespace
 		file->close();
 	}
 
+	void interact(const char* arg)
+	{
+		auto file = openFile(arg);
+		if (!file) { return; }
+
+		try
+		{
+			const JSON       json = JSON::parse(*file);
+			Interactor interactor = json.get<Interactor>();
+			interactor.start();
+		}
+		catch (const JSON::exception& e)
+		{
+			g_logger.log("Failed to parse interactor file {}: {}\n", arg, e.what());
+		}
+
+		file->close();
+	}
+
 	void calcHD(const char* arg)
 	{
 		auto file = openFile(arg);
@@ -173,6 +195,7 @@ int main(int argc, const char* argv[])
 			case Option::LOGGER:
 			case Option::TEST:
 			case Option::ANALYSE:
+			case Option::INTERACT:
 			case Option::CALC_HD:
 			{
 				i++;
@@ -206,6 +229,11 @@ int main(int argc, const char* argv[])
 			case Option::ANALYSE:
 			{
 				analyse(argv[i]);
+				break;
+			}
+			case Option::INTERACT:
+			{
+				interact(argv[i]);
 				break;
 			}
 			case Option::CALC_HD:

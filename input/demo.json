@@ -1,53 +1,46 @@
 {
-	"tests":
+	"graph":
+	{
+		"type": "osm",
+		"datapath": "data/us_states/alaska-latest.osm.pbf",
+		"filepath": "graph/demo.wg"
+	},
+	"pathSolvers":
 	[
 		{
-			"name": "demo",
-			"results":
-			{
-				"log":
-				{
-					"type": "file",
-					"filepath": "results/demo.log"
-				}
-			},
-			"graph":
-			{
-				"type": "osm",
-				"datapath": "data/us_states/alaska-latest.osm.pbf",
-				"filepath": "graph/demo.wg"
-			},
-			"authority":
+			"name": "dij",
+			"pathSolver":
 			{
 				"type": "dijkstra_solver"
-			},
-			"pathSolvers":
-			[
-				{
-					"type": "ci_hierarchy",
-					"filepath": "hierarchies/demo.ci",
-					"buildtimes": "hierarchies/demo.ci.bt"
-				},
-				{
-					"type": "buch",
-					"filepath": "hierarchies/demo.buch",
-					"buildtimes": "hierarchies/demo.buch.bt"
-				},
-				{
-					"type": "cich",
-					"hierarchy": "hierarchies/demo.ci",
-					"filepath": "hierarchies/demo.cich",
-					"buildtimes": "hierarchies/demo.cich.bt"
-				}
-			],
-			"testCases":
-			[
-				{
-					"type": "random",
-					"trials": 100,
-					"name": "random_100"
-				}
-			]
+			}
+		},
+		{
+			"name": "cih",
+			"pathSolver":
+			{
+				"type": "ci_hierarchy",
+				"filepath": "hierarchies/demo.ci",
+				"buildtimes": "hierarchies/demo.ci.bt"
+			}
+		},
+		{
+			"name": "buch",
+			"pathSolver":
+			{
+				"type": "buch",
+				"filepath": "hierarchies/demo.buch",
+				"buildtimes": "hierarchies/demo.buch.bt"
+			}
+		},
+		{
+			"name": "cich",
+			"pathSolver":
+			{
+				"type": "cich",
+				"hierarchy": "hierarchies/demo.ci",
+				"filepath": "hierarchies/demo.cich",
+				"buildtimes": "hierarchies/demo.cich.bt"
+			}
 		}
 	]
 }

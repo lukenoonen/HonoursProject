@@ -14,6 +14,13 @@ inline CachedPathSolverBuilder<T>::CachedPathSolverBuilder(
 }
 
 template <class T>
+void inline CachedPathSolverBuilder<T>::clearCache() const
+{
+	std::filesystem::remove(_filepath);
+	std::filesystem::remove(_buildTimesFilepath);
+}
+
+template <class T>
 inline Ptr<PathSolver> CachedPathSolverBuilder<T>::createInternal(
 	const WeightedGraph& graph
 ) const

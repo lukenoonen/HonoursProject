@@ -47,6 +47,8 @@ add_executable(honoursproject
     HonoursProject/HDCalculator.hpp
     HonoursProject/GraphAnalyser.cpp
     HonoursProject/DijkstraSolver.hpp
+    HonoursProject/Interactor.cpp
+    HonoursProject/Interactor.hpp
     HonoursProject/Output.hpp
     HonoursProject/TestCase.hpp
     HonoursProject/BUCHBuilder.hpp
@@ -107,7 +109,7 @@ add_executable(honoursproject
     HonoursProject/TestInst.cpp
 )
 
-target_link_libraries(honoursproject PRIVATE nlohmann_json::nlohmann_json Boost::graph Boost::heap shapelib::shp)
+target_link_libraries(honoursproject PRIVATE nlohmann_json::nlohmann_json Boost::graph Boost::heap shapelib::shp readline)
 
 if (PROJECT_IS_TOP_LEVEL AND UNIX)
     execute_process(

@@ -20,6 +20,8 @@ public:
 
 	[[nodiscard]] Ptr<PathSolver> create(const WeightedGraph& graph) const;
 
+	virtual void clearCache() const;
+
 protected:
 	[[nodiscard]] virtual Ptr<PathSolver> createInternal(
 		const WeightedGraph& graph

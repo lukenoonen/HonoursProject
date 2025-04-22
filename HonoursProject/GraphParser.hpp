@@ -16,6 +16,8 @@ public:
 
 	[[nodiscard]] Ptr<WeightedGraph> create() const;
 
+	void clearCache() const;
+
 protected:
 	[[nodiscard]] virtual Ptr<WeightedGraph> createInternal() const = 0;
 
