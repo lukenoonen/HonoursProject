@@ -14,6 +14,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_graph CONFIG REQUIRED)
 find_package(boost_heap CONFIG REQUIRED)
 find_package(shapelib CONFIG REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 # Include directories
 include_directories(
@@ -109,7 +110,7 @@ add_executable(honoursproject
     HonoursProject/TestInst.cpp
 )
 
-target_link_libraries(honoursproject PRIVATE nlohmann_json::nlohmann_json Boost::graph Boost::heap shapelib::shp readline)
+target_link_libraries(honoursproject PRIVATE nlohmann_json::nlohmann_json Boost::graph Boost::heap shapelib::shp readline Qt6::Widgets)
 
 if (PROJECT_IS_TOP_LEVEL AND UNIX)
     execute_process(

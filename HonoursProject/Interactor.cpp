@@ -6,6 +6,7 @@
 
 #include "Logger.hpp"
 
+#include <cstring>
 #include <format>
 #include <random>
 
@@ -58,6 +59,19 @@ namespace
 		return result;
 	}
 
+	Vec<Str> tokenize(const char* str, char delim)
+	{
+		std::stringstream ss(str);
+		Vec<Str> result;
+		Str line;
+		while (std::getline(ss, line, delim))
+		{
+			if (line.empty()) { continue; }
+			result.emplace_back(std::move(line));
+		}
+		return result;
+	}
+
 	template <class T>
 	T convert(const Str& str)
 	{
@@ -65,6 +79,22 @@ namespace
 
 		std::stringstream stream(str);
 		stream >> result;
+		
+		return result;
+	}
+
+	template <class T>
+	Vec<T> convertv(const Str& str)
+	{
+		const Vec<Str> tokens = tokenize(str.c_str(), ',');
+
+		Vec<T> result;
+		result.reserve(tokens.size());
+
+		for (const Str& str : tokens)
+		{
+			result.push_back(convert<T>(str));
+		}
 		
 		return result;
 	}
@@ -84,19 +114,6 @@ Interactor::Interactor(
 
 namespace
 {
-	Vec<Str> tokenize(const char* str, char delim)
-	{
-		std::stringstream ss(str);
-		Vec<Str> result;
-		Str line;
-		while (std::getline(ss, line, delim))
-		{
-			if (line.empty()) { continue; }
-			result.emplace_back(std::move(line));
-		}
-		return result;
-	}
-
 	template <class T> 
 	Str stringify(const Vec<T>& vec)
 	{
@@ -112,10 +129,11 @@ namespace
 
 	char* character_name_generator(const char *text, int state)
 	{
-		static std::array<const char*, 12> commands = {
+		static std::array<const char*, 13> commands = {
 			"build",
 			"erase",
 			"clear",
+			"random",
 			"query",
 			"exit",
 			"help",
@@ -161,21 +179,28 @@ void Interactor::start()
 
     rl_attempted_completion_function = character_name_completion;
 
+	Ptr<char[]> prevLine = nullptr;
+
 	while (true)
 	{
-		const Ptr<char[]> line(readline("> "));
+		Ptr<char[]> line(readline("> "));
 		const Vec<Str> tokens = tokenize(line.get(), ' ');
 
 		if (tokens.empty()) { continue; }
 
-		add_history(line.get());
+		if (prevLine.get() == nullptr || std::strcmp(prevLine.get(), line.get()) != 0)
+		{
+			add_history(line.get());
+			prevLine = std::move(line);
+		}
 
 		if (tokens[0] == "help")
 		{
-			g_logger.log("build (all|graph|solvers|*) [recache] Build the graph and path solvers. Optionally recache results.\n");
-			g_logger.log("erase (all|graph|solvers|*)           Erase the graph and path solvers.\n");
-			g_logger.log("clear (all|graph|solvers|*)           Clear the cache of the graph and path solvers.\n");
-			g_logger.log("query (all|*) n [m] [verbose]         Queries path solvers randomly n times to m vertices.\n");
+			g_logger.log("build (all|graph|solvers|*) [recache]       Build the graph and path solvers. Optionally recache results.\n");
+			g_logger.log("erase (all|graph|solvers|*)                 Erase the graph and path solvers.\n");
+			g_logger.log("clear (all|graph|solvers|*)                 Clear the cache of the graph and path solvers.\n");
+			g_logger.log("random (all|*) n [m] [verbose]              Queries path solvers randomly n times to m vertices.\n");
+			g_logger.log("query (all|*) s (t|t1,t2,...,tn) [verbose]  Queries path solvers from s to t(s).\n");
 		}
 		else if (tokens[0] == "build")
 		{
@@ -189,9 +214,13 @@ void Interactor::start()
 		{
 			clear(tokens);
 		}
+		else if (tokens[0] == "random")
+		{
+			random(tokens);
+		}
 		else if (tokens[0] == "query")
 		{
-			randomQuery(tokens);
+			query(tokens);
 		}
 		else if (tokens[0] == "exit")
 		{
@@ -362,11 +391,11 @@ void Interactor::clear(const Vec<Str>& tokens)
 	}
 }
 
-void Interactor::randomQuery(const Vec<Str>& tokens)
+void Interactor::random(const Vec<Str>& tokens)
 {
 	if (tokens.size() < 3)
 	{
-		g_logger.log("Error: 'query' requires at least 3 arguments, {} provided\n", tokens.size());
+		g_logger.log("Error: 'random' requires at least 3 arguments, {} provided\n", tokens.size());
 		return;
 	}
 
@@ -445,6 +474,77 @@ void Interactor::randomQuery(const Vec<Str>& tokens)
 
 		timer.stop();
 		g_logger.log("Queries took {} seconds to execute on path solver '{}'\n", timer.duration(), tokens[1]);
+	}
+	else
+	{
+		g_logger.log("Error: unable to find path solver '{}'\n", tokens[1]);
+	}
+}
+
+void Interactor::query(const Vec<Str>& tokens)
+{
+	if (tokens.size() < 4)
+	{
+		g_logger.log("Error: 'query' requires at least 4 arguments, {} provided\n", tokens.size());
+		return;
+	}
+
+	if (_graph == nullptr)
+	{
+		g_logger.log("Error: unable to query solvers before first building graph\n");
+		return;
+	}
+
+	bool verbose = false;
+	if (tokens.size() >= 5)
+	{
+		if (tokens[4] == "verbose")
+		{
+			verbose = true;
+		}
+	}
+
+	const auto s  = convert<Vertex>(tokens[2]);
+	const auto ts = convertv<Vertex>(tokens[3]);
+
+	if (tokens[1] == "all")
+	{
+		for (const auto& info : _infos)
+		{
+			Timer timer;
+			timer.start();
+
+			if (ts.size() == 1)
+			{
+				executeQuery(info, s, ts.front(), verbose);
+			}
+			else
+			{
+				executeQuery(info, s, ts, verbose);
+			}
+
+			timer.stop();
+			g_logger.log("Query took {} seconds to execute on path solver '{}'\n", timer.duration(), info.name());
+		}
+		return;
+	}
+
+	if (const auto search = _infomap.find(tokens[1]); search != _infomap.end())
+	{
+		Timer timer;
+		timer.start();
+
+		if (ts.size() == 1)
+		{
+			executeQuery(*search->second, s, ts.front(), verbose);
+		}
+		else
+		{
+			executeQuery(*search->second, s, ts, verbose);
+		}
+
+		timer.stop();
+		g_logger.log("Query took {} seconds to execute on path solver '{}'\n", timer.duration(), tokens[1]);
 	}
 	else
 	{

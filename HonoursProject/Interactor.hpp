@@ -29,17 +29,17 @@ private:
 	void build(const Vec<Str>& tokens);
 	void erase(const Vec<Str>& tokens);
 	void clear(const Vec<Str>& tokens);
-	void randomQuery(const Vec<Str>& tokens);
+	void random(const Vec<Str>& tokens);
+	void query(const Vec<Str>& tokens);
 
 	void executeQuery(const PathSolverInfo& info, Vertex s, Vertex t, bool verbose);
 	void executeQuery(const PathSolverInfo& info, Vertex s, Vec<Vertex> ts, bool verbose);
 
 private:
-	Ptr<GraphParser>    _graphParser;
+	Ptr<GraphParser> _graphParser;
 
 	Vec<PathSolverInfo>             _infos;
 	Map<Str, const PathSolverInfo*> _infomap;
-
 
 	Ptr<WeightedGraph> _graph;
 	Map<Str, Ptr<PathSolver>> _pathSolverMap;

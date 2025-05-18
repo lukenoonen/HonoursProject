@@ -1,8 +1,10 @@
 {
   "dependencies": [
     "boost-graph",
+    "boost-heap",
     "nlohmann-json",
     "shapelib",
-    "boost-heap"
+    "qtbase",
+    "qttools"
   ]
 }
